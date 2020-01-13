@@ -1,0 +1,8 @@
+version: '2'
+services:
+  db:
+    image: kartoza/postgis:11.0-2.5
+    volumes:
+      - ./entrypoint-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
