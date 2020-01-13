@@ -1,0 +1,316 @@
+html, body {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    font-family: Ubuntu, SansSerif;
+}
+
+body {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-flex-wrap: nowrap;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    -webkit-align-content: stretch;
+    -ms-flex-line-pack: stretch;
+    align-content: stretch;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+}
+
+.flex-item {
+    height: 100%;
+    padding-top: 62px
+}
+
+.flex-item:nth-child(1) {
+    -webkit-order: 0;
+    -ms-flex-order: 0;
+    order: 0;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    -webkit-align-self: auto;
+    -ms-flex-item-align: auto;
+    align-self: auto;
+}
+
+.flex-item:nth-child(2) {
+    /* This is for right panel*/
+    -webkit-order: 0;
+    -ms-flex-order: 0;
+    order: 0;
+    -webkit-flex: 0 1 auto;
+    -ms-flex: 0 1 auto;
+    flex: 0 1 auto;
+    -webkit-align-self: auto;
+    -ms-flex-item-align: auto;
+    align-self: auto;
+    width: 25%;
+}
+
+.panel-title {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    text-align: center;
+    font-weight: bold
+}
+
+.leaflet-control-layers-list input {
+    cursor: pointer;
+}
+
+.leaflet-touch .leaflet-control-layers-toggle {
+    width: 30px;
+    height: 30px;
+    background-size: 20px;
+}
+
+#cancel-draw {
+    margin-left: 5px;
+}
+
+.datepickers-container {
+    z-index: 1000000 !important;
+}
+
+.navbar {
+    padding-top: 7px;
+    height: 62px;
+    background: #2F87A6;
+    border: none;
+    z-index: 10000;
+}
+
+.navbar-logo {
+    margin-left: 15px;
+    margin-top: 3px;
+}
+
+.logo-inasafe-text {
+    margin-top: 9px
+}
+
+.logo-subtext {
+    font-size: 12px;
+    margin-top: -2px;
+}
+
+.leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar  {
+    border: 2px solid #23657D;
+}
+
+/* Buttons */
+.btn-primary-1 {
+    margin-right: 5px;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.btn-primary-1:disabled {
+    background-color: #D1D3D4 !important;
+    border: #A7A9AC !important;
+}
+
+.btn-warning {
+    background-color: #FCB040;
+}
+
+.btn-success {
+    background-color: #82CA96;
+}
+
+.btn-warning:hover {
+    background-color: #FDC066;
+}
+
+.btn-success:hover {
+    background-color: #A3EAB7;
+}
+
+.btn-back:hover {
+    opacity: 0.5;
+}
+
+.btn-full-width {
+    width: 100%;
+}
+
+.btn-back, .btn-arrow, .btn-arrow-small, .btn-arrow-white {
+    color: #FCB040;
+    background: transparent !important;
+    font-size: 20pt;
+    border: transparent !important;
+    padding: 0;
+    line-height: 20pt;
+    margin-top: -3px;
+}
+
+.btn-arrow-white {
+    color: white !important;
+}
+
+.btn-arrow-small {
+    font-size: 10pt;
+    color: #82CA96;
+    line-height: 10pt;
+    margin: 0 !important;
+}
+
+.btn-arrow-small:focus {
+    border: transparent;
+}
+
+.btn-arrow:disabled, .btn-arrow-small:disabled, btn-arrow-white:disabled {
+    color: #D1D3D4 !important;
+    background: transparent !important;
+    border: transparent !important;
+}
+
+.btn-arrow, .btn-arrow-small {
+    margin: 3px 0 0 0 !important;
+}
+
+.btn-arrow-white {
+    margin: 0 !important;
+}
+
+.btn-back:focus, .btn-arrow:focus {
+    color: #DC923A;
+}
+
+.btn-back:hover, .btn-arrow:hover {
+    color: #FDC066;
+}
+
+.btn-warning.enable {
+    color: #fff;
+    background-color: #DC923A;
+    border-color: #d58512;
+}
+
+.add-flood-scenario img {
+    vertical-align: text-bottom;
+    height: 16px;
+    margin-right: 7px;
+}
+
+.btn-back-summary-panel {
+    margin: 8px 0 !important;
+    outline: none !important;
+}
+
+/* Bouncy browse icon */
+.browse-btn-icon {
+    position: absolute;
+    bottom: 30px;
+    right: 20px;
+}
+
+.browse-btn-icon button {
+    background: transparent !important;
+    border: none !important;
+    height: 45px;
+    outline: none !important;
+}
+
+.stage {
+    display: flex;
+    width: 100%;
+}
+
+.box {
+    align-self: flex-end;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    margin: 0 auto 0 auto;
+    transform-origin: bottom;
+}
+
+.bounce-7 {
+    animation-name: bounce-7;
+    animation-timing-function: cubic-bezier(0.280, 0.840, 0.420, 1);
+}
+
+@keyframes bounce-7 {
+    0%   { transform: scale(1,1)      translateY(0); }
+    10%  { transform: scale(1.1,.9)   translateY(0); }
+    30%  { transform: scale(.9,1.1)   translateY(-10px); }
+    50%  { transform: scale(1.05,.95) translateY(0); }
+    57%  { transform: scale(1,1)      translateY(-7px); }
+    64%  { transform: scale(1,1)      translateY(0); }
+    100% { transform: scale(1,1)      translateY(0); }
+}
+
+#map, .intro {
+    width: 100%;
+    height: 100%;
+}
+
+.intro {
+    overflow-y: auto;
+}
+
+#map {
+    display: none;
+}
+
+.intro-content {
+    height: 90%;
+}
+
+.intro-action button {
+    bottom: 0;
+    padding: 5px 40px;
+    margin-bottom: 20px;
+    font-size: 14pt;
+}
+
+.next-intro, .close-intro {
+    float: right;
+    margin-right: 40px;
+}
+
+.prev-intro {
+    float: left;
+    margin-left: 40px;
+    display: none;
+}
+
+.intro-content {
+    padding: 40px;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.intro-content img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.intro-content center {
+    max-width: 100%;
+    height: 100%;
+}
+
+#fbf-modal {
+    z-index: 99999;
+}
+
+#fbf-modal p {
+    font-size: 16px;
+    padding-top: 10px;
+}
+
+.home-fbf {
+   cursor: pointer;
+}

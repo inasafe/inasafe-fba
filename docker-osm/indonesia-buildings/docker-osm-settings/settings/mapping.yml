@@ -1,0 +1,182 @@
+areas:
+  area_tags: [buildings]
+tables:
+  buildings:
+    columns:
+    - name: osm_id
+      type: id
+    - name: geometry
+      type: geometry
+    - key: name
+      name: name
+      type: string
+    - key: leisure
+      name: leisure
+      type: string
+    - key: height
+      name: height
+      type: integer
+    - key: "building:levels"
+      name: "building:levels"
+      type: string
+    - key: "building:height"
+      name: "building:height"
+      type: integer
+    - key: "building:min_level"
+      name: "building:min_level"
+      type: integer
+    - key: "roof:height"
+      name: "roof:height"
+      type: integer
+    - key: "roof:material"
+      name: "roof:material"
+      type: string
+    - key: "building:material"
+      name: "building:material"
+      type: string
+    - key: use
+      name: use
+      type: string
+    - key: religion
+      name: religon
+      type: string
+    - name: type
+      type: mapping_value
+    - name: amenity
+      type: mapping_value
+    - name: landuse
+      type: mapping_value
+    mapping:
+      building:
+      - __any__
+      amenity:
+        - school
+        - university
+        - government
+        - clinic
+        - hospital
+        - fire
+        - police
+        - public building
+        - worship
+        - mall
+        - doctor
+        - kindergarten
+        - college
+        - market
+      landuse:
+        - residential
+        - recreation_ground
+      religion:
+        - islam
+        - muslim
+        - budd
+        - unitarian
+      use:
+        - government
+        - residential
+        - education
+        - medical
+        - place_of_worship
+        - school
+        - hospital
+        - commercial
+        - industrial
+        - utility
+    type: polygon
+  admin:
+    columns:
+      - name: osm_id
+        type: id
+      - name: geometry
+        type: geometry
+      - key: name
+        name: name
+        type: string
+      - name: type
+        type: mapping_value
+      - key: admin_level
+        name: admin_level
+        type: integer
+    mapping:
+      boundary:
+        - administrative
+    type: polygon
+  waterways:
+    columns:
+      - name: osm_id
+        type: id
+      - name: geometry
+        type: geometry
+      - key: name
+        name: name
+        type: string
+      - name: waterway
+        type: mapping_value
+    mapping:
+      waterway:
+        - river
+        - stream
+        - riverbank
+        - canal
+        - drain
+        - ditch
+    type: linestring
+  roads:
+    columns:
+      - name: osm_id
+        type: id
+      - name: geometry
+        type: geometry
+      - name: type
+        type: mapping_value
+      - key: name
+        name: name
+        type: string
+      - key: oneway
+        name: oneway
+        type: direction
+      - key: layer
+        name: z_order
+        type: wayzorder
+      - key: service
+        name: service
+        type: string
+      - name: class
+        type: mapping_key
+    filters:
+      reject:
+        area: ["yes"]
+    mappings:
+
+      roads:
+        mapping:
+          highway:
+            - motorway
+            - motorway_link
+            - trunk
+            - trunk_link
+            - primary
+            - primary_link
+            - secondary
+            - secondary_link
+            - tertiary
+            - tertiary_link
+            - road
+            - path
+            - track
+            - service
+            - footway
+            - bridleway
+            - cycleway
+            - steps
+            - pedestrian
+            - living_street
+            - unclassified
+            - residential
+            - raceway
+          man_made:
+            - pier
+            - groyne
+    type: linestring
+

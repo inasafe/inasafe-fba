@@ -1,0 +1,23 @@
+.leaflet-control-wms-legend
+{
+    display: block;
+    padding: 3px;
+    border-radius: 1px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    /*box-shadow: 0 1px 7px rgba(0, 0, 0, 0.65);*/
+    cursor: auto;
+    text-align: center;
+    background-color: #FFFFFF;
+    border: 2px solid #23657D;
+}
+
+.leaflet-control-wms-legend:hover
+{
+    background-color: #F4F4F4;
+}
+
+.wms-legend-icon {
+    font-size: 12pt;
+    line-height: 15pt;
+}
