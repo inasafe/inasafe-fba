@@ -65,8 +65,8 @@ update osm_roads set road_type = 'Road, residential, living street, etc.' WHERE 
 ILIKE 'residential' OR type ILIKE 'yes' OR type ILIKE 'road' OR type ILIKE 'unclassified' OR type ILIKE 'service'
            OR type ILIKE '' OR type IS NULL;
 
-update osm_roads set road_type = "type" = 'Track' WHERE  type ILIKE 'track';
-update osm_roads set road_type =  "type" = 'Cycleway, footpath, etc.' WHERE  type ILIKE 'cycleway' OR
+update osm_roads set road_type ='Track' WHERE  type ILIKE 'track';
+update osm_roads set road_type =  'Cycleway, footpath, etc.' WHERE  type ILIKE 'cycleway' OR
             type ILIKE 'footpath' OR type ILIKE 'pedestrian' OR type ILIKE 'footway' OR type ILIKE 'path';
 
 
@@ -165,12 +165,60 @@ update osm_roads set roads_id = foo.roads_id from (
   WHERE a.building_type::text = b.building_class::text
  	) foo where foo.osm_id = osm_buildings.osm_id;
 
+alter table osm_roads add column road_type_score numeric;
+
+update osm_roads set road_type_score  = 1   WHERE road_type = 'Motorway link';
+ update osm_roads set road_type_score  = 0.8 WHERE road_type = 'Motorway or highway';
+ update osm_roads set road_type_score  = 0.7 WHERE road_type = 'Primary link';
+ update osm_roads set road_type_score  = 0.6 WHERE road_type = 'Primary road';
+ update osm_roads set road_type_score  = 0.2 WHERE road_type = 'Road, residential, living street, etc.';
+ update osm_roads set road_type_score  = 0.3 WHERE road_type = 'Secondary';
+ update osm_roads set road_type_score  = 0.3 WHERE road_type = 'Secondary link';
+ update osm_roads set road_type_score  = 0.4 WHERE road_type = 'Tertiary';
+ update osm_roads set road_type_score  = 0.4 WHERE road_type = 'Tertiary link';
+ update osm_roads set road_type_score  = 0.1 WHERE road_type = 'Track';
 
 -- Functions to use to update new records with the same mappings as above
 
 
+CREATE OR REPLACE FUNCTION kartoza_building_area_mapper() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+  BEGIN
+    NEW.building_area:=ST_Area(new.geometry::GEOGRAPHY) ;
+  RETURN NEW;
+  END
+  $$;
 
-CREATE OR REPLACE FUNCTION building_types_mapper () RETURNS trigger LANGUAGE plpgsql
+
+CREATE TRIGGER area_mapper_tg AFTER INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
+    kartoza_building_area_mapper();
+
+
+
+CREATE OR REPLACE FUNCTION kartoza_building_area_score_mapper () RETURNS trigger LANGUAGE plpgsql
+AS $$
+BEGIN
+  SELECT
+        CASE
+            WHEN new.building_area <= 10 THEN 1
+            WHEN new.building_area > 10 and new.building_area <= 30 THEN 0.7
+            WHEN new.building_area > 30 and new.building_area <= 100 THEN 0.5
+            WHEN new.building_area > 100 THEN 0.3
+            ELSE 0.3
+        END
+  INTO new.building_area_score
+  FROM osm_buildings
+    ;
+  RETURN NEW;
+  END
+  $$;
+
+
+CREATE TRIGGER area_recode_mapper_tg AFTER INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
+    kartoza_building_area_score_mapper();
+
+CREATE OR REPLACE FUNCTION kartoza_building_types_mapper () RETURNS trigger LANGUAGE plpgsql
 AS $$
 BEGIN
     SELECT
@@ -185,11 +233,11 @@ BEGIN
            WHEN new.amenity ILIKE '%public building%' THEN 'Public Building'
            WHEN new.amenity ILIKE '%worship%' and (religion ILIKE '%islam' or religion ILIKE '%muslim%')
                THEN 'Place of Worship - Islam'
-           WHEN new.amenity ILIKE '%worship%' and religion ILIKE '%budd%' THEN 'Place of Worship - Buddhist'
-           WHEN new.amenity ILIKE '%worship%' and religion ILIKE '%unitarian%' THEN 'Place of Worship - Unitarian'
+           WHEN new.amenity ILIKE '%worship%' and new.religion ILIKE '%budd%' THEN 'Place of Worship - Buddhist'
+           WHEN new.amenity ILIKE '%worship%' and new.religion ILIKE '%unitarian%' THEN 'Place of Worship - Unitarian'
            WHEN new.amenity ILIKE '%mall%' OR new.amenity ILIKE '%market%' THEN 'Supermarket'
            WHEN new.landuse ILIKE '%residential%' OR new.use = 'residential' THEN 'Residential'
-           WHEN new.landuse ILIKE '%recreation_ground%' OR (leisure IS NOT NULL AND leisure != '') THEN 'Sports Facility'
+           WHEN new.landuse ILIKE '%recreation_ground%' OR new.leisure IS NOT NULL AND new.leisure != '' THEN 'Sports Facility'
            -- run near the end
            WHEN new.amenity = 'yes' THEN 'Residential'
            WHEN new.use = 'government' AND new."type" IS NULL THEN 'Government'
@@ -212,7 +260,10 @@ BEGIN
   END
   $$;
 
-CREATE OR REPLACE FUNCTION building_recode_mapper () RETURNS trigger LANGUAGE plpgsql
+CREATE TRIGGER building_type_mapper_tg AFTER INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
+    kartoza_building_types_mapper();
+
+CREATE OR REPLACE FUNCTION kartoza_building_recode_mapper () RETURNS trigger LANGUAGE plpgsql
 AS $$
 BEGIN
      SELECT
@@ -239,45 +290,10 @@ BEGIN
   END
   $$;
 
-CREATE FUNCTION building_area_mapper() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-  BEGIN
-    NEW.building_area:=ST_Area(geometry::GEOGRAPHY) ;
-  RETURN NEW;
-  END
-  $$;
+CREATE TRIGGER building_type_recode_tg AFTER INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
+    kartoza_building_recode_mapper();
 
-CREATE FUNCTION total_vulnerability() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-  BEGIN
-    NEW.total_vulnerability:=((new.building_type_score + new.building_material_score + new.building_area_score) / 3);
-  RETURN NEW;
-  END
-  $$;
-
-
-CREATE OR REPLACE FUNCTION building_area_score_mapper () RETURNS trigger LANGUAGE plpgsql
-AS $$
-BEGIN
-  SELECT
-        CASE
-            WHEN new.building_area <= 10 THEN 1
-            WHEN new.building_area > 10 and new.building_area <= 30 THEN 0.7
-            WHEN new.building_area > 30 and new.building_area <= 100 THEN 0.5
-            WHEN new.building_area > 100 THEN 0.3
-            ELSE 0.3
-        END
-  INTO new.building_area_score
-  FROM osm_buildings
-    ;
-  RETURN NEW;
-  END
-  $$;
-
-
-CREATE OR REPLACE FUNCTION building_materials_mapper () RETURNS trigger LANGUAGE plpgsql
+CREATE OR REPLACE FUNCTION kartoza_building_materials_mapper () RETURNS trigger LANGUAGE plpgsql
 AS $$
 BEGIN
     SELECT
@@ -294,36 +310,11 @@ BEGIN
   END
   $$;
 
--- this will be replaced by the one Gavin has given me
-CREATE OR REPLACE FUNCTION building_road_density_mapper () RETURNS trigger LANGUAGE plpgsql
-AS $$
-BEGIN
-    SELECT
-            total_length
-    INTO new.building_road_length
-    FROM (WITH clipping AS
-            (SELECT
-            ST_Intersection(v.geometry,m.geom) AS intersection_geom,
-            v.*,
-            m.osm_id as osm_fid
-            FROM
-              osm_roads as v,
-             (select osm_id,st_buffer(ST_SetSRID(ST_Extent(new.geometry),4326)::geography,1000) as geom
-FROM osm_buildings   group by geometry,osm_id )
-             as m
-            WHERE
-              ST_Intersects(v.geometry, m.geom) and v.road_type in
-                                                    ('trunk','road','secondary','trunk_link','secondary_link',
-                                                     'tertiary_link', 'primary', 'residential', 'primary_link',
-'motorway_link','motorway')    )
-            (SELECT osm_fid,sum(st_length(intersection_geom)) as total_length FROM clipping group by osm_fid)
-             ) foo WHERE foo.osm_fid = osm_buildings.osm_id;
-  RETURN NEW;
+CREATE TRIGGER building_material_recode_tg AFTER INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
+    kartoza_building_materials_mapper();
 
-  END
-  $$;
 
-CREATE OR REPLACE FUNCTION road_type_mapping () RETURNS trigger LANGUAGE plpgsql
+CREATE OR REPLACE FUNCTION kartoza_road_type_mapping () RETURNS trigger LANGUAGE plpgsql
 AS $$
 BEGIN
     SELECT
@@ -342,7 +333,7 @@ BEGIN
            OR new.type ILIKE '' OR new.type IS NULL then 'Road, residential, living street, etc.'
            WHEN new.type ILIKE 'track' then "type" = 'Track'
            WHEN new.type ILIKE 'cycleway' OR new.type ILIKE 'footpath' OR new.type ILIKE 'pedestrian'
-                    OR new.type ILIKE 'footway' OR new.type ILIKE 'path' then  "type" = 'Cycleway, footpath, etc.'
+                    OR new.type ILIKE 'footway' OR new.type ILIKE 'path' then 'Cycleway, footpath, etc.'
         END
     INTO new.road_type
     FROM osm_roads
@@ -350,6 +341,9 @@ BEGIN
   RETURN NEW;
   END
   $$;
+
+CREATE TRIGGER road_type_mapper_tg AFTER INSERT OR UPDATE ON osm_roads FOR EACH ROW EXECUTE PROCEDURE
+    kartoza_road_type_mapping();
 
 
 -- Create tables for FBF based on schema diagram in repo.
@@ -404,7 +398,8 @@ create table flood_event (
   spreadsheet BYTEA,
   progress character varying (50) references progress_status(status)
 );
-
+create index flood_event_idx_id on flood_event(id);
+create index flood_event_idx_map_id on flood_event(flood_map_id);
 
 create table flood_event_buildings (
     id serial primary key ,
@@ -507,141 +502,30 @@ create table flood_event_district_summary (
     trigger_status character varying(255) references trigger_status(name)
 );
 
-INSERT INTO public.flood_event_village_summary(
-    village_id,
-    flood_event_id,
-    vulnerability_total_score,
-    building_count,
-    flooded_building_count,
-    residential_building_count,
-    residential_flooded_building_count,
-    clinic_dr_building_count,
-    clinic_dr_flooded_building_count,
-    fire_station_building_count,
-    fire_station_flooded_building_count,
-    school_building_count,
-    school_flooded_building_count,
-    university_building_count,
-    university_flooded_building_count,
-    government_building_count,
-    government_flooded_building_count,
-    hospital_building_count,
-    hospital_flooded_building_count,
-    buddist_building_count,
-    buddist_flooded_building_count,
-    islam_building_count,
-    islam_flooded_building_count,
-    police_station_building_count,
-    police_flooded_building_count)
+-- create trigger status tables
+CREATE TABLE public.village_trigger_status
+(
+    id             serial primary key,
+    village_id     double precision,
+    trigger_status integer references trigger_status (id),
+    flood_event_id integer
+);
 
-select
-    a.village_code,
-    b.flood_event_id,
-    c.total_vulnerability,
-    d.building_count,
-    e.flooded_building_count,
-    f.residential_building_count,
-    g.residential_flooded_building_count,
-    h.clinic_dr_building_count,
-    i.clinic_dr_flooded_building_count,
-    j.fire_station_building_count,
-    k.fire_station_flooded_building_count,
-    l.school_building_count,
-    m.school_flooded_building_count,
-    n.university_building_count,
-    o.university_flooded_building_count,
-    p.government_building_count,
-    q.government_flooded_building_count,
-    r.hospital_building_count,
-    s.hospital_flooded_building_count,
-    t.buddist_building_count,
-    u.buddist_flooded_building_count,
-    v.islam_building_count,
-    w.islam_flooded_building_count,
-    x.police_station_building_count,
-    y.police_flooded_building_count
-FROM
-     ( select b.village_code from flood_event_areas_v a  join village b on st_intersects(a.geometry, b .geom) where a.flood_event_id = 15 ) a,
-    ( select a.flood_event_id from flood_event_areas_v a  join village b on st_intersects(a.geometry, b .geom) where a.flood_event_id = 15 ) b,
-    ( with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select sum(b.total_vulnerability) as total_vulnerability  from osm_buildings as b join agg
- as c on st_intersects(b.geometry,c.geom) group by c.geom) c,
-    ( with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry) group by c.geom) d,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) group by d.geom) e,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as residential_building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry) where a.building_type = 'Residential' group by c.geom
-) f,
-    (select count(*) as residential_flooded_building_count from osm_buildings as a join flood_event_areas_v b on st_intersects(a.geometry,b.geometry)
-        where b.flood_event_id = 15 and a.building_type = 'Residential') g,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as clinic_dr_building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry) where a.building_type = 'Clinic/Doctor' group by c.geom
-) h,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as clinic_dr_flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) where a.building_type = 'Clinic/Doctor' group by d.geom) i,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as fire_station_building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry) where a.building_type = 'Fire Station' group by c.geom
-) j,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as fire_station_flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) where a.building_type = 'Fire Station' group by d.geom) k,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as school_building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry) where a.building_type = 'School' group by c.geom) l,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as school_flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) where a.building_type = 'School' group by d.geom) m,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as university_building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry) where a.building_type = 'University/College' group by c.geom) n,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as university_flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) where a.building_type = 'University/College' group by d.geom) o,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as government_building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry) where a.building_type = 'Government' group by c.geom) p,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as government_flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) where a.building_type = 'Government' group by d.geom) q,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as hospital_building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry)
-        where a.building_type = 'Hospital' group by c.geom) r,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as hospital_flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) where a.building_type = 'Hospital' group by d.geom) s,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as buddist_building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry)
-        where a.building_type = 'Place of Worship - Buddhist' group by c.geom) t,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as buddist_flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) where a.building_type = 'Place of Worship - Buddhist' group by d.geom) u,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as islam_building_count from osm_buildings a join agg c on st_intersects ( c.geom,a.geometry)
-        where a.building_type = 'Place of Worship - Islam' group by c.geom) v,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as islam_flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) where a.building_type = 'Place of Worship - Islam' group by d.geom) w,
-    (with agg as ( select a.geom  from village  as a join flood_event_areas_v b on st_intersects(a.geom,b.geometry) where b.flood_event_id = 15)
-        select count(a.osm_id) as police_station_building_count from osm_buildings a join agg c
-        on st_intersects ( c.geom,a.geometry) where a.building_type = 'Police Station' group by c.geom) x,
-    (with agg as (select a.geom  from village  as a join flood_event_areas_v b on st_within(b.geometry,a.geom) where b.flood_event_id = 15)
-        select count(a.osm_id) as police_flooded_building_count
-        from osm_buildings as a join agg as d on st_intersects(a.geometry,d.geom) where a.building_type = 'Police Station' group by d.geom) y;
+CREATE TABLE public.sub_district_trigger_status
+(
+    id              serial primary key,
+    sub_district_id double precision,
+    trigger_status  integer references trigger_status (id),
+    flood_event_id  integer
+);
 
--- Activation status function
-
-CREATE FUNCTION activation_status () RETURNS trigger
-   LANGUAGE plpgsql AS $$
-    BEGIN
-        update flood_event_village_summary set
-        trigger_status = 'pre-activation'
-            where  ((flooded_building_count::decimal/ building_count::decimal) * 100) >= 20;
-     RETURN NEW;
-    end;
-    $$;
-
--- Trigger to activate the activation_status.
-CREATE TRIGGER fd_village_summary_act_status_tg AFTER INSERT OR UPDATE ON flood_event_village_summary FOR EACH ROW EXECUTE PROCEDURE activation_status();
+CREATE TABLE public.district_trigger_status
+(
+    id             serial primary key,
+    district_id    double precision,
+    trigger_status integer references trigger_status (id),
+    flood_event_id integer
+);
 
 
 -- Function to calculate activation status based on lead times
@@ -693,154 +577,47 @@ select b.geometry, b.building_type, b.district_id, b.sub_district_id, b.village_
 comment on view vw_flood_event_buildings_map is 'Flooded event buildings map view. Added by Tim to show when we select a flood.';
 
 
--- Reporting for vulnerability indicators
+-- Populate the flood event buildings
 
-CREATE MATERIALIZED VIEW public.flood_event_village_summary_mv
-TABLESPACE pg_default
+ CREATE MATERIALIZED VIEW public.mv_flood_event_buildings
+
 AS
- SELECT a.id,
+ WITH intersections AS (
+         SELECT a_1.geometry,
+            d.id AS flood_event_id,
+            a_1.depth_class
+           FROM flooded_area a_1
+             JOIN flooded_areas b_1 ON a_1.id = b_1.flooded_area_id
+             JOIN flood_map c ON c.id = b_1.flood_map_id
+             JOIN flood_event d ON d.flood_map_id = c.id
+        )
+ SELECT row_number() OVER () AS id,
+    b.osm_id AS building_id,
     a.flood_event_id,
-    a.vulnerability_total_score,
-    a.building_count,
-    a.flooded_building_count,
-    a.residential_building_count,
-    a.residential_flooded_building_count,
-    a.clinic_dr_building_count,
-    a.clinic_dr_flooded_building_count,
-    a.fire_station_building_count,
-    a.fire_station_flooded_building_count,
-    a.school_building_count,
-    a.school_flooded_building_count,
-    a.university_building_count,
-    a.university_flooded_building_count,
-    a.government_building_count,
-    a.government_flooded_building_count,
-    a.hospital_building_count,
-    a.hospital_flooded_building_count,
-    a.buddist_building_count,
-    a.buddist_flooded_building_count,
-    a.islam_building_count,
-    a.islam_flooded_building_count,
-    a.police_station_building_count,
-    a.police_flooded_building_count,
-    a.village_id,
-    b.name,
-    b.dc_code,
-    b.sub_dc_code
-   FROM flood_event_village_summary a,
-    village b
-  WHERE b.village_code = a.village_id
-WITH DATA;
-
-CREATE MATERIALIZED VIEW public.flood_event_sub_district_summary_mv
-TABLESPACE pg_default
-AS
- SELECT a.id,
-    a.flood_event_id,
-    a.vulnerability_total_score,
-    a.building_count,
-    a.flooded_building_count,
-    a.residential_building_count,
-    a.residential_flooded_building_count,
-    a.clinic_dr_building_count,
-    a.clinic_dr_flooded_building_count,
-    a.fire_station_building_count,
-    a.fire_station_flooded_building_count,
-    a.school_building_count,
-    a.school_flooded_building_count,
-    a.university_building_count,
-    a.university_flooded_building_count,
-    a.government_building_count,
-    a.government_flooded_building_count,
-    a.hospital_building_count,
-    a.hospital_flooded_building_count,
-    a.buddist_building_count,
-    a.buddist_flooded_building_count,
-    a.islam_building_count,
-    a.islam_flooded_building_count,
-    a.police_station_building_count,
-    a.police_flooded_building_count,
-    a.sub_district_id,
-    b.name,
-    b.dc_code
-   FROM flood_event_sub_district_summary a,
-    sub_district b
-  WHERE b.sub_dc_code = a.sub_district_id
-WITH DATA;
-
-CREATE MATERIALIZED VIEW public.flood_event_district_summary_mv
-TABLESPACE pg_default
-AS
- SELECT a.id,
-    a.flood_event_id,
-    a.vulnerability_total_score,
-    a.building_count,
-    a.flooded_building_count,
-    a.residential_building_count,
-    a.residential_flooded_building_count,
-    a.clinic_dr_building_count,
-    a.clinic_dr_flooded_building_count,
-    a.fire_station_building_count,
-    a.fire_station_flooded_building_count,
-    a.school_building_count,
-    a.school_flooded_building_count,
-    a.university_building_count,
-    a.university_flooded_building_count,
-    a.government_building_count,
-    a.government_flooded_building_count,
-    a.hospital_building_count,
-    a.hospital_flooded_building_count,
-    a.buddist_building_count,
-    a.buddist_flooded_building_count,
-    a.islam_building_count,
-    a.islam_flooded_building_count,
-    a.police_station_building_count,
-    a.police_flooded_building_count,
-    b.name
-   FROM flood_event_district_summary a,
-    district b
-  WHERE a.district_id = b.dc_code
-WITH DATA;
-
-CREATE MATERIALIZED VIEW exposed_buildings_mv as
-    with flood_event as (
-SELECT
-    d.id AS flood_event_id,
     a.depth_class,
-	a.geometry
-   FROM flooded_area a
-     JOIN flooded_areas b ON a.id = b.flooded_area_id
-     JOIN flood_map c ON c.id = b.flood_map_id
-     JOIN flood_event d ON d.flood_map_id = c.id)
-select row_number() OVER () AS id,b.flood_event_id, b.depth_class,c.total_vulnerability from flood_event b join
-osm_buildings  c on st_intersects(c.geometry,b.geometry) ;
+    b.district_id,
+    b.sub_district_id,
+    b.village_id,
+    b.building_type,
+    b.total_vulnerability,
+    b.geometry
+   FROM intersections a
+     JOIN osm_buildings b ON st_intersects(a.geometry, b.geometry)
+  WHERE b.building_area < 7000::numeric
+WITH DATA;
 
-
--- Populate the flood event buildings - need to convert it to function
-
- create materialized view flood_event_buildings_mv as
-with intersections as (SELECT a.geometry,d.id AS flood_event_id, a.depth_class FROM flooded_area a
-     JOIN flooded_areas b ON a.id = b.flooded_area_id
-     JOIN flood_map c ON c.id = b.flood_map_id
-     JOIN flood_event d ON d.flood_map_id = c.id)
-select row_number() OVER () AS id,b.osm_id as building_id,a.flood_event_id,a.depth_class,b.district_id,
-       b.sub_district_id,b.village_id, b.building_type,b.total_vulnerability,b.geometry from intersections a
-join osm_buildings b on st_intersects(a.geometry,b.geometry);
-
-CREATE UNIQUE INDEX id_db_mv
-  ON flood_event_buildings_mv (id);
-create index building_id_mv   ON flood_event_buildings_mv (building_id);
-create index flood_event_id_mv   ON flood_event_buildings_mv (flood_event_id);
-create index district_id_mv   ON flood_event_buildings_mv (district_id);
-create index sub_district_id_mv   ON flood_event_buildings_mv (sub_district_id);
-create index village_id_mv   ON flood_event_buildings_mv (village_id);
-
+CREATE UNIQUE INDEX id_db_mv ON mv_flood_event_buildings (id);
+create index building_id_mv   ON mv_flood_event_buildings  (building_id);
+create index flood_event_id_mv   ON mv_flood_event_buildings  (flood_event_id);
+create index district_id_mv   ON mv_flood_event_buildings  (district_id);
+create index sub_district_id_mv   ON mv_flood_event_buildings  (sub_district_id);
+create index village_id_mv   ON mv_flood_event_buildings  (village_id);
 
 CREATE FUNCTION refresh_flood_event_buildings_mv() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
   BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY flood_event_buildings_mv WITH DATA ;
+    REFRESH MATERIALIZED VIEW CONCURRENTLY mv_flood_event_buildings WITH DATA ;
     RETURN NULL;
   END
   $$;
@@ -849,69 +626,646 @@ CREATE TRIGGER flood_event_buildings_mv_tg AFTER INSERT  ON flood_event
 FOR EACH ROW EXECUTE PROCEDURE refresh_flood_event_buildings_mv();
 
 
-CREATE FUNCTION refresh_exposed_buildings() RETURNS trigger
+-- Create summary stats for village. district and sub district
+
+
+-- create stats for non flooded
+CREATE MATERIALIZED VIEW public.mv_non_flooded_flood_summary
+
+AS
+ SELECT DISTINCT osm_buildings.district_id,
+    osm_buildings.sub_district_id,
+    osm_buildings.village_id,
+    osm_buildings.building_type,
+    count(*) OVER (PARTITION BY osm_buildings.district_id) AS district_count,
+    count(*) OVER (PARTITION BY osm_buildings.sub_district_id) AS sub_district_count,
+    count(*) OVER (PARTITION BY osm_buildings.village_id) AS village_count,
+    count(*) OVER (PARTITION BY osm_buildings.village_id, osm_buildings.building_type) AS building_type_count
+   FROM osm_buildings
+  ORDER BY osm_buildings.district_id, osm_buildings.sub_district_id, osm_buildings.village_id, osm_buildings.building_type
+WITH DATA;
+
+--create stats for flooded
+CREATE MATERIALIZED VIEW public.mv_flooded_flood_summary
+
+AS
+ SELECT DISTINCT mv_flood_event_buildings.flood_event_id,
+    mv_flood_event_buildings.district_id,
+    mv_flood_event_buildings.sub_district_id,
+    mv_flood_event_buildings.village_id,
+    mv_flood_event_buildings.building_type,
+    mv_flood_event_buildings.building_id,
+    mv_flood_event_buildings.depth_class,
+    count(*) OVER (PARTITION BY mv_flood_event_buildings.flood_event_id, mv_flood_event_buildings.district_id) AS district_count,
+    count(*) OVER (PARTITION BY mv_flood_event_buildings.flood_event_id, mv_flood_event_buildings.sub_district_id) AS sub_district_count,
+    count(*) OVER (PARTITION BY mv_flood_event_buildings.flood_event_id, mv_flood_event_buildings.village_id) AS village_count,
+    count(*) OVER (PARTITION BY mv_flood_event_buildings.flood_event_id, mv_flood_event_buildings.village_id, mv_flood_event_buildings.building_type) AS building_type_count,
+    sum(mv_flood_event_buildings.total_vulnerability) OVER (PARTITION BY mv_flood_event_buildings.flood_event_id, mv_flood_event_buildings.building_id, mv_flood_event_buildings.village_id, mv_flood_event_buildings.total_vulnerability) AS total_vulnerability_score
+   FROM mv_flood_event_buildings
+  ORDER BY mv_flood_event_buildings.flood_event_id, mv_flood_event_buildings.district_id, mv_flood_event_buildings.sub_district_id, mv_flood_event_buildings.village_id, mv_flood_event_buildings.building_type
+WITH DATA;
+
+create index non_flooded_sm_tg on mv_non_flooded_flood_summary (village_id);
+
+CREATE OR REPLACE FUNCTION refresh_flood_non_flooded_summary() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
   BEGIN
-    REFRESH MATERIALIZED VIEW exposed_buildings_mv WITH DATA ;
+    REFRESH MATERIALIZED VIEW  mv_non_flooded_flood_summary WITH DATA ;
     RETURN NULL;
   END
   $$;
 
-CREATE TRIGGER exposed_buildings_tg AFTER INSERT OR UPDATE ON flood_event
-FOR EACH ROW EXECUTE PROCEDURE refresh_exposed_buildings();
+ CREATE TRIGGER gz_non_flooded_fd_summary_tg AFTER INSERT  ON flood_event
+FOR EACH ROW EXECUTE PROCEDURE refresh_flood_non_flooded_summary();
 
-CREATE FUNCTION refresh_village_summary() RETURNS trigger
+
+ create  index mv_flooded_sm_tg on mv_flooded_flood_summary(building_id)
+ CREATE OR REPLACE FUNCTION refresh_flooded_flood_summary() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
   BEGIN
-    REFRESH MATERIALIZED VIEW flood_event_village_summary_mv WITH DATA ;
-    RETURN NULL;
-  END
-  $$;
-
-CREATE FUNCTION refresh_sub_district_summary() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-  BEGIN
-    REFRESH MATERIALIZED VIEW flood_event_sub_district_summary_mv WITH DATA ;
+    REFRESH MATERIALIZED VIEW  mv_flooded_flood_summary WITH DATA ;
     RETURN NULL;
   END
   $$;
 
 
-CREATE FUNCTION refresh_district_summary() RETURNS trigger
+CREATE TRIGGER gf_flooded_fd_summary_tg AFTER INSERT  ON flood_event
+FOR EACH ROW EXECUTE PROCEDURE refresh_flooded_flood_summary();
+
+
+
+-- Aggregate village, district, sub district summaries in the right format
+CREATE MATERIALIZED VIEW public.mv_flood_event_village_summary
+
+AS
+ WITH non_flooded_count_selection AS (
+         SELECT b_1.district_id,
+            b_1.sub_district_id,
+            b_1.village_id,
+            sum(b_1.building_type_count) AS building_count,
+            sum(b_1.residential_building_count) AS residential_building_count,
+            sum(b_1.clinic_dr_building_count) AS clinic_dr_building_count,
+            sum(b_1.fire_station_building_count) AS fire_station_building_count,
+            sum(b_1.school_building_count) AS school_building_count,
+            sum(b_1.university_building_count) AS university_building_count,
+            sum(b_1.government_building_count) AS government_building_count,
+            sum(b_1.hospital_building_count) AS hospital_building_count,
+            sum(b_1.police_station_building_count) AS police_station_building_count
+           FROM ( SELECT DISTINCT mv_non_flooded_flood_summary.district_id,
+                    mv_non_flooded_flood_summary.sub_district_id,
+                    mv_non_flooded_flood_summary.village_id,
+                    mv_non_flooded_flood_summary.building_type_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Residential'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS residential_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Clinic'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS clinic_dr_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Fire Station'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS fire_station_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'School'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS school_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'University'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS university_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Government'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS government_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Hospital'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS hospital_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Police Station'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS police_station_building_count
+                   FROM mv_non_flooded_flood_summary
+                  WHERE mv_non_flooded_flood_summary.district_id IS NOT NULL AND mv_non_flooded_flood_summary.sub_district_id IS NOT NULL AND mv_non_flooded_flood_summary.village_id IS NOT NULL) b_1
+          GROUP BY b_1.district_id, b_1.sub_district_id, b_1.village_id
+        ), flooded_count_selection AS (
+         SELECT a.flood_event_id,
+            a.district_id,
+            a.sub_district_id,
+            a.village_id,
+            sum(a.building_type_count) AS flooded_building_count,
+            sum(a.residential_building_count) AS residential_flooded_building_count,
+            sum(a.clinic_dr_building_count) AS clinic_dr_flooded_building_count,
+            sum(a.fire_station_building_count) AS fire_station_flooded_building_count,
+            sum(a.school_building_count) AS school_flooded_building_count,
+            sum(a.university_building_count) AS university_flooded_building_count,
+            sum(a.government_building_count) AS government_flooded_building_count,
+            sum(a.hospital_building_count) AS hospital_flooded_building_count,
+            sum(a.police_station_building_count) AS police_station_flooded_building_count,
+            sum(a.total_vulnerability_score) AS total_vulnerability_score
+           FROM ( SELECT DISTINCT mv_flooded_flood_summary.flood_event_id,
+                    mv_flooded_flood_summary.district_id,
+                    mv_flooded_flood_summary.sub_district_id,
+                    mv_flooded_flood_summary.village_id,
+                    mv_flooded_flood_summary.building_type_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Residential'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS residential_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Clinic'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS clinic_dr_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Fire Station'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS fire_station_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'School'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS school_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'University'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS university_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Government'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS government_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Hospital'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS hospital_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Police Station'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS police_station_building_count,
+                    mv_flooded_flood_summary.total_vulnerability_score
+                   FROM mv_flooded_flood_summary
+                  WHERE mv_flooded_flood_summary.district_id IS NOT NULL AND mv_flooded_flood_summary.sub_district_id IS NOT NULL AND mv_flooded_flood_summary.village_id IS NOT NULL) a
+          GROUP BY a.district_id, a.sub_district_id, a.village_id, a.flood_event_id
+        ), flooded_aggregate_count AS (
+         SELECT a.flood_event_id,
+            a.district_id,
+            a.sub_district_id,
+            a.village_id,
+            a.flooded_building_count,
+            b_1.building_count,
+            b_1.residential_building_count,
+            b_1.clinic_dr_building_count,
+            b_1.fire_station_building_count,
+            b_1.school_building_count,
+            b_1.university_building_count,
+            b_1.government_building_count,
+            b_1.hospital_building_count,
+            b_1.police_station_building_count,
+            a.residential_flooded_building_count,
+            a.clinic_dr_flooded_building_count,
+            a.fire_station_flooded_building_count,
+            a.school_flooded_building_count,
+            a.university_flooded_building_count,
+            a.government_flooded_building_count,
+            a.hospital_flooded_building_count,
+            a.police_station_flooded_building_count,
+            a.total_vulnerability_score
+           FROM flooded_count_selection a
+             JOIN non_flooded_count_selection b_1 ON a.district_id = b_1.district_id AND a.sub_district_id = b_1.sub_district_id AND a.village_id = b_1.village_id
+        )
+ SELECT flooded_aggregate_count.flood_event_id,
+    flooded_aggregate_count.district_id,
+    flooded_aggregate_count.sub_district_id,
+    flooded_aggregate_count.village_id,
+    flooded_aggregate_count.building_count,
+    flooded_aggregate_count.flooded_building_count,
+    flooded_aggregate_count.total_vulnerability_score,
+    flooded_aggregate_count.residential_flooded_building_count,
+    flooded_aggregate_count.clinic_dr_flooded_building_count,
+    flooded_aggregate_count.fire_station_flooded_building_count,
+    flooded_aggregate_count.school_flooded_building_count,
+    flooded_aggregate_count.university_flooded_building_count,
+    flooded_aggregate_count.government_flooded_building_count,
+    flooded_aggregate_count.hospital_flooded_building_count,
+    flooded_aggregate_count.police_station_flooded_building_count,
+    flooded_aggregate_count.residential_building_count,
+    flooded_aggregate_count.clinic_dr_building_count,
+    flooded_aggregate_count.fire_station_building_count,
+    flooded_aggregate_count.school_building_count,
+    flooded_aggregate_count.university_building_count,
+    flooded_aggregate_count.government_building_count,
+    flooded_aggregate_count.hospital_building_count,
+    flooded_aggregate_count.police_station_building_count
+   FROM flooded_aggregate_count
+     LEFT JOIN village_trigger_status b ON b.village_id = flooded_aggregate_count.village_id AND flooded_aggregate_count.flood_event_id = b.flood_event_id
+WITH DATA;
+
+ CREATE OR REPLACE FUNCTION refresh_flood_village_event_summary() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
   BEGIN
-    REFRESH MATERIALIZED VIEW flood_event_district_summary_mv WITH DATA ;
+    REFRESH MATERIALIZED VIEW  mv_flood_event_village_summary WITH DATA ;
     RETURN NULL;
   END
   $$;
 
-CREATE TRIGGER event_village_summary_tg AFTER INSERT OR UPDATE ON flood_event_village_summary
-FOR EACH ROW EXECUTE PROCEDURE refresh_village_summary();
 
-CREATE TRIGGER event_sub_district_summary_tg AFTER INSERT OR UPDATE ON flood_event_sub_district_summary
-FOR EACH ROW EXECUTE PROCEDURE refresh_sub_district_summary();
+CREATE TRIGGER jaf_village_event_smry_tg AFTER INSERT  ON flood_event
+FOR EACH ROW EXECUTE PROCEDURE refresh_flood_village_event_summary();
 
-CREATE TRIGGER event_district_summary_tg AFTER INSERT OR UPDATE ON flood_event_district_summary
-FOR EACH ROW EXECUTE PROCEDURE refresh_district_summary();
 
-CREATE TRIGGER building_type_mapper BEFORE INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
-    building_types_mapper ();
+CREATE OR REPLACE FUNCTION kartoza_populate_spreadsheet_table() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+  BEGIN
+    insert into spreadsheet_reports (flood_event_id)
+    values (NEW.id);
+    RETURN NEW;
+  END
+  $$;
+CREATE TRIGGER event_populate_spreadsheet_flood_tg BEFORE INSERT  ON flood_event
+FOR EACH ROW EXECUTE PROCEDURE kartoza_populate_spreadsheet_table();
 
-CREATE TRIGGER st_building_recoder BEFORE INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
-    building_recode_mapper();
 
-CREATE TRIGGER area_recode_mapper BEFORE INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
-    building_area_mapper();
+CREATE OR REPLACE FUNCTION public.kartoza_generate_excel_report_for_flood() RETURNS trigger
+    LANGUAGE 'plpython3u'
+    COST 100
+    VOLATILE
+AS $BODY$
+    flood_event = TD["new"]["flood_event_id"]
+    import io
+    import sys
+    plpy.execute("select * from satisfy_dependency('xlsxwriter')")
+    plpy.execute("select * from satisfy_dependency('openpyxl')")
+    from smartexcel.smart_excel import SmartExcel
+    from smartexcel.fbf.data_model import FbfFloodData
+    from smartexcel.fbf.definition import FBF_DEFINITION
+    excel = SmartExcel(
+        output=io.BytesIO(),
+        definition=FBF_DEFINITION,
+        data=FbfFloodData(
+            flood_event_id=flood_event,
+            pl_python_env=True
+        )
+    )
+    excel.dump()
+    plan = plpy.prepare("UPDATE spreadsheet_reports SET spreadsheet = ($1) where flood_event_id  = ($2)", ["bytea", "integer"])
+    plpy.execute(plan, [excel.output.getvalue(), flood_event])
+$BODY$;
 
-CREATE TRIGGER building_material_mapper BEFORE INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
-    building_materials_mapper();
+CREATE TRIGGER flood_report_tg BEFORE INSERT  ON spreadsheet_reports
+FOR EACH ROW EXECUTE PROCEDURE kartoza_generate_excel_report_for_flood();
+-- sub district
+CREATE MATERIALIZED VIEW public.mv_flood_event_sub_district_summary
 
-CREATE TRIGGER road_density_calc BEFORE INSERT OR UPDATE ON osm_buildings FOR EACH ROW EXECUTE PROCEDURE
-    building_road_density_mapper () ;
+AS
+ WITH non_flooded_count_selection AS (
+         SELECT b_1.district_id,
+            b_1.sub_district_id,
+            sum(b_1.building_type_count) AS building_count,
+            sum(b_1.residential_building_count) AS residential_building_count,
+            sum(b_1.clinic_dr_building_count) AS clinic_dr_building_count,
+            sum(b_1.fire_station_building_count) AS fire_station_building_count,
+            sum(b_1.school_building_count) AS school_building_count,
+            sum(b_1.university_building_count) AS university_building_count,
+            sum(b_1.government_building_count) AS government_building_count,
+            sum(b_1.hospital_building_count) AS hospital_building_count,
+            sum(b_1.police_station_building_count) AS police_station_building_count
+           FROM ( SELECT DISTINCT mv_non_flooded_flood_summary.district_id,
+                    mv_non_flooded_flood_summary.sub_district_id,
+                    mv_non_flooded_flood_summary.village_id,
+                    mv_non_flooded_flood_summary.building_type_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Residential'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS residential_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Clinic'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS clinic_dr_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Fire Station'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS fire_station_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'School'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS school_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'University'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS university_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Government'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS government_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Hospital'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS hospital_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Police Station'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS police_station_building_count
+                   FROM mv_non_flooded_flood_summary
+                  WHERE mv_non_flooded_flood_summary.district_id IS NOT NULL AND mv_non_flooded_flood_summary.sub_district_id IS NOT NULL AND mv_non_flooded_flood_summary.village_id IS NOT NULL) b_1
+          GROUP BY b_1.district_id, b_1.sub_district_id
+        ), flooded_count_selection AS (
+         SELECT a.flood_event_id,
+            a.district_id,
+            a.sub_district_id,
+            sum(a.building_type_count) AS flooded_building_count,
+            sum(a.residential_building_count) AS residential_flooded_building_count,
+            sum(a.clinic_dr_building_count) AS clinic_dr_flooded_building_count,
+            sum(a.fire_station_building_count) AS fire_station_flooded_building_count,
+            sum(a.school_building_count) AS school_flooded_building_count,
+            sum(a.university_building_count) AS university_flooded_building_count,
+            sum(a.government_building_count) AS government_flooded_building_count,
+            sum(a.hospital_building_count) AS hospital_flooded_building_count,
+            sum(a.police_station_building_count) AS police_station_flooded_building_count,
+            sum(a.total_vulnerability_score) AS total_vulnerability_score
+           FROM ( SELECT DISTINCT mv_flooded_flood_summary.flood_event_id,
+                    mv_flooded_flood_summary.district_id,
+                    mv_flooded_flood_summary.sub_district_id,
+                    mv_flooded_flood_summary.village_id,
+                    mv_flooded_flood_summary.building_type_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Residential'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS residential_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Clinic'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS clinic_dr_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Fire Station'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS fire_station_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'School'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS school_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'University'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS university_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Government'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS government_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Hospital'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS hospital_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Police Station'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS police_station_building_count,
+                    mv_flooded_flood_summary.total_vulnerability_score
+                   FROM mv_flooded_flood_summary
+                  WHERE mv_flooded_flood_summary.district_id IS NOT NULL AND mv_flooded_flood_summary.sub_district_id IS NOT NULL AND mv_flooded_flood_summary.village_id IS NOT NULL) a
+          GROUP BY a.district_id, a.sub_district_id, a.flood_event_id
+        ), flooded_aggregate_count AS (
+         SELECT a.flood_event_id,
+            a.district_id,
+            a.sub_district_id,
+            a.flooded_building_count,
+            b_1.building_count,
+            b_1.residential_building_count,
+            b_1.clinic_dr_building_count,
+            b_1.fire_station_building_count,
+            b_1.school_building_count,
+            b_1.university_building_count,
+            b_1.government_building_count,
+            b_1.hospital_building_count,
+            b_1.police_station_building_count,
+            a.residential_flooded_building_count,
+            a.clinic_dr_flooded_building_count,
+            a.fire_station_flooded_building_count,
+            a.school_flooded_building_count,
+            a.university_flooded_building_count,
+            a.government_flooded_building_count,
+            a.hospital_flooded_building_count,
+            a.police_station_flooded_building_count,
+            a.total_vulnerability_score
+           FROM flooded_count_selection a
+             JOIN non_flooded_count_selection b_1 ON a.district_id = b_1.district_id AND a.sub_district_id = b_1.sub_district_id
+        )
+ SELECT flooded_aggregate_count.flood_event_id,
+    flooded_aggregate_count.district_id,
+    flooded_aggregate_count.sub_district_id,
+    flooded_aggregate_count.building_count,
+    flooded_aggregate_count.flooded_building_count,
+    flooded_aggregate_count.total_vulnerability_score,
+    flooded_aggregate_count.residential_flooded_building_count,
+    flooded_aggregate_count.clinic_dr_flooded_building_count,
+    flooded_aggregate_count.fire_station_flooded_building_count,
+    flooded_aggregate_count.school_flooded_building_count,
+    flooded_aggregate_count.university_flooded_building_count,
+    flooded_aggregate_count.government_flooded_building_count,
+    flooded_aggregate_count.hospital_flooded_building_count,
+    flooded_aggregate_count.police_station_flooded_building_count,
+    flooded_aggregate_count.residential_building_count,
+    flooded_aggregate_count.clinic_dr_building_count,
+    flooded_aggregate_count.fire_station_building_count,
+    flooded_aggregate_count.school_building_count,
+    flooded_aggregate_count.university_building_count,
+    flooded_aggregate_count.government_building_count,
+    flooded_aggregate_count.hospital_building_count,
+    flooded_aggregate_count.police_station_building_count
+   FROM flooded_aggregate_count
+     LEFT JOIN sub_district_trigger_status b ON b.sub_district_id = flooded_aggregate_count.sub_district_id::double precision AND flooded_aggregate_count.flood_event_id = b.flood_event_id
+WITH DATA;
+
+CREATE OR REPLACE FUNCTION refresh_flood_sub_event_summary() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+  BEGIN
+    REFRESH MATERIALIZED VIEW  mv_flood_event_sub_district_summary WITH DATA ;
+    RETURN NULL;
+  END
+  $$;
+
+
+CREATE TRIGGER iaf_sub_fd_summary_tg AFTER INSERT  ON flood_event
+FOR EACH ROW EXECUTE PROCEDURE refresh_flood_sub_event_summary();
+
+
+
+-- district
+CREATE MATERIALIZED VIEW public.mv_flood_event_district_summary
+
+AS
+ WITH non_flooded_count_selection AS (
+         SELECT b_1.district_id,
+            sum(b_1.building_type_count) AS building_count,
+            sum(b_1.residential_building_count) AS residential_building_count,
+            sum(b_1.clinic_dr_building_count) AS clinic_dr_building_count,
+            sum(b_1.fire_station_building_count) AS fire_station_building_count,
+            sum(b_1.school_building_count) AS school_building_count,
+            sum(b_1.university_building_count) AS university_building_count,
+            sum(b_1.government_building_count) AS government_building_count,
+            sum(b_1.hospital_building_count) AS hospital_building_count,
+            sum(b_1.police_station_building_count) AS police_station_building_count
+           FROM ( SELECT DISTINCT mv_non_flooded_flood_summary.district_id,
+                    mv_non_flooded_flood_summary.sub_district_id,
+                    mv_non_flooded_flood_summary.village_id,
+                    mv_non_flooded_flood_summary.building_type_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Residential'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS residential_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Clinic'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS clinic_dr_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Fire Station'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS fire_station_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'School'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS school_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'University'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS university_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Government'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS government_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Hospital'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS hospital_building_count,
+                        CASE
+                            WHEN mv_non_flooded_flood_summary.building_type::text = 'Police Station'::text THEN mv_non_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS police_station_building_count
+                   FROM mv_non_flooded_flood_summary
+                  WHERE mv_non_flooded_flood_summary.district_id IS NOT NULL AND mv_non_flooded_flood_summary.sub_district_id IS NOT NULL AND mv_non_flooded_flood_summary.village_id IS NOT NULL) b_1
+          GROUP BY b_1.district_id
+        ), flooded_count_selection AS (
+         SELECT a.flood_event_id,
+            a.district_id,
+            sum(a.building_type_count) AS flooded_building_count,
+            sum(a.residential_building_count) AS residential_flooded_building_count,
+            sum(a.clinic_dr_building_count) AS clinic_dr_flooded_building_count,
+            sum(a.fire_station_building_count) AS fire_station_flooded_building_count,
+            sum(a.school_building_count) AS school_flooded_building_count,
+            sum(a.university_building_count) AS university_flooded_building_count,
+            sum(a.government_building_count) AS government_flooded_building_count,
+            sum(a.hospital_building_count) AS hospital_flooded_building_count,
+            sum(a.police_station_building_count) AS police_station_flooded_building_count,
+            sum(a.total_vulnerability_score) AS total_vulnerability_score
+           FROM ( SELECT DISTINCT mv_flooded_flood_summary.flood_event_id,
+                    mv_flooded_flood_summary.district_id,
+                    mv_flooded_flood_summary.sub_district_id,
+                    mv_flooded_flood_summary.village_id,
+                    mv_flooded_flood_summary.building_type_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Residential'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS residential_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Clinic'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS clinic_dr_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Fire Station'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS fire_station_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'School'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS school_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'University'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS university_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Government'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS government_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Hospital'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS hospital_building_count,
+                        CASE
+                            WHEN mv_flooded_flood_summary.building_type::text = 'Police Station'::text THEN mv_flooded_flood_summary.building_type_count
+                            ELSE 0::bigint
+                        END AS police_station_building_count,
+                    mv_flooded_flood_summary.total_vulnerability_score
+                   FROM mv_flooded_flood_summary
+                  WHERE mv_flooded_flood_summary.district_id IS NOT NULL AND mv_flooded_flood_summary.sub_district_id IS NOT NULL AND mv_flooded_flood_summary.village_id IS NOT NULL) a
+          GROUP BY a.district_id, a.flood_event_id
+        ), flooded_aggregate_count AS (
+         SELECT a.flood_event_id,
+            a.district_id,
+            a.flooded_building_count,
+            b_1.building_count,
+            b_1.residential_building_count,
+            b_1.clinic_dr_building_count,
+            b_1.fire_station_building_count,
+            b_1.school_building_count,
+            b_1.university_building_count,
+            b_1.government_building_count,
+            b_1.hospital_building_count,
+            b_1.police_station_building_count,
+            a.residential_flooded_building_count,
+            a.clinic_dr_flooded_building_count,
+            a.fire_station_flooded_building_count,
+            a.school_flooded_building_count,
+            a.university_flooded_building_count,
+            a.government_flooded_building_count,
+            a.hospital_flooded_building_count,
+            a.police_station_flooded_building_count,
+            a.total_vulnerability_score
+           FROM flooded_count_selection a
+             JOIN non_flooded_count_selection b_1 ON a.district_id = b_1.district_id
+        )
+ SELECT flooded_aggregate_count.flood_event_id,
+    flooded_aggregate_count.district_id,
+    flooded_aggregate_count.building_count,
+    flooded_aggregate_count.flooded_building_count,
+    flooded_aggregate_count.total_vulnerability_score,
+    flooded_aggregate_count.residential_flooded_building_count,
+    flooded_aggregate_count.clinic_dr_flooded_building_count,
+    flooded_aggregate_count.fire_station_flooded_building_count,
+    flooded_aggregate_count.school_flooded_building_count,
+    flooded_aggregate_count.university_flooded_building_count,
+    flooded_aggregate_count.government_flooded_building_count,
+    flooded_aggregate_count.hospital_flooded_building_count,
+    flooded_aggregate_count.police_station_flooded_building_count,
+    flooded_aggregate_count.residential_building_count,
+    flooded_aggregate_count.clinic_dr_building_count,
+    flooded_aggregate_count.fire_station_building_count,
+    flooded_aggregate_count.school_building_count,
+    flooded_aggregate_count.university_building_count,
+    flooded_aggregate_count.government_building_count,
+    flooded_aggregate_count.hospital_building_count,
+    flooded_aggregate_count.police_station_building_count,
+    b.trigger_status
+   FROM flooded_aggregate_count
+     LEFT JOIN district_trigger_status b ON b.district_id = flooded_aggregate_count.district_id AND flooded_aggregate_count.flood_event_id = b.flood_event_id
+WITH DATA;
+
+
+CREATE OR REPLACE FUNCTION refresh_flood_district_summary() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+  BEGIN
+    REFRESH MATERIALIZED VIEW  mv_flood_event_district_summary WITH DATA ;
+    RETURN NULL;
+  END
+  $$;
+
+ CREATE TRIGGER ha_dist_summary_tg AFTER INSERT  ON flood_event
+FOR EACH ROW EXECUTE PROCEDURE refresh_flood_district_summary();
+
 
 
 -- Generic SQL

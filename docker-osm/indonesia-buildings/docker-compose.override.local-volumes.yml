@@ -1,0 +1,20 @@
+version: '2.1'
+volumes:
+  # When using bind mount, make sure all these folders exists
+  osm-postgis-data:
+    driver_opts:
+      type: none
+      device: ${PWD}/.postgres-data
+      o: bind
+  import_done:
+  import_queue:
+  cache:
+    driver_opts:
+      type: none
+      device: ${PWD}/.cache
+      o: bind
+  osm_data:
+    driver_opts:
+      type: none
+      device: ${PWD}/docker-osm-settings/settings
+      o: bind
