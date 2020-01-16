@@ -7,10 +7,13 @@ define([
     'js/view/intro.js',
     'js/model/depth_class.js',
     'leafletWMSLegend',
-], function (Backbone, $, Basemap, Layers, SidePanelView, IntroView, DepthClassCollection, LeafletWMSLegend) {
+    'leafletAwesomeIcon'
+], function (Backbone, $, Basemap, Layers, SidePanelView, IntroView, DepthClassCollection, LeafletWMSLegend, leafletAwesomeIcon) {
     return Backbone.View.extend({
         initBounds: [[-21.961179941367273,93.86358289827513],[16.948660219367564,142.12675002072507]],
-        wmsLegendURI: 'http://78.47.62.69/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_buildings',
+        wmsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_buildings',
+        wmsFloodDepthLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:flood_forecast_layer',
+        markers: [],
         initialize: function () {
             // constructor
             this.map = L.map('map').setView([51.505, -0.09], 13).fitBounds(this.initBounds);
@@ -36,6 +39,8 @@ define([
             dispatcher.on('map:show-region-boundary', this.showRegionBoundary, this);
             dispatcher.on('map:show-exposed-buildings', this.showExposedBuildings, this);
             dispatcher.on('map:fit-forecast-layer-bounds', this.fitForecastLayerBounds, this);
+            dispatcher.on('map:add-marker', this.addMarker, this);
+            dispatcher.on('map:remove-all-markers', this.removeAllMarkers, this);
         },
         addOverlayLayer: function(layer, name){
             this.layer_control.addOverlay(layer, name);
@@ -53,7 +58,7 @@ define([
             dispatcher.trigger('map:redraw');
             this.map.fitBounds(this.initBounds);
             this.map.setZoom(5);
-            dispatcher.trigger('dashboard:reset')
+            dispatcher.trigger('side-panel:open-welcome')
         },
         showMap: function() {
             $(this.map._container).show();
@@ -75,15 +80,16 @@ define([
                     if(that.forecast_layer){
                         that.removeOverlayLayer(that.forecast_layer);
                     }
-                    dispatcher.trigger('map:redraw');
+                    that.redraw();
                     that.addOverlayLayer(forecast_layer, 'Flood Forecast');
                     // zoom to bbox
-                    that.map.fitBounds(extent.leaflet_bounds);
+                    that.map.flyToBounds(extent.leaflet_bounds);
                     // register layer to view
                     that.forecast_layer = forecast_layer;
                     // reset region boundary and exposed flood maps because we are seeing different flood
                     that.showRegionBoundary(null, null);
                     that.showExposedBuildings(null, null, null);
+                    that.wmsFloodLegend = L.wmsLegend(that.wmsFloodDepthLegendURI, that.map, 'wms-legend-icon fa fa-map-signs');
                     dispatcher.trigger('side-panel:open-dashboard');
                     if(callback) {
                         callback();
@@ -101,6 +107,9 @@ define([
         redraw: function () {
             if(this.wmsLegend) {
                 this.map.removeControl(this.wmsLegend)
+            }
+            if(this.wmsFloodLegend){
+                this.map.removeControl(this.wmsFloodLegend)
             }
             $.each(this.layers.layers, function (index, layer) {
                 layer.addLayer();
@@ -296,7 +305,40 @@ define([
                 }
             });
             this.exposed_layers.forEach(l => that.addOverlayLayer(l.layer, l.name));
-            this.wmsLegend = L.wmsLegend(this.wmsLegendURI, this.map);
+            this.wmsFloodLegend = L.wmsLegend(this.wmsFloodDepthLegendURI, this.map, 'wms-legend-icon fa fa-map-signs');
+            this.wmsLegend = L.wmsLegend(this.wmsLegendURI, this.map, 'wms-legend-icon fa fa-binoculars');
+        },
+        addMarker: function (centroid, trigger_status) {
+            if(centroid) {
+                let that = this;
+                let icon = that.getIcon(trigger_status);
+                let marker = L.marker(centroid, {icon: icon}).addTo(that.map);
+                this.markers.push(marker)
+            }
+        },
+        getIcon: function (colour_code) {
+            let dictColour = {
+                0: 'green',
+                1: 'orange',
+                2: 'red',
+                3: 'darkred',
+            };
+
+            let icon = L.AwesomeMarkers.icon({
+                prefix: 'fa',
+                icon: 'crosshairs',
+                markerColor: dictColour[colour_code]
+              });
+
+            return icon
+        },
+        removeAllMarkers: function () {
+            let that = this;
+            if(that.markers.length > 0){
+                $.each(that.markers, function (index, marker) {
+                    that.map.removeLayer(marker)
+                })
+            }
         }
     });
 });

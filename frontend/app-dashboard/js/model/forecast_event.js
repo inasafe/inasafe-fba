@@ -15,7 +15,7 @@ define([
      *  - trigger_status
      *
      */
-    const _forecast_flood_url = postgresUrl + 'flood_event';
+    const _forecast_flood_url = postgresUrl + 'hazard_event';
     const _flood_event_forecast_list_f_url = postgresUrl + 'rpc/flood_event_forecast_list_f';
     const _flood_event_historical_forecast_list_f_url = postgresUrl + 'rpc/flood_event_historical_forecast_list_f';
     // We define which column to take because we don't want to fetch the whole spreadsheet blob.

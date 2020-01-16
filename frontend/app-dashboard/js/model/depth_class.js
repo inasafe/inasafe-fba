@@ -9,7 +9,7 @@ define([
      */
     function (Backbone) {
     const DepthClass = Backbone.Model.extend({
-        urlRoot: postgresUrl + 'depth_class',
+        urlRoot: postgresUrl + 'hazard_class',
 
         url: function(){
             return `${this.urlRoot}?id=eq.${this.id}`;
@@ -18,7 +18,7 @@ define([
 
     return Backbone.Collection.extend({
         model: DepthClass,
-        urlRoot: postgresUrl + 'depth_class',
+        urlRoot: postgresUrl + 'hazard_class',
         url: function () {
             return this.urlRoot
         }

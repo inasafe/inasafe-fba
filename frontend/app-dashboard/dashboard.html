@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="js/libs/leaflet-wms-legend/leaflet.wmslegend.css"/>
     <link href="css/dashboard.css" rel="stylesheet" type="text/css" media="screen, projection"/>
     <link href="css/side-panel.css" rel="stylesheet" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="js/libs/leaflet.awesome-markers/css/ionicons.min.css">
+    <link rel="stylesheet" href="js/libs/leaflet.awesome-markers/css/leaflet.awesome-markers.css">
 </head>
 
 <body>
@@ -393,14 +395,6 @@
         <table>
             <tr>
                 <td>
-                    Acquisition Date
-                </td>
-                <td>
-                    <%= acquisition_date %>
-                </td>
-            </tr>
-            <tr>
-                <td>
                     Forecast Date
                 </td>
                 <td>
@@ -431,9 +425,28 @@
                     <%= link %>
                 </td>
             </tr>
+            <tr>
+                <td>
+                    Event Status
+                </td>
+                <td>
+                    <%= event_status %>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Lead Time
+                </td>
+                <td>
+                    <%= lead_time %>
+                </td>
+            </tr>
         </table>
     </div>
     <div id="chart-score-panel">
+        <div class="col-lg-12 panel-title panel-sub-title">
+            Affected Buildings
+        </div>
         <div class="col-lg-12">
             <div class="col-lg-5 box-vulnerability">
                 <div id="vulnerability-score">-</div>
@@ -445,7 +458,23 @@
             </div>
         </div>
         <div class="panel-chart" style="min-height: 250px">
-            <canvas id="summary-chart"></canvas>
+            <canvas id="summary-chart" style="height: 250px"></canvas>
+        </div>
+        <div class="col-lg-12 panel-title panel-sub-title">
+            Affected Roads
+        </div>
+        <div class="col-lg-12">
+            <div class="col-lg-5 box-vulnerability">
+                <div id="vulnerability-score-road">-</div>
+                <div class="subtext">Vulnerability Score Total</div>
+            </div>
+            <div class="col-lg-5 box-building">
+                <div id="road-count">-</div>
+                <div class="subtext">Potentially affected roads</div>
+            </div>
+        </div>
+        <div class="panel-chart-road" style="min-height: 250px">
+            <canvas id="summary-chart-road" style="height: 250px"></canvas>
         </div>
     </div>
     <div id="region-summary-panel" style="border-top: 1px solid #ddd; padding-bottom: 35px">
@@ -469,7 +498,7 @@
         <td class="box-count-left">
             <div class="box-count">
                 <div class="score"><%= flooded_vulnerability_total %></div>
-                <div class="subtext">Total Vulnerability Score</div>
+                <div class="subtext">Total Vulnerability Score for Buildings</div>
             </div>
         </td>
         <td class="box-count-right">
