@@ -8,6 +8,6 @@ How to set up the front end of this project on your local machine.
 
 Should you prefer to use `localhost`, you may do the following:
 - go to your `frontend/app_dashboard` folder
-- run this command on your console: `python -m SimpleHTTPServer 8080`
+- run this command on your console: `python3 -m http.server 8080`
 - open: `http://localhost:8080/`
 
