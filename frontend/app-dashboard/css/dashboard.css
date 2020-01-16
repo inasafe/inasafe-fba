@@ -64,6 +64,10 @@ body {
     font-weight: bold
 }
 
+.panel-sub-title {
+    border-top: 1px solid #ddd;
+}
+
 .leaflet-control-layers-list input {
     cursor: pointer;
 }

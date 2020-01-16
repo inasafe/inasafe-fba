@@ -30,6 +30,7 @@ define([
         initialize: function () {
             this.referer_region = [];
             dispatcher.on('dashboard:render-chart-2', this.renderChart2, this);
+            dispatcher.on('dashboard:render-chart-road', this.renderChartRoad, this);
             dispatcher.on('dashboard:reset', this.resetDashboard, this);
             dispatcher.on('dashboard:hide', this.hideDashboard, this);
             dispatcher.on('dashboard:render-region-summary', this.renderRegionSummary, this);
@@ -66,6 +67,119 @@ define([
             $('#vulnerability-score').html(that.loading_template);
             $('#building-count').html(that.loading_template);
             this.changeStatus(floodCollectionView.selected_forecast.attributes.trigger_status);
+        },
+        renderChartRoad: function (data) {
+            let that = this;
+            let id_key = {
+                'district': 'district_id',
+                'sub_district': 'sub_district_id',
+                'village': 'village_id'
+            };
+
+
+            let $parentWrapper = $('#chart-score-panel');
+            $parentWrapper.find('#summary-chart-road').remove();
+            $parentWrapper.find('.panel-chart-road').html('<canvas id="summary-chart-road"></canvas>');
+
+            let total_road_array = [];
+            let graph_data = [];
+            let flood_graph_data = [];
+            let backgroundColours = [];
+            let unlisted_key = [
+                'id', 'flood_event_id', 'total_vulnerability_score', 'flooded_building_count', 'building_count',
+                'village_id', 'name', 'region', 'district_id', 'sub_district_id', 'sub_dc_code', 'village_code', 'dc_code',
+                'trigger_status', 'road_count'
+            ];
+            for(var key in data) {
+                if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') > -1) {
+                    flood_graph_data.push({
+                        y: key.replace('_flooded_road_count', ''),
+                        x: data[key]
+                    });
+                }
+
+                if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') === -1) {
+                    let flood_key = key.replace('_road_count', '_flooded_road_count');
+                    let count = data[key] - data[flood_key];
+                    if(!count === NaN){
+                        count = 0
+                    }
+                    graph_data.push({
+                        y: key.replace('_road_count', ''),
+                        x: count
+                    });
+
+                    total_road_array.push({
+                        key: key.replace('_road_count', ''),
+                        value: data[key]
+                    })
+                }
+                backgroundColours.push('#82B7CA');
+            }
+
+            total_road_array.sort(function(a, b){return b.value - a.value});
+
+            var label = [];
+            for(var o in total_road_array) {
+                label.push(total_road_array[o].key);
+            }
+
+            graph_data.sort(function(a, b){
+              return label.indexOf(a.y) - label.indexOf(b.y);
+            });
+
+            flood_graph_data.sort(function(a, b){
+              return label.indexOf(a.y) - label.indexOf(b.y);
+            });
+
+            let humanLabel = [];
+            for(let i=0; i<label.length; i++) {
+                humanLabel.push(toTitleCase(label[i].replace('_', ' ')))
+            }
+
+            var ctx = document.getElementById('summary-chart-road').getContext('2d');
+            var datasets = {
+                labels: humanLabel,
+                datasets: [
+                    {
+                        label: "Not Flooded",
+                        data: graph_data
+                    }, {
+                        label: "Flooded",
+                        data: flood_graph_data,
+                        backgroundColor: backgroundColours
+                    }]
+            };
+
+            let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2): 0;
+            $('#vulnerability-score-road').html(total_vulnerability_score);
+            $('#road-count').html(data['flooded_flooded_road_count']);
+
+            new Chart(ctx, {
+                type: 'horizontalBar',
+                data: datasets,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                            gridLines: {
+                                display:false
+                            },
+                            ticks: {
+                                min: 0
+                            }
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            gridLines: {
+                                display:false
+                            },
+                        }]
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
         },
         renderChart2: function (data, main_panel) {
             let that = this;
@@ -262,10 +376,14 @@ define([
                 .attr('data-region-trigger-status', that.referer_region[that.referer_region.length -1].trigger_status);
             this.changeStatus(trigger_status);
             dispatcher.trigger('flood:fetch-stats-data', region, region_id, false);
+            dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, false);
             this.fetchExtent(region_id, region);
             dispatcher.trigger('map:show-region-boundary', region, region_id);
             let forecast_id = floodCollectionView.selected_forecast.id;
             dispatcher.trigger('map:show-exposed-buildings', forecast_id, region, region_id);
+            $('#accordion').animate({
+              scrollTop: 0
+            }, 0)
         },
         backPanelDrilldown: function (e) {
             let that = this;
@@ -298,6 +416,7 @@ define([
                 .attr('data-region-trigger-status', referer_trigger_status);
             this.changeStatus(trigger_status);
             dispatcher.trigger('flood:fetch-stats-data', region, region_id, main);
+            dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, main);
             this.fetchExtent(region_id, region);
             dispatcher.trigger('map:show-region-boundary', region, region_id);
             let forecast_id = floodCollectionView.selected_forecast.id;
