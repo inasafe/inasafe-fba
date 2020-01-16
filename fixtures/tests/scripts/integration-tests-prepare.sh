@@ -17,8 +17,8 @@ cp -rf .sample.env .env
 cp -rf docker-compose.override.local-volumes.yml docker-compose.override.yml
 
 # Copy docker osm custom settings
-export FIXTURES_PATH=${FIXTURES_PATH:-../../}
-export REPO_ROOT=${FIXTURES_PATH}/../
+export FIXTURES_PATH=$(realpath ${FIXTURES_PATH:-../../})
+export REPO_ROOT=$(realpath ${FIXTURES_PATH}/../)
 
 echo "FIXTURES_PATH: ${FIXTURES_PATH}"
 echo "REPO_ROOT: ${REPO_ROOT}"
@@ -29,9 +29,11 @@ cp -rf docker-osm-settings/settings/post-pbf-import.sql docker-osm-settings/cust
 cp -rf ${FIXTURES_PATH}/tests/docker-osm/clip.geojson docker-osm-settings/custom_settings/clip.geojson
 
 # Download test pbf for docker-osm
+export PBF_URL=${PBF_URL:-http://cloud.kartoza.com/s/sxR8anXo5fgFN9Q/download}
 
-# wget -c URL FOR LATER
-# Or from packaged docker image
+# Retrieve PBF test files
+echo "Downloading test PBF file: ${PBF_URL}"
+curl ${PBF_URL} -o docker-osm-settings/custom_settings/country.pdf
 
 popd
 
