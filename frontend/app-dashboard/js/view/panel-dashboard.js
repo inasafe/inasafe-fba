@@ -514,8 +514,9 @@ define([
             dispatcher.trigger('flood:fetch-stats-data', region, region_id, false);
             dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, false);
             this.fetchExtent(region_id, region);
-            dispatcher.trigger('map:show-region-boundary', region, region_id);
             let forecast_id = floodCollectionView.selected_forecast.id;
+            dispatcher.trigger('map:show-exposed-roads', forecast_id, region, region_id);
+            dispatcher.trigger('map:show-region-boundary', region, region_id);
             dispatcher.trigger('map:show-exposed-buildings', forecast_id, region, region_id);
             $('#accordion').animate({
               scrollTop: 0
@@ -554,8 +555,9 @@ define([
             dispatcher.trigger('flood:fetch-stats-data', region, region_id, main);
             dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, main);
             this.fetchExtent(region_id, region);
-            dispatcher.trigger('map:show-region-boundary', region, region_id);
             let forecast_id = floodCollectionView.selected_forecast.id;
+            dispatcher.trigger('map:show-exposed-roads', forecast_id, region, region_id);
+            dispatcher.trigger('map:show-region-boundary', region, region_id);
             dispatcher.trigger('map:show-exposed-buildings', forecast_id, region, region_id);
         },
         containsReferer: function (obj, list) {
