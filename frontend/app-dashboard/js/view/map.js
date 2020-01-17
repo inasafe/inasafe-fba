@@ -14,6 +14,7 @@ define([
         wmsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_buildings&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
         wmsFloodDepthLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:flood_forecast_layer&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
         markers: [],
+        exposed_road_layer: null,
         initialize: function () {
             // constructor
             this.map = L.map('map').setView([51.505, -0.09], 13).fitBounds(this.initBounds);
@@ -38,6 +39,7 @@ define([
             dispatcher.on('map:fit-bounds', this.fitBounds, this);
             dispatcher.on('map:show-region-boundary', this.showRegionBoundary, this);
             dispatcher.on('map:show-exposed-buildings', this.showExposedBuildings, this);
+            dispatcher.on('map:show-exposed-roads', this.showExposedRoads, this);
             dispatcher.on('map:fit-forecast-layer-bounds', this.fitForecastLayerBounds, this);
             dispatcher.on('map:add-marker', this.addMarker, this);
             dispatcher.on('map:remove-all-markers', this.removeAllMarkers, this);
@@ -87,6 +89,7 @@ define([
                     // register layer to view
                     that.forecast_layer = forecast_layer;
                     // reset region boundary and exposed flood maps because we are seeing different flood
+                    that.showExposedRoads(null, null, null);
                     that.showRegionBoundary(null, null);
                     that.showExposedBuildings(null, null, null);
                     that.wmsFloodLegend = L.wmsLegend(that.wmsFloodDepthLegendURI, that.map, 'wms-legend-icon fa fa-map-signs');
@@ -307,6 +310,37 @@ define([
             this.exposed_layers.forEach(l => that.addOverlayLayer(l.layer, l.name));
             this.wmsFloodLegend = L.wmsLegend(this.wmsFloodDepthLegendURI, this.map, 'wms-legend-icon fa fa-map-signs');
             this.wmsLegend = L.wmsLegend(this.wmsLegendURI, this.map, 'wms-legend-icon fa fa-binoculars');
+        },
+        showExposedRoads: function (forecast_id, region, region_id) {
+            let that = this;
+            if(this.exposed_road_layer){
+                that.removeOverlayLayer(that.exposed_road_layer)
+            }
+
+            dispatcher.trigger('map:redraw');
+
+            let id_key = {
+                'district': 'district_id',
+                'sub_district': 'sub_district_id',
+                'village': 'village_id',
+            };
+
+            if(region == null && region_id == null){
+                return;
+            }
+
+            this.exposed_road_layer = L.tileLayer.wms(
+                geoserverStagingUrl,
+                {
+                    layers: 'kartoza:exposed_roads',
+                    format: 'image/png',
+                    transparent: true,
+                    srs: 'EPSG:4326',
+                    cql_filter: `flood_event_id=${forecast_id} AND ${id_key[region]}=${region_id}`,
+                }
+            );
+            this.exposed_road_layer.setZIndex(3);
+            that.addOverlayLayer(this.exposed_road_layer, 'Exposed roads')
         },
         addMarker: function (centroid, trigger_status) {
             if(centroid) {
