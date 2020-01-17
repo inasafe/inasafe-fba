@@ -73,10 +73,11 @@ L.Control.WMSLegend = L.Control.extend({
     },
 });
 
-L.wmsLegend = function (uri, map, iconClass) {
+L.wmsLegend = function (uri, map, iconClass, position) {
     var wmsLegendControl = new L.Control.WMSLegend;
     wmsLegendControl.options.uri = uri;
-    wmsLegendControl.options.iconClass = iconClass
+    wmsLegendControl.options.iconClass = iconClass;
+    wmsLegendControl.options.position = position;
     map.addControl(wmsLegendControl);
 
     var draggable = new L.Draggable(wmsLegendControl.getContainer());
