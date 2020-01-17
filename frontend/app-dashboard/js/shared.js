@@ -8,6 +8,7 @@ var postgresBaseUrl = 'http://78.46.133.148:3000';
 var mapView;
 var AppRequest;
 var floodCollectionView;
+var resetView = true;
 
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;

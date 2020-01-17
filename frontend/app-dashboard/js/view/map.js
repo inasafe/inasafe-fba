@@ -54,13 +54,16 @@ define([
         },
         removeForecastLayer: function(){
             if(this.forecast_layer){
-                this.removeOverlayLayer(this.forecast_layer)
+                this.removeOverlayLayer(this.forecast_layer);
                 this.forecast_layer = null;
             }
             dispatcher.trigger('map:redraw');
             this.map.fitBounds(this.initBounds);
             this.map.setZoom(5);
-            dispatcher.trigger('side-panel:open-welcome')
+            if(resetView) {
+                dispatcher.trigger('side-panel:open-welcome')
+            }
+            resetView = true;
         },
         showMap: function() {
             $(this.map._container).show();
@@ -92,7 +95,7 @@ define([
                     that.showExposedRoads(null, null, null);
                     that.showRegionBoundary(null, null);
                     that.showExposedBuildings(null, null, null);
-                    that.wmsFloodLegend = L.wmsLegend(that.wmsFloodDepthLegendURI, that.map, 'wms-legend-icon fa fa-map-signs');
+                    that.wmsFloodLegend = L.wmsLegend(that.wmsFloodDepthLegendURI, that.map, 'wms-legend-icon fa fa-map-signs', 'bottomleft');
                     dispatcher.trigger('side-panel:open-dashboard');
                     if(callback) {
                         callback();
@@ -308,8 +311,8 @@ define([
                 }
             });
             this.exposed_layers.forEach(l => that.addOverlayLayer(l.layer, l.name));
-            this.wmsFloodLegend = L.wmsLegend(this.wmsFloodDepthLegendURI, this.map, 'wms-legend-icon fa fa-map-signs');
-            this.wmsLegend = L.wmsLegend(this.wmsLegendURI, this.map, 'wms-legend-icon fa fa-binoculars');
+            this.wmsLegend = L.wmsLegend(this.wmsLegendURI, this.map, 'wms-legend-icon fa fa-binoculars', 'bottomleft');
+            this.wmsFloodLegend = L.wmsLegend(this.wmsFloodDepthLegendURI, this.map, 'wms-legend-icon fa fa-map-signs', 'bottomleft');
         },
         showExposedRoads: function (forecast_id, region, region_id) {
             let that = this;
