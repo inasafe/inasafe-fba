@@ -318,3 +318,14 @@ body {
 .home-fbf {
    cursor: pointer;
 }
+
+.tab-active {
+    border-bottom: none !important;
+}
+
+.tab-title {
+    padding: 10px !important;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: -10px !important;
+    cursor: pointer;
+}
