@@ -333,7 +333,7 @@ define([
             }
 
             this.exposed_road_layer = L.tileLayer.wms(
-                geoserverStagingUrl,
+                geoserverUrl,
                 {
                     layers: 'kartoza:exposed_roads',
                     format: 'image/png',
