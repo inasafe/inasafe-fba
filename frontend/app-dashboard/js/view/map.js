@@ -13,6 +13,7 @@ define([
         initBounds: [[-21.961179941367273,93.86358289827513],[16.948660219367564,142.12675002072507]],
         wmsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_buildings&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
         wmsFloodDepthLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:flood_forecast_layer&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
+        wmsExposedRoadsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_roads&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
         markers: [],
         exposed_road_layer: null,
         initialize: function () {
@@ -116,6 +117,9 @@ define([
             }
             if(this.wmsFloodLegend){
                 this.map.removeControl(this.wmsFloodLegend)
+            }
+            if(this.wmsExposedRoadsLegend){
+                this.map.removeControl(this.wmsExposedRoadsLegend)
             }
             $.each(this.layers.layers, function (index, layer) {
                 layer.addLayer();
@@ -311,6 +315,7 @@ define([
                 }
             });
             this.exposed_layers.forEach(l => that.addOverlayLayer(l.layer, l.name));
+            this.wmsExposedRoadsLegend = L.wmsLegend(this.wmsExposedRoadsLegendURI, this.map, 'wms-legend-icon fa fa-road', 'bottomright');
             this.wmsLegend = L.wmsLegend(this.wmsLegendURI, this.map, 'wms-legend-icon fa fa-binoculars', 'bottomleft');
             this.wmsFloodLegend = L.wmsLegend(this.wmsFloodDepthLegendURI, this.map, 'wms-legend-icon fa fa-map-signs', 'bottomleft');
         },
