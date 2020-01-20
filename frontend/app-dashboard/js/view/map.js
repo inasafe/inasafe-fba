@@ -97,6 +97,7 @@ define([
                     that.showRegionBoundary(null, null);
                     that.showExposedBuildings(null, null, null);
                     that.wmsFloodLegend = L.wmsLegend(that.wmsFloodDepthLegendURI, that.map, 'wms-legend-icon fa fa-map-signs', 'bottomleft');
+                    that.addLegendControl();
                     dispatcher.trigger('side-panel:open-dashboard');
                     if(callback) {
                         callback();
@@ -112,6 +113,9 @@ define([
                 })
         },
         redraw: function () {
+            if(this.generalLegendControl){
+                this.map.removeControl(this.generalLegendControl)
+            }
             if(this.wmsLegend) {
                 this.map.removeControl(this.wmsLegend)
             }
@@ -318,6 +322,7 @@ define([
             this.wmsExposedRoadsLegend = L.wmsLegend(this.wmsExposedRoadsLegendURI, this.map, 'wms-legend-icon fa fa-road', 'bottomright');
             this.wmsLegend = L.wmsLegend(this.wmsLegendURI, this.map, 'wms-legend-icon fa fa-binoculars', 'bottomleft');
             this.wmsFloodLegend = L.wmsLegend(this.wmsFloodDepthLegendURI, this.map, 'wms-legend-icon fa fa-map-signs', 'bottomleft');
+            this.addLegendControl();
         },
         showExposedRoads: function (forecast_id, region, region_id) {
             let that = this;
@@ -381,6 +386,50 @@ define([
                     that.map.removeLayer(marker)
                 })
             }
+        },
+        addLegendControl: function () {
+            let that = this;
+            L.Control.CustomLegendButton = L.Control.extend({
+                onAdd: function(map) {
+                    var el = L.DomUtil.create('div', 'leaflet-bar leaflet-control-wms-legend general-legend-control legend-active');
+                    el.innerHTML = '<i class="fa fa-map wms-legend-icon"></i>';
+                    L.DomEvent.on(el, 'click', this._click, this);
+                    return el;
+                },
+                _click: function (e) {
+                    L.DomEvent.stopPropagation(e);
+                    L.DomEvent.preventDefault(e);
+                    let $container = $('.general-legend-control');
+                    if($container.hasClass('legend-active')){
+                        $container.removeClass('legend-active');
+                        if(that.wmsLegend) {
+                            that.map.removeControl(that.wmsLegend)
+                        }
+                        if(that.wmsFloodLegend){
+                            that.map.removeControl(that.wmsFloodLegend)
+                        }
+                        if(that.wmsExposedRoadsLegend){
+                            that.map.removeControl(that.wmsExposedRoadsLegend)
+                        }
+                    }else {
+                        $container.addClass('legend-active');
+                        if(that.wmsLegend) {
+                            that.map.addControl(that.wmsLegend)
+                        }
+                        if(that.wmsFloodLegend){
+                            that.map.addControl(that.wmsFloodLegend)
+                        }
+                        if(that.wmsExposedRoadsLegend){
+                            that.map.addControl(that.wmsExposedRoadsLegend)
+                        }
+                    }
+                }
+            });
+
+            this.generalLegendControl = new L.Control.CustomLegendButton;
+            this.generalLegendControl.options.position = 'topleft';
+            this.map.addControl(this.generalLegendControl);
+
         }
     });
 });
