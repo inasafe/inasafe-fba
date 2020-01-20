@@ -1,7 +1,6 @@
 var dispatcher;
-var geoserverUrl = 'http://78.47.62.69/geoserver/wms';
-var geoserverStagingUrl = 'http://78.46.133.148/geoserver/wms';
-var gwcURL = 'http://78.47.62.69/geoserver/gwc/service/wms';
+var geoserverUrl = 'http://staging.fbf.kartoza.com/geoserver/wms';
+var gwcURL = 'http://staging.fbf.kartoza.com/geoserver/gwc/service/wms';
 var postgresUrl = 'http://78.46.133.148:3000/';
 // for appending Location url
 var postgresBaseUrl = 'http://78.46.133.148:3000';
