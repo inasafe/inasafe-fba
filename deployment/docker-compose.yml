@@ -1,0 +1,16 @@
+version: '2.1'
+
+services:
+  # image for build artifacts
+  inasafe-fba:
+    image: inasafe/inasafe-fba
+    build:
+      dockerfile: deployment/docker/Dockerfile
+      context: ../
+    environment:
+      POSTGREST_SERVER: ${POSTGREST_SERVER:-postgrest.fbf.test:3000}
+      SWAGGER_SERVER: ${SWAGGER_SERVER:-swagger.fbf.test:3080}
+      GEOSERVER_BASE_URL: ${GEOSERVER_BASE_URL}
+      POSTGREST_BASE_URL: ${POSTGREST_BASE_URL}
+    ports:
+      - "80:80"

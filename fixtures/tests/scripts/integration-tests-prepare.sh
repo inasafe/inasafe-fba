@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Working dir refer to the current location of the docker-compose.yml file to run integration tests
+# Working dir refer to the current location of the docker-compose.yml file of the backend to run integration tests
 pushd ${WORKING_DIR}
 
 echo "Current working directory ${WORKING_DIR}"

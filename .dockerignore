@@ -1,0 +1,8 @@
+# Ignore huge binary files by default
+*.pbf
+*.zip
+
+# Ignore mounted volumes
+docker-osm
+fixtures
+documents

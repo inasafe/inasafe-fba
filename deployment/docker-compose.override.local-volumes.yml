@@ -1,0 +1,5 @@
+version: '2.1'
+services:
+  inasafe-fba:
+    volumes:
+      - ../frontend/app-dashboard:/usr/share/nginx/app-dashboard

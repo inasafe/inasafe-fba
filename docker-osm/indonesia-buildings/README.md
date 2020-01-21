@@ -37,6 +37,8 @@ By default it will mount volumes into local host bind. You can also modify the s
 
 Use `.env` file to override environment variables that are going to be used in docker-compose file
 
+Important keys like `PGRST_SERVER_PROXY_URI` and `PBF_URL` have comments on it to explain what it do.
+
 ### Spin up the services
 
 Simply execute:
@@ -54,7 +56,8 @@ make down
 
 ### Verify backend is running
 
-The stack will expose postgres database in port 35432 in your local machine.
+The stack by default will expose postgres database in port 35432 in your local machine.
 You can check the database using psql or db admin tools.
-It will also expose postgrest and swagger-ui by default in port 3000 and 3080 respectively.
+It will also expose postgrest and swagger-ui by default in port 3000 and 3080 respectively of your local machine.
 So you can check it from the browser to see if the API is available.
+The default address to check would be on the http://localhost:3000 and http://localhost:3080.
