@@ -1,9 +1,4 @@
 var dispatcher;
-var geoserverUrl = 'http://staging.fbf.kartoza.com/geoserver/wms';
-var gwcURL = 'http://staging.fbf.kartoza.com/geoserver/gwc/service/wms';
-var postgresUrl = 'http://78.46.133.148:3000/';
-// for appending Location url
-var postgresBaseUrl = 'http://78.46.133.148:3000';
 var mapView;
 var AppRequest;
 var floodCollectionView;

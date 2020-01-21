@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "clip_small",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 106.626574922728778, -6.380398325666699 ], [ 106.676228615073057, -6.380398325666699 ], [ 106.676228615073057, -6.320041939503643 ], [ 106.626574922728778, -6.320041939503643 ], [ 106.626574922728778, -6.380398325666699 ] ] ] } }
+]
+}

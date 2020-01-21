@@ -1,51 +1,60 @@
 version: '2.1'
-
 volumes:
   osm-postgis-data:
   import_done:
   import_queue:
   cache:
+  osm_data:
 
 services:
   db:
     # About the postgresql version, it should match in the dockerfile of docker-imposm3
-    image: kartoza/postgis:11.0-2.5
+    image: kartoza/postgis:12.0
     restart: always
     hostname: db
     environment:
-      - POSTGRES_USER=docker
-      - POSTGRES_PASS=docker
-      - POSTGRES_DBNAME=gis
-      # Uncomment to expose the postgis database on the network
-      - ALLOW_IP_RANGE= 0.0.0.0/0
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASS=${POSTGRES_PASS}
+      - ALLOW_IP_RANGE=${POSTGRES_HBA_RANGE}
+      - IP_LIST=${ALLOW_LISTEN_RANGE}
     volumes:
-      - osm-postgis-data:/var/lib/postgresql
+     - osm-postgis-data:/var/lib/postgresql
     ports:
-      - "35432:5432"
-    healthcheck:
-        test: "exit 0"
+      - "${POSTGRES_PORT}:5432"
+
+  osm_downloader:
+    image: kartoza/docker-osm:pbf-downloader
+    volumes:
+      # These are sharable to other containers
+      - osm_data:/home/settings
+    environment:
+      # Read the README in docker-osm-pbf
+      - CONTINENT=${CONTINENT}
+      - COUNTRY=${COUNTRY}
+      - BASE_URL=${PBF_URL}
+      - MAPPING_URL=${MAPPING_URL}
+      - GEOJSON_URL=${GEOJSON_URL}
 
   imposm:
     image: kartoza/docker-osm:imposm-latest
     restart: always
     volumes:
-      # These are sharable to other containers
-      - ./docker-osm-settings/settings:/home/settings
+      - osm_data:/home/settings
       - import_done:/home/import_done
       - import_queue:/home/import_queue
       - cache:/home/cache
-    depends_on:
-        db:
-          condition: service_healthy
+    links:
+      - db:db
     environment:
-      - POSTGRES_USER=docker
-      - POSTGRES_PASS=docker
-      - POSTGRES_DBNAME=gis
-      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASS=${POSTGRES_PASS}
+      - POSTGRES_PORT=${PG_PORT}
       - POSTGRES_HOST=db
       # seconds between 2 executions of the script
       # if 0, then no update will be done, only the first initial import from the PBF
-      - TIME=120
+      - TIME=${UPDATE_TIME}
       # folder for settings (with *.json and *.sql)
       - SETTINGS=settings
       # folder for caching
@@ -55,43 +64,44 @@ services:
       # folder for diff which hasn't been imported yet
       - IMPORT_QUEUE=import_queue
       # it can be 3857
-      - SRID=4326
+      - SRID=${TABLE_SRID}
       # see http://imposm.org/docs/imposm3/latest/tutorial.html#optimize
       - OPTIMIZE=false
       # see http://imposm.org/docs/imposm3/latest/tutorial.html#deploy-production-tables
-      - DBSCHEMA_PRODUCTION=public
+      - DBSCHEMA_PRODUCTION=${DB_SCHEMA}
       # http://imposm.org/docs/imposm3/latest/tutorial.html#deploy-production-tables
-      - DBSCHEMA_IMPORT=import
+      - DBSCHEMA_IMPORT=${DB_SCHEMA_IMPORT}
       # http://imposm.org/docs/imposm3/latest/tutorial.html#deploy-production-tables
-      - DBSCHEMA_BACKUP=backup
+      - DBSCHEMA_BACKUP=${DB_SCHEMA_BACKUP}
       # Install some styles if you are using the default mapping. It can be 'yes' or 'no'
-      - QGIS_STYLE=yes
+      - QGIS_STYLE=${QGIS_STYLE_BOOLEAN}
       # Use clip in the database
-      - CLIP=no
+      - CLIP=${CLIP_BOOLEAN}
+    command: bash -c "while [ ! -f /home/settings/country.pbf ] ; do sleep 1; done && python3 -u /home/importer.py"
 
   osmupdate:
     image: kartoza/docker-osm:osmupdate-latest
     restart: always
     volumes:
       # These are sharable to other containers
-      - ./docker-osm-settings/settings:/home/settings
+      - osm_data:/home/settings
       - import_done:/home/import_done
       - import_queue:/home/import_queue
       - cache:/home/cache
-    depends_on:
-      db:
-        condition: service_healthy
+    links:
+      - db:db
+
     environment:
       # These are all currently the defaults but listed here for your
       # convenience if you want to change them
       # the maximum time range to assemble a cumulated changefile.
-      - MAX_DAYS=100
+      - MAX_DAYS=${MAX_RANGE}
       # osmupdate uses a combination of minutely, hourly and daily changefiles. This value can be minute, hour, day or sporadic.
-      - DIFF=sporadic
+      - DIFF=${DIFF_VAL}
       # argument to determine the maximum number of parallely processed changefiles.
-      - MAX_MERGE=7
+      - MAX_MERGE=${MAX_MERGE_TIME}
       # define level for gzip compression. values between 1 (low compression but fast) and 9 (high compression but slow)
-      - COMPRESSION_LEVEL=1
+      - COMPRESSION_LEVEL=${COMPRESS_LEVEL}
       # change the URL to use a custom URL to fetch regional file updates.
       - BASE_URL=http://planet.openstreetmap.org/replication/
       # folder for diff which hasn't been imported yet
@@ -100,25 +110,24 @@ services:
       - IMPORT_DONE=import_done
       # seconds between 2 executions of the script
       # if 0, then no update will be done, only the first initial import from the PBF
-      - TIME=120
+      - TIME=${UPDATE_TIME}
+    command: bash -c "while [ ! -f /home/settings/country.pbf ] ; do sleep 1; done && python3 -u /home/download.py"
 
   osmenrich:
     image: kartoza/docker-osm:osmenrich-latest
     restart: always
     volumes:
-      # These are sharable to other containers
-      - ./docker-osm-settings/settings:/home/settings
+      - osm_data:/home/settings
       - import_done:/home/import_done
       - import_queue:/home/import_queue
       - cache:/home/cache
-    depends_on:
-      db:
-        condition: service_healthy
+    links:
+      - db:db
     environment:
-      - POSTGRES_USER=docker
-      - POSTGRES_PASS=docker
-      - POSTGRES_DBNAME=gis
-      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASS=${POSTGRES_PASS}
+      - POSTGRES_PORT=${PG_PORT}
       - POSTGRES_HOST=db
       # These are all currently the defaults but listed here for your
       # convenience if you want to change them
@@ -128,4 +137,23 @@ services:
       - IMPORT_DONE=import_done
       # seconds between 2 executions of the script
       # if 0, then no update will be done, only the first initial import from the PBF
-      - TIME=120
+      - TIME=${UPDATE_TIME}
+
+  postgrest:
+    image: postgrest/postgrest
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASS}@db:5432/${POSTGRES_DB}
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: ${POSTGRES_USER}
+      PGRST_SERVER_PROXY_URI: ${PGRST_SERVER_PROXY_URI}
+    links:
+      - db:db
+    ports:
+      - "${PGRST_PORT}:3000"
+
+  swagger:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "${SWAGGER_UI_PORT}:8080"
+    environment:
+      API_URL: ${PGRST_SERVER_PROXY_URI}

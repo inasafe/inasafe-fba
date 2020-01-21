@@ -131,3 +131,6 @@ dmypy.json
 .idea/
 
 
+# Docker compose override
+docker-compose.override.yml
+forecast_script/tmp
