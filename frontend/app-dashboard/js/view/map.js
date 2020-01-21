@@ -11,9 +11,11 @@ define([
 ], function (Backbone, $, Basemap, Layers, SidePanelView, IntroView, DepthClassCollection, LeafletWMSLegend, leafletAwesomeIcon) {
     return Backbone.View.extend({
         initBounds: [[-21.961179941367273,93.86358289827513],[16.948660219367564,142.12675002072507]],
-        wmsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_buildings',
-        wmsFloodDepthLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:flood_forecast_layer',
+        wmsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_buildings&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
+        wmsFloodDepthLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:flood_forecast_layer&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
+        wmsExposedRoadsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_roads&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
         markers: [],
+        exposed_road_layer: null,
         initialize: function () {
             // constructor
             this.map = L.map('map').setView([51.505, -0.09], 13).fitBounds(this.initBounds);
@@ -38,6 +40,7 @@ define([
             dispatcher.on('map:fit-bounds', this.fitBounds, this);
             dispatcher.on('map:show-region-boundary', this.showRegionBoundary, this);
             dispatcher.on('map:show-exposed-buildings', this.showExposedBuildings, this);
+            dispatcher.on('map:show-exposed-roads', this.showExposedRoads, this);
             dispatcher.on('map:fit-forecast-layer-bounds', this.fitForecastLayerBounds, this);
             dispatcher.on('map:add-marker', this.addMarker, this);
             dispatcher.on('map:remove-all-markers', this.removeAllMarkers, this);
@@ -52,13 +55,16 @@ define([
         },
         removeForecastLayer: function(){
             if(this.forecast_layer){
-                this.removeOverlayLayer(this.forecast_layer)
+                this.removeOverlayLayer(this.forecast_layer);
                 this.forecast_layer = null;
             }
             dispatcher.trigger('map:redraw');
             this.map.fitBounds(this.initBounds);
             this.map.setZoom(5);
-            dispatcher.trigger('side-panel:open-welcome')
+            if(resetView) {
+                dispatcher.trigger('side-panel:open-welcome')
+            }
+            resetView = true;
         },
         showMap: function() {
             $(this.map._container).show();
@@ -87,9 +93,11 @@ define([
                     // register layer to view
                     that.forecast_layer = forecast_layer;
                     // reset region boundary and exposed flood maps because we are seeing different flood
+                    that.showExposedRoads(null, null, null);
                     that.showRegionBoundary(null, null);
                     that.showExposedBuildings(null, null, null);
-                    that.wmsFloodLegend = L.wmsLegend(that.wmsFloodDepthLegendURI, that.map, 'wms-legend-icon fa fa-map-signs');
+                    that.wmsFloodLegend = L.wmsLegend(that.wmsFloodDepthLegendURI, that.map, 'wms-legend-icon fa fa-map-signs', 'bottomleft');
+                    that.addLegendControl();
                     dispatcher.trigger('side-panel:open-dashboard');
                     if(callback) {
                         callback();
@@ -105,11 +113,17 @@ define([
                 })
         },
         redraw: function () {
+            if(this.generalLegendControl){
+                this.map.removeControl(this.generalLegendControl)
+            }
             if(this.wmsLegend) {
                 this.map.removeControl(this.wmsLegend)
             }
             if(this.wmsFloodLegend){
                 this.map.removeControl(this.wmsFloodLegend)
+            }
+            if(this.wmsExposedRoadsLegend){
+                this.map.removeControl(this.wmsExposedRoadsLegend)
             }
             $.each(this.layers.layers, function (index, layer) {
                 layer.addLayer();
@@ -305,8 +319,41 @@ define([
                 }
             });
             this.exposed_layers.forEach(l => that.addOverlayLayer(l.layer, l.name));
-            this.wmsFloodLegend = L.wmsLegend(this.wmsFloodDepthLegendURI, this.map, 'wms-legend-icon fa fa-map-signs');
-            this.wmsLegend = L.wmsLegend(this.wmsLegendURI, this.map, 'wms-legend-icon fa fa-binoculars');
+            this.wmsExposedRoadsLegend = L.wmsLegend(this.wmsExposedRoadsLegendURI, this.map, 'wms-legend-icon fa fa-road', 'bottomright');
+            this.wmsLegend = L.wmsLegend(this.wmsLegendURI, this.map, 'wms-legend-icon fa fa-binoculars', 'bottomleft');
+            this.wmsFloodLegend = L.wmsLegend(this.wmsFloodDepthLegendURI, this.map, 'wms-legend-icon fa fa-map-signs', 'bottomleft');
+            this.addLegendControl();
+        },
+        showExposedRoads: function (forecast_id, region, region_id) {
+            let that = this;
+            if(this.exposed_road_layer){
+                that.removeOverlayLayer(that.exposed_road_layer)
+            }
+
+            dispatcher.trigger('map:redraw');
+
+            let id_key = {
+                'district': 'district_id',
+                'sub_district': 'sub_district_id',
+                'village': 'village_id',
+            };
+
+            if(region == null && region_id == null){
+                return;
+            }
+
+            this.exposed_road_layer = L.tileLayer.wms(
+                geoserverUrl,
+                {
+                    layers: 'kartoza:exposed_roads',
+                    format: 'image/png',
+                    transparent: true,
+                    srs: 'EPSG:4326',
+                    cql_filter: `flood_event_id=${forecast_id} AND ${id_key[region]}=${region_id}`,
+                }
+            );
+            this.exposed_road_layer.setZIndex(3);
+            that.addOverlayLayer(this.exposed_road_layer, 'Exposed roads')
         },
         addMarker: function (centroid, trigger_status) {
             if(centroid) {
@@ -339,6 +386,50 @@ define([
                     that.map.removeLayer(marker)
                 })
             }
+        },
+        addLegendControl: function () {
+            let that = this;
+            L.Control.CustomLegendButton = L.Control.extend({
+                onAdd: function(map) {
+                    var el = L.DomUtil.create('div', 'leaflet-bar leaflet-control-wms-legend general-legend-control legend-active');
+                    el.innerHTML = '<i class="fa fa-map wms-legend-icon"></i>';
+                    L.DomEvent.on(el, 'click', this._click, this);
+                    return el;
+                },
+                _click: function (e) {
+                    L.DomEvent.stopPropagation(e);
+                    L.DomEvent.preventDefault(e);
+                    let $container = $('.general-legend-control');
+                    if($container.hasClass('legend-active')){
+                        $container.removeClass('legend-active');
+                        if(that.wmsLegend) {
+                            that.map.removeControl(that.wmsLegend)
+                        }
+                        if(that.wmsFloodLegend){
+                            that.map.removeControl(that.wmsFloodLegend)
+                        }
+                        if(that.wmsExposedRoadsLegend){
+                            that.map.removeControl(that.wmsExposedRoadsLegend)
+                        }
+                    }else {
+                        $container.addClass('legend-active');
+                        if(that.wmsLegend) {
+                            that.map.addControl(that.wmsLegend)
+                        }
+                        if(that.wmsFloodLegend){
+                            that.map.addControl(that.wmsFloodLegend)
+                        }
+                        if(that.wmsExposedRoadsLegend){
+                            that.map.addControl(that.wmsExposedRoadsLegend)
+                        }
+                    }
+                }
+            });
+
+            this.generalLegendControl = new L.Control.CustomLegendButton;
+            this.generalLegendControl.options.position = 'topleft';
+            this.map.addControl(this.generalLegendControl);
+
         }
     });
 });

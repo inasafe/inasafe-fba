@@ -25,7 +25,8 @@ define([
         events: {
             'click .drilldown': 'drilldown',
             'click .btn-back-summary-panel': 'backPanelDrilldown',
-            'click .download-spreadsheet': 'fetchExcel'
+            'click .download-spreadsheet': 'fetchExcel',
+            'click .tab-title': 'switchTab'
         },
         initialize: function () {
             this.referer_region = [];
@@ -66,20 +67,16 @@ define([
             }));
             $('#vulnerability-score').html(that.loading_template);
             $('#building-count').html(that.loading_template);
+            $('#vulnerability-score-road').html(that.loading_template);
+            $('#road-count').html(that.loading_template);
             this.changeStatus(floodCollectionView.selected_forecast.attributes.trigger_status);
         },
         renderChartRoad: function (data) {
-            let that = this;
-            let id_key = {
-                'district': 'district_id',
-                'sub_district': 'sub_district_id',
-                'village': 'village_id'
-            };
-
-
             let $parentWrapper = $('#chart-score-panel');
             $parentWrapper.find('#summary-chart-road').remove();
             $parentWrapper.find('.panel-chart-road').html('<canvas id="summary-chart-road"></canvas>');
+            $parentWrapper.find('#summary-chart-road-residential').remove();
+            $parentWrapper.find('.panel-chart-road-residential').html('<canvas id="summary-chart-road-residential" style="height: 50px"></canvas>');
 
             let total_road_array = [];
             let graph_data = [];
@@ -90,12 +87,21 @@ define([
                 'village_id', 'name', 'region', 'district_id', 'sub_district_id', 'sub_dc_code', 'village_code', 'dc_code',
                 'trigger_status', 'road_count'
             ];
+            let residential_flood_data = [];
+            let residential_data = [];
             for(var key in data) {
                 if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') > -1) {
-                    flood_graph_data.push({
-                        y: key.replace('_flooded_road_count', ''),
-                        x: data[key]
-                    });
+                    if(key.indexOf('residential') > -1){
+                        residential_flood_data.push({
+                            y: key.replace('_flooded_road_count', ''),
+                            x: data[key]
+                        });
+                    }else {
+                        flood_graph_data.push({
+                            y: key.replace('_flooded_road_count', ''),
+                            x: data[key]
+                        });
+                    }
                 }
 
                 if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') === -1) {
@@ -104,10 +110,18 @@ define([
                     if(!count === NaN){
                         count = 0
                     }
-                    graph_data.push({
-                        y: key.replace('_road_count', ''),
-                        x: count
-                    });
+
+                    if(key.indexOf('residential') > -1){
+                        residential_data.push({
+                            y: key.replace('_road_count', ''),
+                            x: count
+                        });
+                    }else {
+                        graph_data.push({
+                            y: key.replace('_road_count', ''),
+                            x: count
+                        });
+                    }
 
                     total_road_array.push({
                         key: key.replace('_road_count', ''),
@@ -121,7 +135,9 @@ define([
 
             var label = [];
             for(var o in total_road_array) {
-                label.push(total_road_array[o].key);
+                if(total_road_array[o].key.indexOf('residential') === -1) {
+                    label.push(total_road_array[o].key);
+                }
             }
 
             graph_data.sort(function(a, b){
@@ -136,6 +152,20 @@ define([
             for(let i=0; i<label.length; i++) {
                 humanLabel.push(toTitleCase(label[i].replace('_', ' ')))
             }
+
+            var ctxResidential = document.getElementById('summary-chart-road-residential').getContext('2d');
+            var datasetsResidential = {
+                labels: ['Residential'],
+                datasets: [
+                    {
+                        label: "Not Flooded",
+                        data: residential_data
+                    }, {
+                        label: "Flooded",
+                        data: residential_flood_data,
+                        backgroundColor: ['#82B7CA']
+                    }]
+            };
 
             var ctx = document.getElementById('summary-chart-road').getContext('2d');
             var datasets = {
@@ -155,10 +185,46 @@ define([
             $('#vulnerability-score-road').html(total_vulnerability_score);
             $('#road-count').html(data['flooded_flooded_road_count']);
 
+            new Chart(ctxResidential, {
+                type: 'horizontalBar',
+                data: datasetsResidential,
+                options: {
+                    legend: {
+                        display: true,
+                        onClick: function (e) {
+                            e.stopPropagation();
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                            gridLines: {
+                                display:false
+                            },
+                            ticks: {
+                                min: 0
+                            }
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            gridLines: {
+                                display:false
+                            },
+                            barPercentage: 0.5
+                        }]
+                    },
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+
             new Chart(ctx, {
                 type: 'horizontalBar',
                 data: datasets,
                 options: {
+                    legend: {
+                        display: false
+                    },
                     scales: {
                         xAxes: [{
                             stacked: true,
@@ -216,7 +282,9 @@ define([
 
             let $parentWrapper = $('#chart-score-panel');
             $parentWrapper.find('#summary-chart').remove();
-            $parentWrapper.find('.panel-chart').html('<canvas id="summary-chart"></canvas>');
+            $parentWrapper.find('.panel-chart').html('<canvas id="summary-chart" style="height: 250px"></canvas>');
+            $parentWrapper.find('#summary-chart-residential').remove();
+            $parentWrapper.find('.panel-chart-residential').html('<canvas id="summary-chart-residential" style="height: 50px"></canvas>');
             $('#region-summary-panel').html('');
 
             let total_building_array = [];
@@ -228,12 +296,21 @@ define([
                 'village_id', 'name', 'region', 'district_id', 'sub_district_id', 'sub_dc_code', 'village_code', 'dc_code',
                 'trigger_status'
             ];
+            let residential_flood_data = [];
+            let residential_data = [];
             for(var key in data) {
                 if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') > -1) {
-                    flood_graph_data.push({
-                        y: key.replace('_flooded_building_count', ''),
-                        x: data[key]
-                    });
+                    if(key.indexOf('residential') > -1){
+                        residential_flood_data.push({
+                            y: key.replace('_flooded_building_count', ''),
+                            x: data[key]
+                        });
+                    }else {
+                        flood_graph_data.push({
+                            y: key.replace('_flooded_building_count', ''),
+                            x: data[key]
+                        });
+                    }
                 }
 
                 if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') === -1) {
@@ -242,10 +319,18 @@ define([
                     if(!count === NaN){
                         count = 0
                     }
-                    graph_data.push({
-                        y: key.replace('_building_count', ''),
-                        x: count
-                    });
+
+                    if(key.indexOf('residential') > -1){
+                        residential_data.push({
+                            y: key.replace('_building_count', ''),
+                            x: count
+                        });
+                    }else {
+                        graph_data.push({
+                            y: key.replace('_building_count', ''),
+                            x: count
+                        });
+                    }
 
                     total_building_array.push({
                         key: key.replace('_building_count', ''),
@@ -259,7 +344,9 @@ define([
 
             var label = [];
             for(var o in total_building_array) {
-                label.push(total_building_array[o].key);
+                if(total_building_array[o].key.indexOf('residential') === -1) {
+                    label.push(total_building_array[o].key);
+                }
             }
 
             graph_data.sort(function(a, b){
@@ -275,6 +362,19 @@ define([
                 humanLabel.push(toTitleCase(label[i].replace('_', ' ')))
             }
 
+            var ctxResidential = document.getElementById('summary-chart-residential').getContext('2d');
+            var datasetsResidential = {
+                labels: ['Residential'],
+                datasets: [
+                    {
+                        label: "Not Flooded",
+                        data: residential_data
+                    }, {
+                        label: "Flooded",
+                        data: residential_flood_data,
+                        backgroundColor: ['#82B7CA']
+                    }]
+            };
             var ctx = document.getElementById('summary-chart').getContext('2d');
             var datasets = {
                 labels: humanLabel,
@@ -297,6 +397,9 @@ define([
                 type: 'horizontalBar',
                 data: datasets,
                 options: {
+                    legend: {
+                        display: false
+                    },
                     scales: {
                         xAxes: [{
                             stacked: true,
@@ -316,6 +419,39 @@ define([
                     },
                     responsive: true,
                     maintainAspectRatio: false
+                }
+            });
+
+            new Chart(ctxResidential, {
+                type: 'horizontalBar',
+                data: datasetsResidential,
+                options: {
+                    legend: {
+                        display: true,
+                        onClick: function (e) {
+                            e.stopPropagation();
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            stacked: true,
+                            gridLines: {
+                                display:false
+                            },
+                            ticks: {
+                                min: 0
+                            }
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            gridLines: {
+                                display:false
+                            },
+                            barPercentage: 0.5
+                        }]
+                    },
+                    responsive: true,
+                    maintainAspectRatio: true
                 }
             });
         },
@@ -378,8 +514,9 @@ define([
             dispatcher.trigger('flood:fetch-stats-data', region, region_id, false);
             dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, false);
             this.fetchExtent(region_id, region);
-            dispatcher.trigger('map:show-region-boundary', region, region_id);
             let forecast_id = floodCollectionView.selected_forecast.id;
+            dispatcher.trigger('map:show-exposed-roads', forecast_id, region, region_id);
+            dispatcher.trigger('map:show-region-boundary', region, region_id);
             dispatcher.trigger('map:show-exposed-buildings', forecast_id, region, region_id);
             $('#accordion').animate({
               scrollTop: 0
@@ -418,8 +555,9 @@ define([
             dispatcher.trigger('flood:fetch-stats-data', region, region_id, main);
             dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, main);
             this.fetchExtent(region_id, region);
-            dispatcher.trigger('map:show-region-boundary', region, region_id);
             let forecast_id = floodCollectionView.selected_forecast.id;
+            dispatcher.trigger('map:show-exposed-roads', forecast_id, region, region_id);
+            dispatcher.trigger('map:show-region-boundary', region, region_id);
             dispatcher.trigger('map:show-exposed-buildings', forecast_id, region, region_id);
         },
         containsReferer: function (obj, list) {
@@ -499,6 +637,16 @@ define([
                         dispatcher.trigger('map:fit-bounds', coordinates)
                     }
             }});
+        },
+        switchTab: function (e) {
+            let $div = $(e.target).closest('.tab-title');
+            if(!$div.hasClass('tab-active')) {
+                $('.tab-wrapper').hide();
+                $('.tab-title').removeClass('tab-active');
+                $div.addClass('tab-active');
+                let target = $div.attr('tab-target');
+                $('.tab-' + target).show();
+            }
         }
     })
 });

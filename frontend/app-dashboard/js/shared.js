@@ -2,6 +2,7 @@ var dispatcher;
 var mapView;
 var AppRequest;
 var floodCollectionView;
+var resetView = true;
 
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
