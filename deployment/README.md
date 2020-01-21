@@ -20,6 +20,7 @@ Edit `.env` file and change corresponding `_SERVER` and `_BASE_URL` value.
 By default, if you want to setup full test server in your local machine, all `*.fbf.test` subdomain should refer to your local machine's IP Address.
 
 If you just want to develop frontend only against staging backend, use staging server address.
+To make it easier, copy `.sample.staging.env` as `.env` file.
 
 Once that is done, execute
 
