@@ -33,7 +33,7 @@ export PBF_URL=${PBF_URL:-http://cloud.kartoza.com/s/sxR8anXo5fgFN9Q/download}
 
 # Retrieve PBF test files
 echo "Downloading test PBF file: ${PBF_URL}"
-curl ${PBF_URL} -o docker-osm-settings/custom_settings/country.pdf
+curl -L ${PBF_URL} -o docker-osm-settings/custom_settings/country.pbf
 
 popd
 

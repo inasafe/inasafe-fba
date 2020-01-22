@@ -23,9 +23,21 @@ build-archive:
 	@cd ../forecast_script;$(MAKE) build
 
 backend-up:
-	@cd ../docker-osm/indonesia-buildings; $(MAKE) up
-	@cd ../geoserver; $(MAKE) up
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) up SERVICE=$(SERVICE)
+#	@cd ../geoserver; $(MAKE) up
+
+backend-logs:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) logs SERVICE=$(SERVICE)
+
+backend-test:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) test
+
+wait-db-ready:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) wait-db-ready
+
+wait-backend-ready:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) wait-backend-ready
 
 backend-down:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) down
-	@cd ../geoserver; $(MAKE) down
+#	@cd ../geoserver; $(MAKE) down

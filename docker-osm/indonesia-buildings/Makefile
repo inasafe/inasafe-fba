@@ -16,12 +16,34 @@ prepare-integration-tests:
 	@echo "------------------------------------------------------------------"
 	@WORKING_DIR=$(PWD); FIXTURES_PATH=$(PWD)/../../fixtures; source $${FIXTURES_PATH}/tests/scripts/integration-tests-prepare.sh
 
+upgrade-plpython-scripts:
+	@docker-compose exec db bash -c 'wget -qO- $${ARCHIVE_BASE_URL}/install-plpython-scripts.sh | bash'
+#	@docker-compose exec db sh -c 'echo "$${ARCHIVE_BASE_URL}/install-plpython-scripts.sh"'
+
+shell:
+	@docker-compose exec db bash
+
+testrunner-shell:
+	@docker-compose exec testrunner bash
+
+test:
+	@docker-compose exec testrunner python -m unittest discover
+
+wait-db-ready:
+	@docker-compose exec db bash -c 'while ! su - postgres -c "psql -l" > /dev/null; do echo "Database not ready. Wait"; sleep $(or ${TIMEOUT},5); done; echo "Database ready."'
+
+wait-backend-ready:
+	@docker-compose exec testrunner bash -c 'while ! python -m unittest backend 2>&1 > /dev/null; do echo "Database not ready. Waiting"; sleep $(or ${TIMEOUT},60); done; echo "Backend ready."'
+
+ps:
+	@docker-compose ps
+
 up:
 	@echo
 	@echo "------------------------------------------------------------------"
 	@echo "Bringing up docker osm instance with default prod configuration"
 	@echo "------------------------------------------------------------------"
-	@docker-compose up -d
+	@docker-compose up -d $(SERVICE)
 
 run: run-docker-osm-setting 
 	@echo
@@ -72,4 +94,4 @@ logs:
 	@echo "------------------------------------------------------------------"
 	@echo "Show logs of stack status"
 	@echo "------------------------------------------------------------------"
-	@docker-compose logs -f
+	@docker-compose logs -f --tail=30 $(SERVICE)
