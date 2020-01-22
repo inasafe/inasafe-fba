@@ -11,3 +11,6 @@ pushd ${REPO_ROOT}/forecast_script
 make build
 popd
 cp ${REPO_ROOT}/forecast_script/tmp/entrypoint-scripts.zip ${REPO_ROOT}/archive/forecast_scripts/
+
+# Deploy plpython install scripts to archive
+cp -rf ${REPO_ROOT}/deployment/docker/scripts/install-plpython-scripts.sh ${REPO_ROOT}/archive/

@@ -1,0 +1,39 @@
+language: python
+
+services:
+  - docker
+
+addons:
+  hosts:
+    - fbf.test
+    - postgrest.fbf.test
+    - swagger.fbf.test
+    - geoserver.fbf.test
+
+before_install:
+  # We use makefile to control build
+  - sudo apt -y update; sudo apt -y install make zip wget curl
+
+before_script:
+  # Frontend deployment
+  - pushd deployment
+  - cp .sample.env .env
+  - popd
+  # Docker OSM backend
+  - pushd docker-osm/indonesia-buildings
+  - make prepare-integration-tests
+  - popd
+
+script:
+  # Backend deployment tests
+  - pushd deployment
+  - make backend-up SERVICE=db
+  - make wait-db-ready
+  - make backend-up SERVICE=imposm
+  - make backend-up SERVICE=testrunner
+  - make backend-up SERVICE=postgrest
+  - make backend-up SERVICE=swagger
+  - make backend-logs SERVICE=imposm &
+  - make wait-backend-ready
+  - make backend-test
+  - popd

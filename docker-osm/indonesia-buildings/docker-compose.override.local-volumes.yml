@@ -16,5 +16,10 @@ volumes:
   osm_data:
     driver_opts:
       type: none
-      device: ${PWD}/docker-osm-settings/settings
+      device: ${PWD}/docker-osm-settings/custom_settings
+      o: bind
+  test-package:
+    driver_opts:
+      type: none
+      device: ${PWD}/../../fixtures/tests
       o: bind

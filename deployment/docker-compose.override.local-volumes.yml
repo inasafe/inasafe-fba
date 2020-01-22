@@ -3,3 +3,5 @@ services:
   inasafe-fba:
     volumes:
       - ../frontend/app-dashboard:/usr/share/nginx/app-dashboard
+    ports:
+      - "8080:80"
