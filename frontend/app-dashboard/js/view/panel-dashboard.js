@@ -603,12 +603,17 @@ define([
         fetchExcel: function (){
             let that = this;
             const modal = $('#fbf-modal');
+            let $loadingIcon = $('.download-spreadsheet-loading');
+            $loadingIcon.show();
+            $loadingIcon.closest('button').prop('disabled', true);
             $.post({
                 url: `${postgresUrl}rpc/flood_event_spreadsheet`,
                 data: {
-                    "flood_event_id":floodCollectionView.selected_forecast.attributes.id
+                    "hazard_event_id":floodCollectionView.selected_forecast.attributes.id
                 },
                 success: function (data) {
+                    $loadingIcon.hide();
+                    $loadingIcon.closest('button').prop('disabled', false);
                     if (data.length > 0 && data[0].hasOwnProperty('spreadsheet_content') && data[0]['spreadsheet_content']) {
                         that.downloadSpreadsheet(data[0]['spreadsheet_content']);
                     } else {
@@ -617,6 +622,10 @@ define([
                             'toggle'
                         );
                     }
+                },
+                error: function () {
+                    $loadingIcon.hide();
+                    $loadingIcon.closest('button').prop('disabled', false);
                 }
             })
         },
