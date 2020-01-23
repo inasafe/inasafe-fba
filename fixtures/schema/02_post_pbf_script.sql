@@ -1591,40 +1591,6 @@ CREATE SEQUENCE public.building_type_class_id_seq
 ALTER SEQUENCE public.building_type_class_id_seq OWNED BY public.building_type_class.id;
 
 
---
--- Name: clip; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.clip (
-    ogc_fid integer NOT NULL,
-    id numeric(10,0),
-    width numeric(21,6),
-    height numeric(21,6),
-    area numeric(21,6),
-    perimeter numeric(21,6),
-    geom public.geometry(MultiPolygon,4326)
-);
-
-
---
--- Name: clip_ogc_fid_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.clip_ogc_fid_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: clip_ogc_fid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.clip_ogc_fid_seq OWNED BY public.clip.ogc_fid;
-
 
 --
 -- Name: hazard_class; Type: TABLE; Schema: public; Owner: -
@@ -1671,35 +1637,6 @@ CREATE TABLE public.dev_reports (
 -- Name: district; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.district (
-    id integer NOT NULL,
-    geom public.geometry(MultiPolygon,4326),
-    prov_code double precision,
-    dc_code double precision NOT NULL,
-    name character varying(254)
-);
-
-
---
--- Name: district_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.district_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: district_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.district_id_seq OWNED BY public.district.id;
-
-
 --
 -- Name: district_trigger_status; Type: TABLE; Schema: public; Owner: -
 --
@@ -1731,43 +1668,6 @@ CREATE SEQUENCE public.district_trigger_status_id_seq
 
 ALTER SEQUENCE public.district_trigger_status_id_seq OWNED BY public.district_trigger_status.id;
 
-
---
--- Name: fb_gavin; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.fb_gavin (
-    flood_event_id integer,
-    district_id double precision,
-    sub_district_id numeric,
-    village_id double precision,
-    building_type character varying(100),
-    district_count bigint,
-    sub_district_count bigint,
-    village_count bigint,
-    building_type_count bigint
-);
-
-
---
--- Name: flood_event_buildings_gavin; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.flood_event_buildings_gavin (
-    flood_event_id integer,
-    district_id double precision,
-    sub_district_id numeric,
-    village_id double precision,
-    building_type character varying(100),
-    buildings_in_district bigint,
-    buildings_in_sub_district bigint,
-    buildings_in_village bigint,
-    buildings_of_type_in_village bigint,
-    flooded_buildings_in_district bigint,
-    flooded_buildings_in_sub_district bigint,
-    flooded_buildings_in_village bigint,
-    flooded_buildings_of_type_in_village bigint
-);
 
 
 --
@@ -1949,6 +1849,24 @@ CREATE TABLE public.hazard (
     station character varying(255)
 );
 
+--
+-- Name: osm_flood_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.osm_flood_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: osm_flood_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.osm_flood_id_seq OWNED BY public.hazard.id;
 
 --
 -- Name: hazard_type; Type: TABLE; Schema: public; Owner: -
@@ -1980,73 +1898,6 @@ CREATE SEQUENCE public.hazard_type_id_seq
 ALTER SEQUENCE public.hazard_type_id_seq OWNED BY public.hazard_type.id;
 
 
---
--- Name: layer_styles; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.layer_styles (
-    id integer NOT NULL,
-    f_table_catalog character varying,
-    f_table_schema character varying,
-    f_table_name character varying,
-    f_geometry_column character varying,
-    stylename character varying(30),
-    styleqml xml,
-    stylesld xml,
-    useasdefault boolean,
-    description text,
-    owner character varying(30),
-    ui xml,
-    update_time timestamp without time zone DEFAULT now()
-);
-
-
---
--- Name: layer_styles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.layer_styles_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: layer_styles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.layer_styles_id_seq OWNED BY public.layer_styles.id;
-
-
---
--- Name: sub_district; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.sub_district (
-    id integer NOT NULL,
-    geom public.geometry(MultiPolygon,4326),
-    prov_code smallint,
-    dc_code smallint,
-    name character varying(255),
-    sub_dc_code numeric NOT NULL
-);
-
-
---
--- Name: village; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.village (
-    id integer NOT NULL,
-    geom public.geometry(MultiPolygon,4326),
-    prov_code double precision,
-    dc_code double precision,
-    sub_dc_code double precision,
-    village_code double precision NOT NULL,
-    name character varying(254)
-);
 
 
 --
@@ -2066,51 +1917,6 @@ CREATE MATERIALIZED VIEW public.mv_administrative_mapping AS
   WITH NO DATA;
 
 
---
--- Name: osm_buildings; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.osm_buildings (
-    id integer NOT NULL,
-    osm_id bigint NOT NULL,
-    name character varying,
-    use character varying,
-    religion character varying,
-    leisure character varying,
-    height integer,
-    "building:levels" character varying,
-    "building:height" integer,
-    "building:min_level" integer,
-    "roof:direction" character varying,
-    "roof:levels" integer,
-    "roof:shape" character varying,
-    surface character varying,
-    "roof:orientation" character varying,
-    "roof:height" integer,
-    "roof:material" character varying,
-    "building:material" character varying,
-    type character varying,
-    amenity character varying,
-    landuse character varying,
-    geometry public.geometry(Geometry,4326),
-    building_type character varying(100),
-    building_area numeric,
-    building_type_score numeric,
-    building_road_length numeric,
-    building_material_score numeric,
-    building_area_score numeric,
-    building_road_density_score numeric,
-    total_vulnerability numeric,
-    building_road_density integer,
-    building_id integer,
-    village_id double precision,
-    sub_district_id numeric,
-    district_id double precision,
-    changeset_id integer,
-    changeset_version integer,
-    changeset_timestamp timestamp without time zone,
-    changeset_user character varying
-);
 
 
 --
@@ -2381,28 +2187,7 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_district_summary AS
   WITH NO DATA;
 
 
---
--- Name: osm_roads; Type: TABLE; Schema: public; Owner: -
---
 
-CREATE TABLE public.osm_roads (
-    id integer NOT NULL,
-    osm_id bigint NOT NULL,
-    type character varying,
-    name character varying,
-    class character varying,
-    geometry public.geometry(LineString,4326),
-    road_type character varying(50),
-    roads_id integer,
-    changeset_id integer,
-    changeset_version integer,
-    changeset_timestamp timestamp without time zone,
-    changeset_user character varying,
-    village_id double precision,
-    district_id double precision,
-    sub_district_id numeric,
-    road_type_score numeric
-);
 
 
 --
@@ -3488,140 +3273,9 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_village_summary AS
   WITH NO DATA;
 
 
---
--- Name: osm_admin; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.osm_admin (
-    geometry public.geometry(Geometry,4326),
-    gid integer,
-    osm_id numeric,
-    name character varying(254),
-    type character varying(254),
-    admin_level bigint,
-    changeset_id integer,
-    changeset_version integer,
-    changeset_timestamp timestamp without time zone,
-    changeset_user character varying
-);
 
 
---
--- Name: osm_buildings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
 
-CREATE SEQUENCE public.osm_buildings_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: osm_buildings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.osm_buildings_id_seq OWNED BY public.osm_buildings.id;
-
-
---
--- Name: osm_flood_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.osm_flood_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: osm_flood_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.osm_flood_id_seq OWNED BY public.hazard.id;
-
-
---
--- Name: osm_roads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.osm_roads_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: osm_roads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.osm_roads_id_seq OWNED BY public.osm_roads.id;
-
-
---
--- Name: osm_summary_gavin; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.osm_summary_gavin (
-    district_id double precision,
-    sub_district_id numeric,
-    village_id double precision,
-    building_type character varying(100),
-    district_count bigint,
-    sub_district_count bigint,
-    village_count bigint,
-    building_type_count bigint
-);
-
-
---
--- Name: osm_waterways; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.osm_waterways (
-    id integer NOT NULL,
-    osm_id bigint NOT NULL,
-    name character varying,
-    boat boolean,
-    intermittent boolean,
-    "name:af" character varying,
-    osm_type character varying,
-    waterway character varying,
-    geometry public.geometry(LineString,4326),
-    waterway_id integer,
-    changeset_id integer,
-    changeset_version integer,
-    changeset_timestamp timestamp without time zone,
-    changeset_user character varying
-);
-
-
---
--- Name: osm_waterways_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.osm_waterways_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: osm_waterways_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.osm_waterways_id_seq OWNED BY public.osm_waterways.id;
 
 
 --
@@ -3654,36 +3308,7 @@ CREATE SEQUENCE public.progress_status_id_seq
 ALTER SEQUENCE public.progress_status_id_seq OWNED BY public.progress_status.id;
 
 
---
--- Name: province; Type: TABLE; Schema: public; Owner: -
---
 
-CREATE TABLE public.province (
-    id integer NOT NULL,
-    geom public.geometry(MultiPolygon,4326),
-    name character varying(50),
-    prov_code double precision
-);
-
-
---
--- Name: province_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.province_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: province_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.province_id_seq OWNED BY public.province.id;
 
 
 --
@@ -3810,24 +3435,6 @@ CREATE SEQUENCE public.spreadsheet_reports_id_seq
 ALTER SEQUENCE public.spreadsheet_reports_id_seq OWNED BY public.spreadsheet_reports.id;
 
 
---
--- Name: sub_district_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.sub_district_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: sub_district_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.sub_district_id_seq OWNED BY public.sub_district.id;
 
 
 --
@@ -3880,24 +3487,6 @@ CREATE SEQUENCE public.trigger_status_id_seq
 ALTER SEQUENCE public.trigger_status_id_seq OWNED BY public.trigger_status.id;
 
 
---
--- Name: village_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.village_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: village_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.village_id_seq OWNED BY public.village.id;
 
 
 --
@@ -4085,18 +3674,7 @@ ALTER SEQUENCE public.waterway_type_class_id_seq OWNED BY public.waterway_type_c
 ALTER TABLE ONLY public.building_type_class ALTER COLUMN id SET DEFAULT nextval('public.building_type_class_id_seq'::regclass);
 
 
---
--- Name: clip ogc_fid; Type: DEFAULT; Schema: public; Owner: -
---
 
-ALTER TABLE ONLY public.clip ALTER COLUMN ogc_fid SET DEFAULT nextval('public.clip_ogc_fid_seq'::regclass);
-
-
---
--- Name: district id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.district ALTER COLUMN id SET DEFAULT nextval('public.district_id_seq'::regclass);
 
 
 --
@@ -4162,32 +3740,9 @@ ALTER TABLE ONLY public.hazard_map ALTER COLUMN id SET DEFAULT nextval('public.f
 ALTER TABLE ONLY public.hazard_type ALTER COLUMN id SET DEFAULT nextval('public.hazard_type_id_seq'::regclass);
 
 
---
--- Name: layer_styles id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.layer_styles ALTER COLUMN id SET DEFAULT nextval('public.layer_styles_id_seq'::regclass);
 
 
---
--- Name: osm_buildings id; Type: DEFAULT; Schema: public; Owner: -
---
 
-ALTER TABLE ONLY public.osm_buildings ALTER COLUMN id SET DEFAULT nextval('public.osm_buildings_id_seq'::regclass);
-
-
---
--- Name: osm_roads id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.osm_roads ALTER COLUMN id SET DEFAULT nextval('public.osm_roads_id_seq'::regclass);
-
-
---
--- Name: osm_waterways id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.osm_waterways ALTER COLUMN id SET DEFAULT nextval('public.osm_waterways_id_seq'::regclass);
 
 
 --
@@ -4197,11 +3752,6 @@ ALTER TABLE ONLY public.osm_waterways ALTER COLUMN id SET DEFAULT nextval('publi
 ALTER TABLE ONLY public.progress_status ALTER COLUMN id SET DEFAULT nextval('public.progress_status_id_seq'::regclass);
 
 
---
--- Name: province id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.province ALTER COLUMN id SET DEFAULT nextval('public.province_id_seq'::regclass);
 
 
 --
@@ -4232,11 +3782,7 @@ ALTER TABLE ONLY public.road_type_class ALTER COLUMN id SET DEFAULT nextval('pub
 ALTER TABLE ONLY public.spreadsheet_reports ALTER COLUMN id SET DEFAULT nextval('public.spreadsheet_reports_id_seq'::regclass);
 
 
---
--- Name: sub_district id; Type: DEFAULT; Schema: public; Owner: -
---
 
-ALTER TABLE ONLY public.sub_district ALTER COLUMN id SET DEFAULT nextval('public.sub_district_id_seq'::regclass);
 
 
 --
@@ -4257,7 +3803,6 @@ ALTER TABLE ONLY public.trigger_status ALTER COLUMN id SET DEFAULT nextval('publ
 -- Name: village id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.village ALTER COLUMN id SET DEFAULT nextval('public.village_id_seq'::regclass);
 
 
 --
@@ -4274,12 +3819,7 @@ ALTER TABLE ONLY public.village_trigger_status ALTER COLUMN id SET DEFAULT nextv
 ALTER TABLE ONLY public.waterway_type_class ALTER COLUMN id SET DEFAULT nextval('public.waterway_type_class_id_seq'::regclass);
 
 
---
--- Name: clip clip_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
 
-ALTER TABLE ONLY public.clip
-    ADD CONSTRAINT clip_pkey PRIMARY KEY (ogc_fid);
 
 
 --
@@ -4288,14 +3828,6 @@ ALTER TABLE ONLY public.clip
 
 ALTER TABLE ONLY public.hazard_class
     ADD CONSTRAINT depth_class_pkey PRIMARY KEY (id);
-
-
---
--- Name: district district_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.district
-    ADD CONSTRAINT district_pkey PRIMARY KEY (dc_code);
 
 
 --
@@ -4354,36 +3886,8 @@ ALTER TABLE ONLY public.hazard_type
     ADD CONSTRAINT hazard_type_pkey PRIMARY KEY (id);
 
 
---
--- Name: layer_styles layer_styles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.layer_styles
-    ADD CONSTRAINT layer_styles_pkey PRIMARY KEY (id);
 
 
---
--- Name: osm_buildings osm_buildings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.osm_buildings
-    ADD CONSTRAINT osm_buildings_pkey PRIMARY KEY (osm_id);
-
-
---
--- Name: osm_roads osm_roads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.osm_roads
-    ADD CONSTRAINT osm_roads_pkey PRIMARY KEY (osm_id, id);
-
-
---
--- Name: osm_waterways osm_waterways_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.osm_waterways
-    ADD CONSTRAINT osm_waterways_pkey PRIMARY KEY (osm_id, id);
 
 
 --
@@ -4397,9 +3901,6 @@ ALTER TABLE ONLY public.progress_status
 --
 -- Name: province province_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
-
-ALTER TABLE ONLY public.province
-    ADD CONSTRAINT province_pkey PRIMARY KEY (id);
 
 
 --
@@ -4434,12 +3935,6 @@ ALTER TABLE ONLY public.trigger_status
     ADD CONSTRAINT status_name_key UNIQUE (name);
 
 
---
--- Name: sub_district sub_district_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sub_district
-    ADD CONSTRAINT sub_district_pkey PRIMARY KEY (sub_dc_code);
 
 
 --
@@ -4462,9 +3957,6 @@ ALTER TABLE ONLY public.trigger_status
 -- Name: village village_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.village
-    ADD CONSTRAINT village_pkey PRIMARY KEY (village_code);
-
 
 --
 -- Name: village_trigger_status village_trigger_status_pkey; Type: CONSTRAINT; Schema: public; Owner: -
@@ -4474,11 +3966,6 @@ ALTER TABLE ONLY public.village_trigger_status
     ADD CONSTRAINT village_trigger_status_pkey PRIMARY KEY (id);
 
 
---
--- Name: clip_wkb_geometry_geom_idx; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX clip_wkb_geometry_geom_idx ON public.clip USING gist (geom);
 
 
 --
@@ -4530,88 +4017,9 @@ CREATE INDEX id_osm_flood_idx ON public.hazard USING btree (id);
 CREATE INDEX id_osm_flood_name ON public.hazard USING btree (name);
 
 
---
--- Name: idx_osm_building_area_score; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_building_area_score ON public.osm_buildings USING btree (building_area_score);
 
 
---
--- Name: idx_osm_building_material_score; Type: INDEX; Schema: public; Owner: -
---
 
-CREATE INDEX idx_osm_building_material_score ON public.osm_buildings USING btree (building_material_score);
-
-
---
--- Name: idx_osm_building_road_density_score; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_building_road_density_score ON public.osm_buildings USING btree (building_road_density_score);
-
-
---
--- Name: idx_osm_building_road_length; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_building_road_length ON public.osm_buildings USING btree (building_road_length);
-
-
---
--- Name: idx_osm_building_total_vulnerability; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_building_total_vulnerability ON public.osm_buildings USING btree (total_vulnerability);
-
-
---
--- Name: idx_osm_building_type; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_building_type ON public.osm_buildings USING btree (building_type);
-
-
---
--- Name: idx_osm_building_type_score; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_building_type_score ON public.osm_buildings USING btree (building_type_score);
-
-
---
--- Name: idx_osm_road; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_road ON public.osm_roads USING btree (road_type);
-
-
---
--- Name: idx_osm_roads_osm_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_roads_osm_id ON public.osm_roads USING btree (osm_id);
-
-
---
--- Name: idx_osm_waterways_osm_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_waterways_osm_id ON public.osm_waterways USING btree (osm_id);
-
-
---
--- Name: idx_osm_waterways_way; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_osm_waterways_way ON public.osm_waterways USING btree (waterway);
-
-
---
--- Name: osm_buildings_geom; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX osm_buildings_geom ON public.osm_buildings USING gist (geometry);
 
 
 --
@@ -4621,18 +4029,6 @@ CREATE INDEX osm_buildings_geom ON public.osm_buildings USING gist (geometry);
 CREATE INDEX osm_flood_gix ON public.hazard USING gist (geometry);
 
 
---
--- Name: osm_roads_geom; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX osm_roads_geom ON public.osm_roads USING gist (geometry);
-
-
---
--- Name: osm_waterways_geom; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX osm_waterways_geom ON public.osm_waterways USING gist (geometry);
 
 
 --
@@ -4649,32 +4045,7 @@ CREATE UNIQUE INDEX reporting_point_glofas_id_uindex ON public.reporting_point U
 CREATE UNIQUE INDEX reporting_point_id_uindex ON public.reporting_point USING btree (id);
 
 
---
--- Name: sidx_district_geom; Type: INDEX; Schema: public; Owner: -
---
 
-CREATE INDEX sidx_district_geom ON public.district USING gist (geom);
-
-
---
--- Name: sidx_province_geom; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX sidx_province_geom ON public.province USING gist (geom);
-
-
---
--- Name: sidx_sub_district_geom; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX sidx_sub_district_geom ON public.sub_district USING gist (geom);
-
-
---
--- Name: sidx_village_geom; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX sidx_village_geom ON public.village USING gist (geom);
 
 
 --
@@ -4899,28 +4270,6 @@ ALTER TABLE ONLY public.hazard_event
     ADD CONSTRAINT hazard_type_fkey FOREIGN KEY (hazard_type_id) REFERENCES public.hazard_type(id);
 
 
---
--- Name: osm_buildings osm_buildings_district_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.osm_buildings
-    ADD CONSTRAINT osm_buildings_district_id_fkey FOREIGN KEY (district_id) REFERENCES public.district(dc_code);
-
-
---
--- Name: osm_buildings osm_buildings_sub_district_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.osm_buildings
-    ADD CONSTRAINT osm_buildings_sub_district_id_fkey FOREIGN KEY (sub_district_id) REFERENCES public.sub_district(sub_dc_code);
-
-
---
--- Name: osm_buildings osm_buildings_village_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.osm_buildings
-    ADD CONSTRAINT osm_buildings_village_id_fkey FOREIGN KEY (village_id) REFERENCES public.village(village_code);
 
 
 --
