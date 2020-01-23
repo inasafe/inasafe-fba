@@ -7,7 +7,7 @@ services:
     ports:
       - "5432:5432"
 
-  web:
-    image: nginx
-    volumes:
-      - ./:/
+#  web:
+#    image: nginx
+#    volumes:
+#      - ./:/
