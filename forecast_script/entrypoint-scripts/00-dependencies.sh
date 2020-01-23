@@ -5,9 +5,7 @@ apt -y update; apt -y install python3 python3-pip git
 
 # Add ubuntugis
 apt -y install software-properties-common wget
-add-apt-repository ppa:ubuntugis/ppa
 apt -y update
-apt -y upgrade
 
 # Add GDAL
 apt -y install gdal-bin libgdal-dev python3-gdal
@@ -15,7 +13,9 @@ export CPLUS_INCLUDE_PATH=/usr/include/gdal
 export C_INCLUDE_PATH=/usr/include/gdal
 pip3 install GDAL==`gdal-config --version`
 
-export PG_MAJOR_VERSION=$(pg_config --version | grep -Po '(?<=PostgreSQL )[^.]+')
+source /env-data.sh
+export PG_MAJOR_VERSION=$(${POSTGRES} --version | grep -Po '(?<=PostgreSQL\) )[^.]+')
+echo "Postgres major version: $PG_MAJOR_VERSION"
 
 # Add pg_cron
 apt -y install postgresql-$PG_MAJOR_VERSION-cron
@@ -25,6 +25,19 @@ echo "cron.database_name = 'gis'" >> /etc/postgresql/$PG_MAJOR_VERSION/main/post
 # Add plpython3u
 apt -y install postgresql-plpython3-$PG_MAJOR_VERSION
 
-# Needs postgres restart to apply new extension library
-source /env-data.sh
-restart_postgres
+#function force_restart_postgres {
+#PID=`cat ${PG_PID}`
+#kill -KILL ${PID}
+#
+## Brought postgres back up again
+#source /env-data.sh
+#su - postgres -c "${POSTGRES} -D ${DATADIR} -c config_file=${CONF} ${LOCALONLY} &"
+#
+## wait for postgres to come up
+#until su - postgres -c "psql -l"; do
+#  sleep 1
+#done
+#echo "postgres ready"
+#}
+#
+#force_restart_postgres
