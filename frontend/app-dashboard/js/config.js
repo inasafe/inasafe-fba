@@ -14,6 +14,7 @@ require.config({
         'airDatepicker': 'libs/airdatepicker/js/datepicker',
         'airDatepickerEN': 'libs/airdatepicker/js/i18n/datepicker.en',
         'chartjs': 'libs/chart/Chart-2.7.2',
+        'chartPluginLabel': 'libs/chart-plugin-label/chartjs-plugin-labels',
         'markdown': 'libs/markdown-it-10.0.0/markdown-it.min',
         'filesaver': 'libs/filesaver/FileSaver',
         'leafletWMSLegend': 'libs/leaflet-wms-legend/leaflet.wmslegend',
@@ -54,6 +55,9 @@ require.config({
         },
         leafletAwesomeIcon: {
             deps: ['leaflet']
+        },
+        chartPluginLabel: {
+            deps: ['chartjs']
         }
     }
 });
