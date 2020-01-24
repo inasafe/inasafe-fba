@@ -420,3 +420,7 @@ form label {
     font-size: 11pt;
     display: none;
 }
+
+.panel-chart, .panel-chart-road, .panel-chart-residential, .panel-chart-road-residential {
+    margin-top: 15px
+}

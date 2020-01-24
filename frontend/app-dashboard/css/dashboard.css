@@ -321,6 +321,7 @@ body {
 
 .tab-active {
     border-bottom: none !important;
+    background-color: transparent !important;
 }
 
 .tab-title {
@@ -328,6 +329,7 @@ body {
     border-bottom: 1px solid #ddd;
     margin-bottom: -10px !important;
     cursor: pointer;
+    background-color: #F0F0F0;
 }
 
 .general-legend-control {

@@ -4,9 +4,10 @@ define([
     'jquery',
     'jqueryUi',
     'chartjs',
+    'chartPluginLabel',
     'filesaver',
-    'js/model/trigger_status.js'
-], function (Backbone, _, $, JqueryUi, Chart, fileSaver, TriggerStatusCollection) {
+    'js/model/trigger_status.js',
+], function (Backbone, _, $, JqueryUi, Chart, ChartJsPlugin, fileSaver, TriggerStatusCollection) {
     return Backbone.View.extend({
         template: _.template($('#dashboard-template').html()),
         loading_template: '<i class="fa fa-spinner fa-spin fa-fw"></i>',
@@ -92,10 +93,7 @@ define([
             for(var key in data) {
                 if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') > -1) {
                     if(key.indexOf('residential') > -1){
-                        residential_flood_data.push({
-                            y: key.replace('_flooded_road_count', ''),
-                            x: data[key]
-                        });
+                        residential_flood_data = data[key]
                     }else {
                         flood_graph_data.push({
                             y: key.replace('_flooded_road_count', ''),
@@ -112,10 +110,7 @@ define([
                     }
 
                     if(key.indexOf('residential') > -1){
-                        residential_data.push({
-                            y: key.replace('_road_count', ''),
-                            x: count
-                        });
+                        residential_data = count
                     }else {
                         graph_data.push({
                             y: key.replace('_road_count', ''),
@@ -155,16 +150,13 @@ define([
 
             var ctxResidential = document.getElementById('summary-chart-road-residential').getContext('2d');
             var datasetsResidential = {
-                labels: ['Residential'],
+                labels: ["Not Flooded", "Flooded"],
                 datasets: [
                     {
-                        label: "Not Flooded",
-                        data: residential_data
-                    }, {
-                        label: "Flooded",
-                        data: residential_flood_data,
-                        backgroundColor: ['#82B7CA']
-                    }]
+                        data: [residential_data, residential_flood_data],
+                        backgroundColor: ['#e5e5e5', '#82B7CA']
+                    }
+                ],
             };
 
             var ctx = document.getElementById('summary-chart-road').getContext('2d');
@@ -184,68 +176,7 @@ define([
             let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2): 0;
             $('#vulnerability-score-road').html(total_vulnerability_score);
             $('#road-count').html(data['flooded_flooded_road_count']);
-
-            new Chart(ctxResidential, {
-                type: 'horizontalBar',
-                data: datasetsResidential,
-                options: {
-                    legend: {
-                        display: true,
-                        onClick: function (e) {
-                            e.stopPropagation();
-                        }
-                    },
-                    scales: {
-                        xAxes: [{
-                            stacked: true,
-                            gridLines: {
-                                display:false
-                            },
-                            ticks: {
-                                min: 0
-                            }
-                        }],
-                        yAxes: [{
-                            stacked: true,
-                            gridLines: {
-                                display:false
-                            },
-                            barPercentage: 0.5
-                        }]
-                    },
-                    responsive: true,
-                    maintainAspectRatio: true
-                }
-            });
-
-            new Chart(ctx, {
-                type: 'horizontalBar',
-                data: datasets,
-                options: {
-                    legend: {
-                        display: false
-                    },
-                    scales: {
-                        xAxes: [{
-                            stacked: true,
-                            gridLines: {
-                                display:false
-                            },
-                            ticks: {
-                                min: 0
-                            }
-                        }],
-                        yAxes: [{
-                            stacked: true,
-                            gridLines: {
-                                display:false
-                            },
-                        }]
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
+            this.renderChartData(datasets, ctx, 'Residential Roads', datasetsResidential, ctxResidential, 'Other Roads');
         },
         renderChart2: function (data, main_panel) {
             let that = this;
@@ -284,7 +215,7 @@ define([
             $parentWrapper.find('#summary-chart').remove();
             $parentWrapper.find('.panel-chart').html('<canvas id="summary-chart" style="height: 250px"></canvas>');
             $parentWrapper.find('#summary-chart-residential').remove();
-            $parentWrapper.find('.panel-chart-residential').html('<canvas id="summary-chart-residential" style="height: 50px"></canvas>');
+            $parentWrapper.find('.panel-chart-residential').html('<canvas id="summary-chart-residential" style="height: 100px"></canvas>');
             $('#region-summary-panel').html('');
 
             let total_building_array = [];
@@ -301,10 +232,7 @@ define([
             for(var key in data) {
                 if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') > -1) {
                     if(key.indexOf('residential') > -1){
-                        residential_flood_data.push({
-                            y: key.replace('_flooded_building_count', ''),
-                            x: data[key]
-                        });
+                        residential_flood_data = data[key]
                     }else {
                         flood_graph_data.push({
                             y: key.replace('_flooded_building_count', ''),
@@ -321,10 +249,7 @@ define([
                     }
 
                     if(key.indexOf('residential') > -1){
-                        residential_data.push({
-                            y: key.replace('_building_count', ''),
-                            x: count
-                        });
+                        residential_data = count
                     }else {
                         graph_data.push({
                             y: key.replace('_building_count', ''),
@@ -364,16 +289,11 @@ define([
 
             var ctxResidential = document.getElementById('summary-chart-residential').getContext('2d');
             var datasetsResidential = {
-                labels: ['Residential'],
-                datasets: [
-                    {
-                        label: "Not Flooded",
-                        data: residential_data
-                    }, {
-                        label: "Flooded",
-                        data: residential_flood_data,
-                        backgroundColor: ['#82B7CA']
-                    }]
+                labels: ["Not Flooded", "Flooded"],
+                datasets: [{
+                    data: [residential_data, residential_flood_data],
+                    backgroundColor: ['#e5e5e5', '#82B7CA']
+                }]
             };
             var ctx = document.getElementById('summary-chart').getContext('2d');
             var datasets = {
@@ -393,12 +313,38 @@ define([
             $('#vulnerability-score').html(total_vulnerability_score);
             $('#building-count').html(data['flooded_building_count']);
 
+            this.renderChartData(datasets, ctx, 'Residential Buildings', datasetsResidential, ctxResidential, 'Other Buildings');
+        },
+        renderChartData: function (datasets, ctx, title, datasetsResidential, ctxResidential, title2) {
+            new Chart(ctxResidential, {
+                type: 'pie',
+                data: datasetsResidential,
+                options: {
+                    legend: {
+                        display: true
+                    },
+                    title: {
+                        display: true,
+                        text: title
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        labels: {
+                            render: 'value',
+                            position: 'outside',
+                            textMargin: 4
+                        }
+                    }
+                }
+            });
+
             new Chart(ctx, {
                 type: 'horizontalBar',
                 data: datasets,
                 options: {
                     legend: {
-                        display: false
+                        display: true
                     },
                     scales: {
                         xAxes: [{
@@ -416,42 +362,13 @@ define([
                                 display:false
                             },
                         }]
+                    },
+                    title: {
+                        display: true,
+                        text: title2
                     },
                     responsive: true,
                     maintainAspectRatio: false
-                }
-            });
-
-            new Chart(ctxResidential, {
-                type: 'horizontalBar',
-                data: datasetsResidential,
-                options: {
-                    legend: {
-                        display: true,
-                        onClick: function (e) {
-                            e.stopPropagation();
-                        }
-                    },
-                    scales: {
-                        xAxes: [{
-                            stacked: true,
-                            gridLines: {
-                                display:false
-                            },
-                            ticks: {
-                                min: 0
-                            }
-                        }],
-                        yAxes: [{
-                            stacked: true,
-                            gridLines: {
-                                display:false
-                            },
-                            barPercentage: 0.5
-                        }]
-                    },
-                    responsive: true,
-                    maintainAspectRatio: true
                 }
             });
         },
