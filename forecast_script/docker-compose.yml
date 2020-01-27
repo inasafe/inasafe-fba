@@ -1,11 +1,14 @@
 version: '2'
 services:
   db:
-    image: kartoza/postgis:11.0-2.5
+    build: docker
     volumes:
       - ./entrypoint-scripts:/docker-entrypoint-initdb.d
+    environment:
+      POSTGREST_BASE_URL: 'http://78.46.133.148:3000/'
     ports:
       - "5432:5432"
+      - "5522:22"
 
 #  web:
 #    image: nginx
