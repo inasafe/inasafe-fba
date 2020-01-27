@@ -37,3 +37,8 @@ script:
   - make wait-backend-ready
   - make backend-test
   - popd
+  # forecast test
+  - pushd forecast_script
+  - make build up wait-entrypoint-scripts-ready
+  - make test
+  - popd

@@ -2,10 +2,11 @@ import json
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
-from osgeo import ogr
-from glofas.layer.reporting_point import ReportingPointAPI, ReportingPointResult
-
 import requests
+from glofas.layer.reporting_point import (
+    ReportingPointAPI,
+    ReportingPointResult)
+from osgeo import ogr
 
 
 class GloFASForecast(object):
@@ -42,20 +43,20 @@ class GloFASForecast(object):
     _default_activation_impact_limit = 0
 
     # Flood map query filter
-    _default_postgrest_url = 'http://159.69.44.205:3000/'
-    _default_flood_map_query_filter = 'flood_map?select=*,reporting_point(id,glofas_id)&reporting_point.glofas_id=eq.{station_id}&measuring_station_id=not.is.null&and=(return_period.gte.{return_period_min},return_period.lt.{return_period_max})'
+    _default_postgrest_url = 'http://78.46.133.148:3000/'
+    _default_flood_map_query_filter = 'hazard_map?select=*,reporting_point(id,glofas_id)&reporting_point.glofas_id=eq.{station_id}&measuring_station_id=not.is.null&and=(return_period.gte.{return_period_min},return_period.lt.{return_period_max})'
     _default_plpy_query_flood_map_filter ='select flood_map.* from flood_map join reporting_point on flood_map.measuring_station_id = reporting_point.id where reporting_point.glofas_id = $1 and return_period >= $2 and return_period < $3'
 
     # Flood Forecast query filter
-    _default_flood_forecast_event_query_filter = 'flood_event?select=id,flood_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress&acquisition_date=lt.{acquisition_date}&forecast_date=eq.{forecast_date}&source=eq.{source}&order=acquisition_date.desc'
+    _default_flood_forecast_event_query_filter = 'hazard_event?select=id,flood_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress&acquisition_date=lt.{acquisition_date}&forecast_date=eq.{forecast_date}&source=eq.{source}&order=acquisition_date.desc'
     _default_plpy_flood_forecast_event_filter = 'select id,flood_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress from flood_event where acquisition_date < $1 and forecast_date = $2 and source = $3'
 
     # Flood forecast delete
-    _default_flood_event_delete_query_filter = '?and=(flood_map_id.eq.{flood_map_id},acquisition_date.eq.{acquisition_date},forecast_date.eq.{forecast_date},source.eq.{source})'
+    _default_flood_event_delete_query_filter = '&and=(flood_map_id.eq.{flood_map_id},acquisition_date.eq.{acquisition_date},forecast_date.eq.{forecast_date},source.eq.{source})'
     _default_plpy_flood_event_delete_filter = 'delete from flood_event where flood_map_id = $1 and acquisition_date = $2 and forecast_date = $3 and source = $4'
 
     # Flood Forecast insert
-    _default_flood_event_insert_endpoint = 'flood_event?select=id,flood_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress'
+    _default_flood_event_insert_endpoint = 'hazard_event?select=id,flood_map_id,acquisition_date,forecast_date,source,notes,link,trigger_status,progress'
     _default_plpy_flood_event_insert_query = 'insert into flood_event (flood_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress) select flood_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress from json_populate_recordset(null::flood_event, $1) returning id'
 
     # Impact query
@@ -68,6 +69,10 @@ class GloFASForecast(object):
 
     # Administrative mapping
     _default_parent_administrative_mapping = 'mv_administrative_mapping?select={parent_region}_id,{child_region}_id&{child_region}_id=in.{child_ids}'
+
+    # Calculate impact
+    _default_rpc_calculate_impact='rpc/kartoza_calculate_impact'
+    _default_rpc_generate_report = 'rpc/kartoza_fba_generate_excel_report_for_flood'
 
     def __init__(
             self,
@@ -103,7 +108,10 @@ class GloFASForecast(object):
             region_trigger_status_delete_query_param=_default_region_trigger_status_delete_query_param,
             region_trigger_status_query_filter=_default_region_trigger_status_query_filter,
             # Administrative mapping
-            parent_administrative_mapping=_default_parent_administrative_mapping):
+            parent_administrative_mapping=_default_parent_administrative_mapping,
+            # Calculate impact
+            rpc_calculate_impact=_default_rpc_calculate_impact,
+            rpc_generate_report=_default_rpc_generate_report):
         self.api = ReportingPointAPI()
         self.point_layer_source = (
                 reporting_point_layer_source
@@ -133,9 +141,21 @@ class GloFASForecast(object):
         self.region_trigger_status_delete_query_param = region_trigger_status_delete_query_param
         self.region_trigger_status_query_filter = region_trigger_status_query_filter
         self.parent_administrative_mapping = parent_administrative_mapping
+        self.rpc_calculate_impact = rpc_calculate_impact
+        self.rpc_generate_report = rpc_generate_report
         ##
+        self.source_text = 'GloFAS - Reporting Point'
         self.feature_info = []
         self.flood_forecast_events = []
+
+    @property
+    def acquisition_time(self):
+        return self.api.time
+
+    @acquisition_time.setter
+    def acquisition_time(self, value):
+        self.api.time = value or datetime.today().replace(
+            hour=0, minute=0, second=0, microsecond=0)
 
     def find_flood_map_plpy(self, station_id, return_period_min, return_period_max):
         import plpy
@@ -389,7 +409,7 @@ class GloFASForecast(object):
                 'flood_map_id': flood_map_id,
                 'acquisition_date': acquisition_date,
                 'forecast_date': forecast_date,
-                'source': 'GloFAS - Reporting Point',
+                'source': self.source_text,
                 'alert_level_key': alert_level,
                 'notes': 'Alert Warning Level: {alert_level}'.format(
                     alert_level=alert_level.upper()),
@@ -489,13 +509,12 @@ class GloFASForecast(object):
         ds = ogr.Open(self.point_layer_source)
         point_layer = ds.GetLayer()
         # Get the forecast itself
-        self.api.time = acquisition_date or self.api.time
-        self.feature_info = self.api.get_feature_info(point_layer)
+        self.acquisition_time = acquisition_date or self.acquisition_time
+        self.feature_info = self.api.get_feature_info(point_layer, srs='EPSG:4326')
 
     def process_forecast(self):
         # determine current date
-        today = self.api.time or datetime.today().replace(
-            hour=0, minute=0, second=0, microsecond=0)
+        today = self.acquisition_time
 
         flood_forecast_events = []
 
@@ -686,9 +705,10 @@ class GloFASForecast(object):
 
         return updated
 
-    def evaluate_trigger_status(self):
-        today = self.api.time or datetime.today().replace(
-            hour=0, minute=0, second=0, microsecond=0)
+    def evaluate_trigger_status(self, forecast_events=None):
+        today = self.acquisition_time
+        self.flood_forecast_events = (
+            forecast_events or self.flood_forecast_events)
 
         # Evaluate trigger status by considering impact level
         # At this point, impact data should already been calculated in the DB
@@ -822,10 +842,35 @@ class GloFASForecast(object):
             # Update flood_forecast information
             self.update_flood_event_forecast(flood_forecast)
 
+    def calculate_impact(self):
+        # We calculate impact by triggering database functions.
+        # Calculations happens in database
+        url = '{postgrest_url}{query_param}'.format(
+            postgrest_url=self.postgrest_url,
+            query_param=self.rpc_calculate_impact)
+        response = requests.post(url)
+        return response.status_code == 200
+
+    def generate_report(self):
+        # We generate report by triggering database functions.
+
+        url = '{postgrest_url}{query_param}'.format(
+            postgrest_url=self.postgrest_url,
+            query_param=self.rpc_generate_report)
+        for f in self.flood_forecast_events:
+            data = {
+                'flood_event_id': f['id']
+            }
+            requests.post(url, json=data)
+        return True
+
     def run(self):
         self.fetch_forecast()
         self.process_forecast()
+        self.calculate_impact()
         self.evaluate_trigger_status()
+        self.calculate_impact()
+        self.generate_report()
 
 
 if __name__ == '__main__':

@@ -25,19 +25,19 @@ echo "cron.database_name = 'gis'" >> /etc/postgresql/$PG_MAJOR_VERSION/main/post
 # Add plpython3u
 apt -y install postgresql-plpython3-$PG_MAJOR_VERSION
 
-#function force_restart_postgres {
-#PID=`cat ${PG_PID}`
-#kill -KILL ${PID}
-#
-## Brought postgres back up again
-#source /env-data.sh
-#su - postgres -c "${POSTGRES} -D ${DATADIR} -c config_file=${CONF} ${LOCALONLY} &"
-#
-## wait for postgres to come up
-#until su - postgres -c "psql -l"; do
-#  sleep 1
-#done
-#echo "postgres ready"
-#}
-#
-#force_restart_postgres
+function force_restart_postgres {
+PID=`cat ${PG_PID}`
+kill -KILL ${PID}
+
+# Brought postgres back up again
+source /env-data.sh
+su - postgres -c "${POSTGRES} -D ${DATADIR} -c config_file=${CONF} ${LOCALONLY} &"
+
+# wait for postgres to come up
+until su - postgres -c "psql -l"; do
+  sleep 1
+done
+echo "postgres ready"
+}
+
+force_restart_postgres
