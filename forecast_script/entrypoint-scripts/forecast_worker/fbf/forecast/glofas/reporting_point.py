@@ -307,7 +307,7 @@ class GloFASForecast(object):
                 # No previous forecast
                 continue
 
-            previous_trigger_status = flood_event['trigger_status_candidate']
+            previous_trigger_status = flood_event['trigger_status']
             if not (
                     previous_trigger_status ==
                     GloFASForecast.TRIGGER_STATUS_PRE_ACTIVATION
@@ -697,7 +697,7 @@ class GloFASForecast(object):
 
         # Perform update
         response = requests.patch(
-            url + '?id=eq.{id}'.format(id=flood_event['id']),
+            url + '&id=eq.{id}'.format(id=flood_event['id']),
             data=json_string,
             headers=headers)
         # Get the returned ids
