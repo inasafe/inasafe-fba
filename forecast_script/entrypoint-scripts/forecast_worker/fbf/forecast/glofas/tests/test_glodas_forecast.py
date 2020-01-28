@@ -102,6 +102,49 @@ class TestGloFASForecast(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertTrue(result[0]['spreadsheet_content'])
 
+    def test_activation_criteria(self):
+
+        self.job.acquisition_time = datetime.datetime(
+            year=2019, month=12, day=19, hour=0, minute=0, second=0)
+        self.job.source_text = '[TEST] GloFAS - Reporting Point'
+        self.job.run()
+
+        self.job.acquisition_time = datetime.datetime(
+            year=2019, month=12, day=22, hour=0, minute=0, second=0)
+        self.job.run()
+
+        # validate activation result
+        hazard_event = self.job.flood_forecast_events[1]
+        self.assertEqual(
+            hazard_event['trigger_status'],
+            GloFASForecast.TRIGGER_STATUS_ACTIVATION)
+
+        # fetch districts summaries
+        url = '{postgres_url}mv_flood_event_district_summary?flood_event_id' \
+              '=eq.{id}&order=trigger_status.desc,' \
+              'total_vulnerability_score.desc'.format(
+            postgres_url=self.job.postgrest_url,
+            id=hazard_event['id']
+        )
+        response = requests.get(url)
+        district_summaries = response.json()
+        trigger_statuses = [d['trigger_status'] for d in district_summaries]
+
+        self.assertIn(
+            GloFASForecast.TRIGGER_STATUS_ACTIVATION,
+            trigger_statuses)
+
+        self.job.flood_forecast_events = self.find_test_events(
+            self.job.source_text)
+
+    def find_test_events(self, source_text):
+        url = '{postgres_url}hazard_event?source=eq.{source_text}'.format(
+            postgres_url=self.job.postgrest_url,
+            source_text=source_text
+        )
+        response = requests.get(url)
+        return response.json()
+
     def delete_trigger_status(self, forecast_event_ids):
         table_names = [
             'village_trigger_status',
