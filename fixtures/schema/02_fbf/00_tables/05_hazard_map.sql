@@ -2,7 +2,7 @@
 -- Name: hazard_map; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.hazard_map (
+CREATE TABLE IF NOT EXISTS public.hazard_map (
     id integer NOT NULL,
     notes character varying(255),
     measuring_station_id integer,
@@ -15,7 +15,7 @@ CREATE TABLE public.hazard_map (
 -- Name: flood_map_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.flood_map_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.flood_map_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

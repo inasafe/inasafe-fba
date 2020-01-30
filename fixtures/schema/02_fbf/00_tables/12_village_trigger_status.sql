@@ -2,7 +2,7 @@
 -- Name: village_trigger_status; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.village_trigger_status (
+CREATE TABLE IF NOT EXISTS public.village_trigger_status (
     id integer NOT NULL,
     village_id double precision,
     trigger_status integer,
@@ -12,7 +12,7 @@ CREATE TABLE public.village_trigger_status (
 -- Name: village_trigger_status_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.village_trigger_status_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.village_trigger_status_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

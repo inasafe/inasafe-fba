@@ -26,6 +26,9 @@ shell:
 testrunner-shell:
 	@docker-compose exec testrunner bash
 
+schema-test:
+	@docker-compose exec db bash -c '$${REPO_ROOT}/fixtures/tests/scripts/import-sql.sh $${REPO_ROOT}/fixtures/schema'
+
 test:
 	@docker-compose exec testrunner python -m unittest discover
 

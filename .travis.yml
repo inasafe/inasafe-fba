@@ -29,6 +29,7 @@ script:
   - pushd deployment
   - make backend-up SERVICE=db
   - make wait-db-ready
+  - make backend-schema-test
   - make backend-up SERVICE=imposm
   - make backend-up SERVICE=testrunner
   - make backend-up SERVICE=postgrest

@@ -2,7 +2,7 @@
 -- Name: hazard_areas; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.hazard_areas (
+CREATE TABLE IF NOT EXISTS public.hazard_areas (
     id integer NOT NULL,
     flood_map_id integer,
     flooded_area_id integer
@@ -13,7 +13,7 @@ CREATE TABLE public.hazard_areas (
 -- Name: flooded_areas_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.flooded_areas_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.flooded_areas_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

@@ -29,6 +29,9 @@ backend-up:
 backend-logs:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) logs SERVICE=$(SERVICE)
 
+backend-schema-test:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) schema-test
+
 backend-test:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) test
 

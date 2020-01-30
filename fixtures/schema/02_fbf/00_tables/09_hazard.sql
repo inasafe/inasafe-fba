@@ -2,7 +2,7 @@
 -- Name: hazard; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.hazard (
+CREATE TABLE IF NOT EXISTS public.hazard (
     id integer NOT NULL,
     geometry public.geometry(MultiPolygon,4326),
     name character varying(80),
@@ -16,7 +16,7 @@ CREATE TABLE public.hazard (
 -- Name: osm_flood_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.osm_flood_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.osm_flood_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

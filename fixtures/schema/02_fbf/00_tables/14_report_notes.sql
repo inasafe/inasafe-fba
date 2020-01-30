@@ -3,7 +3,7 @@
 -- Name: report_notes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.report_notes (
+CREATE TABLE IF NOT EXISTS public.report_notes (
     id integer NOT NULL,
     notes text,
     hazard_type integer,
@@ -15,7 +15,7 @@ CREATE TABLE public.report_notes (
 -- Name: report_notes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.report_notes_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.report_notes_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
