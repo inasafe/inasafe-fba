@@ -1,5 +1,6 @@
 version: '2.1'
 volumes:
+  repo-volume:
   osm-postgis-data:
   import_done:
   import_queue:
@@ -16,11 +17,14 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASS=${POSTGRES_PASS}
+      - POSTGRES_HOST=${POSTGRES_HOST}
       - ALLOW_IP_RANGE=${POSTGRES_HBA_RANGE}
       - IP_LIST=${ALLOW_LISTEN_RANGE}
       - ARCHIVE_BASE_URL=${ARCHIVE_BASE_URL}
+      - REPO_ROOT=${REPO_ROOT}
     volumes:
      - osm-postgis-data:/var/lib/postgresql
+     - repo-volume:/opt/inasafe-fba
     ports:
       - "${POSTGRES_PORT}:5432"
 
@@ -161,8 +165,8 @@ services:
 
   testrunner:
       image: python:3
-      entrypoint: /opt/test-package/scripts/testrunner-entrypoint.sh
-      working_dir: /opt/test-package
+      entrypoint: ${REPO_ROOT}/scripts/testrunner-entrypoint.sh
+      working_dir: ${REPO_ROOT}
       command: tail -f /dev/null
       environment:
         POSTGRES_DB: ${POSTGRES_DB}
@@ -170,8 +174,8 @@ services:
         POSTGRES_PASS: ${POSTGRES_PASS}
         POSTGRES_PORT: ${PG_PORT}
         POSTGRES_HOST: db
-        TEST_PACKAGE_ROOT: /opt/test-package
+        TEST_PACKAGE_ROOT: ${REPO_ROOT}/fixtures/tests
       links:
         - db
       volumes:
-        - test-package:/opt/test-package
+        - repo-volume:${REPO_ROOT}

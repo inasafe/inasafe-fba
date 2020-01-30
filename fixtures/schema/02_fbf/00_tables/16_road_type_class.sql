@@ -2,7 +2,7 @@
 -- Name: road_type_class; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.road_type_class (
+CREATE TABLE IF NOT EXISTS public.road_type_class (
     id integer NOT NULL,
     road_class character varying(100)
 );
@@ -12,7 +12,7 @@ CREATE TABLE public.road_type_class (
 -- Name: road_type_class_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.road_type_class_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.road_type_class_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

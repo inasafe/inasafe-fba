@@ -2,7 +2,7 @@
 -- Name: spreadsheet_reports; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.spreadsheet_reports (
+CREATE TABLE IF NOT EXISTS public.spreadsheet_reports (
     id integer NOT NULL,
     flood_event_id integer,
     spreadsheet bytea
@@ -13,7 +13,7 @@ CREATE TABLE public.spreadsheet_reports (
 -- Name: spreadsheet_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.spreadsheet_reports_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.spreadsheet_reports_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

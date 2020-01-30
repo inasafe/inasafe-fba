@@ -2,7 +2,7 @@
 -- Name: trigger_status; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.trigger_status (
+CREATE TABLE IF NOT EXISTS public.trigger_status (
     id integer NOT NULL,
     name character varying(255) NOT NULL
 );
@@ -12,7 +12,7 @@ CREATE TABLE public.trigger_status (
 -- Name: trigger_status_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.trigger_status_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.trigger_status_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

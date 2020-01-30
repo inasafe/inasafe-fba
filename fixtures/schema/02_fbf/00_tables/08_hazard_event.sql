@@ -2,7 +2,7 @@
 -- Name: hazard_event; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.hazard_event (
+CREATE TABLE IF NOT EXISTS public.hazard_event (
     id integer NOT NULL,
     flood_map_id integer,
     acquisition_date timestamp without time zone DEFAULT now() NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE public.hazard_event (
 -- Name: forecast_flood_event_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.forecast_flood_event_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.forecast_flood_event_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

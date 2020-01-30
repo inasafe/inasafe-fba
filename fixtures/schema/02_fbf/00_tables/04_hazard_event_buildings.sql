@@ -2,7 +2,7 @@
 -- Name: hazard_event_buildings; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.hazard_event_buildings (
+CREATE TABLE IF NOT EXISTS public.hazard_event_buildings (
     id integer NOT NULL,
     flood_event_id integer,
     building_id integer,
@@ -14,7 +14,7 @@ CREATE TABLE public.hazard_event_buildings (
 -- Name: flood_event_buildings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.flood_event_buildings_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.flood_event_buildings_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

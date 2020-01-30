@@ -2,7 +2,7 @@
 -- Name: progress_status; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.progress_status (
+CREATE TABLE IF NOT EXISTS public.progress_status (
     id integer NOT NULL,
     status character varying(50)
 );
@@ -12,7 +12,7 @@ CREATE TABLE public.progress_status (
 -- Name: progress_status_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.progress_status_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.progress_status_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

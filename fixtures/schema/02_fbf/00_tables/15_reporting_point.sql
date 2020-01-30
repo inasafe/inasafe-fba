@@ -2,7 +2,7 @@
 -- Name: reporting_point; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.reporting_point (
+CREATE TABLE IF NOT EXISTS public.reporting_point (
     id bigint NOT NULL,
     glofas_id bigint,
     name character varying(80),
@@ -14,7 +14,7 @@ CREATE TABLE public.reporting_point (
 -- Name: reporting_point_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.reporting_point_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.reporting_point_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE

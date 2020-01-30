@@ -2,7 +2,7 @@
 -- Name: hazard_class; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.hazard_class (
+CREATE TABLE IF NOT EXISTS public.hazard_class (
     id integer NOT NULL,
     min_m double precision,
     max_m double precision,
@@ -13,7 +13,7 @@ CREATE TABLE public.hazard_class (
 -- Name: depth_class_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.depth_class_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.depth_class_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

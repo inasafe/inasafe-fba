@@ -2,7 +2,7 @@
 -- Name: hazard_area; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.hazard_area (
+CREATE TABLE IF NOT EXISTS public.hazard_area (
     id integer NOT NULL,
     depth_class integer,
     geometry public.geometry(MultiPolygon,4326)
@@ -13,7 +13,7 @@ CREATE TABLE public.hazard_area (
 -- Name: flooded_area_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.flooded_area_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.flooded_area_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1

@@ -2,7 +2,7 @@
 -- Name: hazard_type; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.hazard_type (
+CREATE TABLE IF NOT EXISTS public.hazard_type (
     id integer NOT NULL,
     name text
 );
@@ -12,7 +12,7 @@ CREATE TABLE public.hazard_type (
 -- Name: hazard_type_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.hazard_type_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.hazard_type_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
