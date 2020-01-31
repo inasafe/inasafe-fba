@@ -2,7 +2,7 @@
 -- Name: vw_hazard_wkt_view; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE VIEW public.vw_hazard_wkt_view AS
+CREATE OR REPLACE VIEW public.vw_hazard_wkt_view AS
  SELECT hazard.id,
     hazard.name,
     public.st_astext(hazard.geometry) AS st_astext,

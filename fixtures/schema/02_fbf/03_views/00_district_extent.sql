@@ -2,7 +2,7 @@
 -- Name: vw_district_extent; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE VIEW public.vw_district_extent AS
+CREATE OR REPLACE VIEW public.vw_district_extent AS
  SELECT district_extent.id,
     district_extent.id_code,
     public.st_xmin((district_extent.extent)::public.box3d) AS x_min,

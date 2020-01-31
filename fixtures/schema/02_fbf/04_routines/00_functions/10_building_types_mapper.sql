@@ -2,7 +2,7 @@
 --
 -- Name: kartoza_building_types_mapper(); Type: FUNCTION; Schema: public; Owner: -
 --
-
+DROP FUNCTION IF EXISTS public.kartoza_building_types_mapper CASCADE ;
 CREATE FUNCTION public.kartoza_building_types_mapper() RETURNS trigger
     LANGUAGE plpgsql
     AS $$

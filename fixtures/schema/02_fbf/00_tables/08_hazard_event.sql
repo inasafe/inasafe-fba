@@ -12,7 +12,12 @@ CREATE TABLE IF NOT EXISTS public.hazard_event (
     link text,
     trigger_status integer,
     progress integer,
-    hazard_type_id integer
+    hazard_type_id integer,
+    CONSTRAINT flood_event_progress_fkey FOREIGN KEY (progress) REFERENCES public.progress_status(id),
+    CONSTRAINT flood_event_trigger_status_fkey FOREIGN KEY (trigger_status) REFERENCES public.trigger_status(id),
+    CONSTRAINT forecast_flood_event_flood_map_id_fkey FOREIGN KEY (flood_map_id) REFERENCES public.hazard_map(id),
+    CONSTRAINT hazard_type_fkey FOREIGN KEY (hazard_type_id) REFERENCES public.hazard_type(id),
+    CONSTRAINT forecast_flood_event_pkey PRIMARY KEY (id)
 );
 
 
@@ -41,55 +46,15 @@ ALTER SEQUENCE public.forecast_flood_event_id_seq OWNED BY public.hazard_event.i
 
 ALTER TABLE ONLY public.hazard_event ALTER COLUMN id SET DEFAULT nextval('public.forecast_flood_event_id_seq'::regclass);
 
-
---
--- Name: hazard_event forecast_flood_event_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_event
-    ADD CONSTRAINT forecast_flood_event_pkey PRIMARY KEY (id);
-
 --
 -- Name: flood_event_idx_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX flood_event_idx_id ON public.hazard_event USING btree (id);
+CREATE INDEX IF NOT EXISTS flood_event_idx_id ON public.hazard_event USING btree (id);
 
 
 --
 -- Name: flood_event_idx_map_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX flood_event_idx_map_id ON public.hazard_event USING btree (flood_map_id);
-
-
---
--- Name: hazard_event flood_event_progress_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_event
-    ADD CONSTRAINT flood_event_progress_fkey FOREIGN KEY (progress) REFERENCES public.progress_status(id);
-
-
---
--- Name: hazard_event flood_event_trigger_status_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_event
-    ADD CONSTRAINT flood_event_trigger_status_fkey FOREIGN KEY (trigger_status) REFERENCES public.trigger_status(id);
-
-
---
--- Name: hazard_event forecast_flood_event_flood_map_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_event
-    ADD CONSTRAINT forecast_flood_event_flood_map_id_fkey FOREIGN KEY (flood_map_id) REFERENCES public.hazard_map(id);
-
-
---
--- Name: hazard_event hazard_type_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_event
-    ADD CONSTRAINT hazard_type_fkey FOREIGN KEY (hazard_type_id) REFERENCES public.hazard_type(id);
+CREATE INDEX IF NOT EXISTS flood_event_idx_map_id ON public.hazard_event USING btree (flood_map_id);

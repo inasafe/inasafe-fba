@@ -38,3 +38,5 @@ COMMENT ON SCHEMA public IS 'standard public schema';
 
 
 SET default_tablespace = '';
+
+CREATE EXTENSION IF NOT EXISTS postgis;

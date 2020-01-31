@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS public.reporting_point (
     id bigint NOT NULL,
     glofas_id bigint,
     name character varying(80),
-    geometry public.geometry(Point,4326)
+    geometry public.geometry(Point,4326),
+    CONSTRAINT reporting_point_pk PRIMARY KEY (id)
 );
 
 
@@ -35,21 +36,14 @@ ALTER SEQUENCE public.reporting_point_id_seq OWNED BY public.reporting_point.id;
 ALTER TABLE ONLY public.reporting_point ALTER COLUMN id SET DEFAULT nextval('public.reporting_point_id_seq'::regclass);
 
 --
--- Name: reporting_point reporting_point_pk; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.reporting_point
-    ADD CONSTRAINT reporting_point_pk PRIMARY KEY (id);
-
---
 -- Name: reporting_point_glofas_id_uindex; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX reporting_point_glofas_id_uindex ON public.reporting_point USING btree (glofas_id);
+CREATE UNIQUE INDEX IF NOT EXISTS reporting_point_glofas_id_uindex ON public.reporting_point USING btree (glofas_id);
 
 
 --
 -- Name: reporting_point_id_uindex; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX reporting_point_id_uindex ON public.reporting_point USING btree (id);
+CREATE UNIQUE INDEX IF NOT EXISTS reporting_point_id_uindex ON public.reporting_point USING btree (id);

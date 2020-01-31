@@ -1,7 +1,7 @@
 --
 -- Name: mv_flood_event_village_summary; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
-
+DROP MATERIALIZED VIEW IF EXISTS public.mv_flood_event_village_summary;
 CREATE MATERIALIZED VIEW public.mv_flood_event_village_summary AS
  WITH non_flooded_count_selection AS (
          SELECT b_1.district_id,

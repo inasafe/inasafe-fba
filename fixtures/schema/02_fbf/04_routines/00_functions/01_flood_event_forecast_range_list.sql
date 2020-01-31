@@ -2,7 +2,7 @@
 --
 -- Name: flood_event_forecast_range_list_f(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: -
 --
-
+DROP FUNCTION IF EXISTS public.flood_event_forecast_range_list_f;
 CREATE FUNCTION public.flood_event_forecast_range_list_f(acquisition_date_start timestamp without time zone, acquisition_date_end timestamp without time zone) RETURNS TABLE(total_forecast bigint, forecast_date_str text, acquisition_date_str text, trigger_status_id integer)
     LANGUAGE plpgsql
     AS $$

@@ -5,7 +5,10 @@
 CREATE TABLE IF NOT EXISTS public.hazard_areas (
     id integer NOT NULL,
     flood_map_id integer,
-    flooded_area_id integer
+    flooded_area_id integer,
+    CONSTRAINT flooded_areas_pkey PRIMARY KEY (id),
+    CONSTRAINT flooded_areas_flood_map_id_fkey FOREIGN KEY (flood_map_id) REFERENCES public.hazard_map(id),
+    CONSTRAINT flooded_areas_flooded_area_id_fkey FOREIGN KEY (flooded_area_id) REFERENCES public.hazard_area(id)
 );
 
 
@@ -33,26 +36,3 @@ ALTER SEQUENCE public.flooded_areas_id_seq OWNED BY public.hazard_areas.id;
 --
 
 ALTER TABLE ONLY public.hazard_areas ALTER COLUMN id SET DEFAULT nextval('public.flooded_areas_id_seq'::regclass);
-
-
---
--- Name: hazard_areas flooded_areas_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_areas
-    ADD CONSTRAINT flooded_areas_pkey PRIMARY KEY (id);
-
---
--- Name: hazard_areas flooded_areas_flood_map_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_areas
-    ADD CONSTRAINT flooded_areas_flood_map_id_fkey FOREIGN KEY (flood_map_id) REFERENCES public.hazard_map(id);
-
-
---
--- Name: hazard_areas flooded_areas_flooded_area_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_areas
-    ADD CONSTRAINT flooded_areas_flooded_area_id_fkey FOREIGN KEY (flooded_area_id) REFERENCES public.hazard_area(id);

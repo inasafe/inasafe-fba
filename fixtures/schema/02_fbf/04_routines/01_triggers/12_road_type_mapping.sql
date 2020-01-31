@@ -2,7 +2,7 @@
 --
 -- Name: kartoza_road_type_mapping(); Type: FUNCTION; Schema: public; Owner: -
 --
-
+DROP FUNCTION IF EXISTS public.kartoza_road_type_mapping CASCADE ;
 CREATE FUNCTION public.kartoza_road_type_mapping() RETURNS trigger
     LANGUAGE plpgsql
     AS $$

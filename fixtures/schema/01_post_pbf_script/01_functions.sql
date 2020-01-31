@@ -3,7 +3,8 @@
 -- Name: clean_tables(); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.clean_tables() RETURNS void
+DROP FUNCTION IF EXISTS public.clean_tables;
+CREATE OR REPLACE FUNCTION public.clean_tables() RETURNS void
     LANGUAGE plpgsql
     AS $$
 DECLARE osm_tables CURSOR FOR

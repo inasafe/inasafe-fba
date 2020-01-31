@@ -2,7 +2,7 @@
 --
 -- Name: kartoza_fba_generate_excel_report_for_flood(integer); Type: FUNCTION; Schema: public; Owner: -
 --
-
+DROP FUNCTION IF EXISTS public.kartoza_fba_generate_excel_report_for_flood;
 CREATE FUNCTION public.kartoza_fba_generate_excel_report_for_flood(flood_event_id integer) RETURNS character varying
     LANGUAGE plpython3u
     AS $_$

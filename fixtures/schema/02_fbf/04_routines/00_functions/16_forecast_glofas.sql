@@ -1,5 +1,6 @@
 -- Register function
-CREATE OR REPLACE FUNCTION kartoza_fba_forecast_glofas() RETURNS CHARACTER VARYING
+DROP FUNCTION IF EXISTS public.kartoza_fba_forecast_glofas;
+CREATE FUNCTION public.kartoza_fba_forecast_glofas() RETURNS CHARACTER VARYING
     LANGUAGE plpython3u
 as
 $$
@@ -9,6 +10,8 @@ job.run()
 
 return 'OK'
 $$;
+
+SELECT pg_reload_conf();
 
 -- Include in cron
 INSERT INTO cron.job (schedule, command)
