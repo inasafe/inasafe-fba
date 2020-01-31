@@ -1,7 +1,7 @@
 --
 -- Name: mv_non_flooded_roads_summary; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
-
+DROP MATERIALIZED VIEW IF EXISTS public.mv_non_flooded_roads_summary;
 CREATE MATERIALIZED VIEW public.mv_non_flooded_roads_summary AS
  SELECT DISTINCT osm_roads.district_id,
     osm_roads.sub_district_id,

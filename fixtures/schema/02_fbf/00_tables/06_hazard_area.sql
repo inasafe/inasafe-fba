@@ -5,7 +5,9 @@
 CREATE TABLE IF NOT EXISTS public.hazard_area (
     id integer NOT NULL,
     depth_class integer,
-    geometry public.geometry(MultiPolygon,4326)
+    geometry public.geometry(MultiPolygon,4326),
+    CONSTRAINT flooded_area_depth_class_fkey FOREIGN KEY (depth_class) REFERENCES public.hazard_class(id),
+    CONSTRAINT flooded_area_pkey PRIMARY KEY (id)
 );
 
 
@@ -36,27 +38,13 @@ ALTER TABLE ONLY public.hazard_area ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- Name: hazard_area flooded_area_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_area
-    ADD CONSTRAINT flooded_area_pkey PRIMARY KEY (id);
-
---
 -- Name: flooded_area_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX flooded_area_id ON public.hazard_area USING btree (id);
+CREATE INDEX IF NOT EXISTS flooded_area_id ON public.hazard_area USING btree (id);
 
 --
 -- Name: flooded_area_idx_geometry; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX flooded_area_idx_geometry ON public.hazard_area USING gist (geometry);
-
---
--- Name: hazard_area flooded_area_depth_class_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_area
-    ADD CONSTRAINT flooded_area_depth_class_fkey FOREIGN KEY (depth_class) REFERENCES public.hazard_class(id);
+CREATE INDEX IF NOT EXISTS flooded_area_idx_geometry ON public.hazard_area USING gist (geometry);

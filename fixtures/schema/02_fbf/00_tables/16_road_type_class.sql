@@ -4,7 +4,8 @@
 
 CREATE TABLE IF NOT EXISTS public.road_type_class (
     id integer NOT NULL,
-    road_class character varying(100)
+    road_class character varying(100),
+    constraint road_type_class_pkey primary key (id)
 );
 
 

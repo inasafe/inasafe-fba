@@ -5,7 +5,8 @@
 
 CREATE TABLE IF NOT EXISTS public.waterway_type_class (
     id integer NOT NULL,
-    waterway_class character varying(100)
+    waterway_class character varying(100),
+    constraint waterway_type_class_pkey primary key (id)
 );
 
 

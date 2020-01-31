@@ -2,7 +2,7 @@
 -- Name: vw_hazard_event_areas; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE VIEW public.vw_hazard_event_areas AS
+CREATE OR REPLACE VIEW public.vw_hazard_event_areas AS
  SELECT a.geometry,
     d.id AS flood_event_id,
     c.id AS flood_map_id,

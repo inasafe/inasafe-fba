@@ -2,7 +2,7 @@
 -- Name: vw_hazard_event_buildings_map; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE VIEW public.vw_hazard_event_buildings_map AS
+CREATE OR REPLACE VIEW public.vw_hazard_event_buildings_map AS
  SELECT row_number() OVER () AS id,
     b.geometry,
     b.building_type,

@@ -21,8 +21,13 @@ echo "Postgres major version: $PG_MAJOR_VERSION"
 
 # Add pg_cron
 apt -y install postgresql-$PG_MAJOR_VERSION-cron
-echo "shared_preload_libraries = 'pg_cron'" >> /etc/postgresql/$PG_MAJOR_VERSION/main/postgresql.conf
-echo "cron.database_name = 'gis'" >> /etc/postgresql/$PG_MAJOR_VERSION/main/postgresql.conf
+if ! cat /etc/postgresql/$PG_MAJOR_VERSION/main/postgresql.conf | grep "shared_preload_libraries = 'pg_cron'" > /dev/null; then
+	echo "shared_preload_libraries = 'pg_cron'" >> /etc/postgresql/$PG_MAJOR_VERSION/main/postgresql.conf
+	echo "cron.database_name = 'gis'" >> /etc/postgresql/$PG_MAJOR_VERSION/main/postgresql.conf
+
+	source /env-data.sh
+	restart_postgres
+fi
 
 # Add plpython3u
 apt -y install postgresql-plpython3-$PG_MAJOR_VERSION

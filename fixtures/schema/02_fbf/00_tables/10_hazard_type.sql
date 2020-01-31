@@ -4,7 +4,8 @@
 
 CREATE TABLE IF NOT EXISTS public.hazard_type (
     id integer NOT NULL,
-    name text
+    name text,
+    CONSTRAINT hazard_type_pkey PRIMARY KEY (id)
 );
 
 
@@ -33,12 +34,4 @@ ALTER SEQUENCE public.hazard_type_id_seq OWNED BY public.hazard_type.id;
 
 ALTER TABLE ONLY public.hazard_type ALTER COLUMN id SET DEFAULT nextval('public.hazard_type_id_seq'::regclass);
 
-
-
---
--- Name: hazard_type hazard_type_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.hazard_type
-    ADD CONSTRAINT hazard_type_pkey PRIMARY KEY (id);
 

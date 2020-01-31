@@ -1,7 +1,7 @@
 --
 -- Name: mv_flooded_building_summary; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
-
+DROP MATERIALIZED VIEW IF EXISTS public.mv_flooded_building_summary;
 CREATE MATERIALIZED VIEW public.mv_flooded_building_summary AS
  SELECT DISTINCT a.flood_event_id,
     a.district_id,

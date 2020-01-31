@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS public.village_trigger_status (
     id integer NOT NULL,
     village_id double precision,
     trigger_status integer,
-    flood_event_id integer
+    flood_event_id integer,
+    CONSTRAINT village_trigger_status_pkey PRIMARY KEY (id),
+    CONSTRAINT village_trigger_status_trigger_status_fkey FOREIGN KEY (trigger_status) REFERENCES public.trigger_status(id)
 );
 --
 -- Name: village_trigger_status_id_seq; Type: SEQUENCE; Schema: public; Owner: -
@@ -33,19 +35,3 @@ ALTER SEQUENCE public.village_trigger_status_id_seq OWNED BY public.village_trig
 --
 
 ALTER TABLE ONLY public.village_trigger_status ALTER COLUMN id SET DEFAULT nextval('public.village_trigger_status_id_seq'::regclass);
-
---
--- Name: village_trigger_status village_trigger_status_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.village_trigger_status
-    ADD CONSTRAINT village_trigger_status_pkey PRIMARY KEY (id);
-
-
---
--- Name: village_trigger_status village_trigger_status_trigger_status_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.village_trigger_status
-    ADD CONSTRAINT village_trigger_status_trigger_status_fkey FOREIGN KEY (trigger_status) REFERENCES public.trigger_status(id);
-

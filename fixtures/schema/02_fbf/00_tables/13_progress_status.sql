@@ -4,7 +4,8 @@
 
 CREATE TABLE IF NOT EXISTS public.progress_status (
     id integer NOT NULL,
-    status character varying(50)
+    status character varying(50),
+    CONSTRAINT progress_status_pkey PRIMARY KEY (id)
 );
 
 
@@ -33,10 +34,3 @@ ALTER SEQUENCE public.progress_status_id_seq OWNED BY public.progress_status.id;
 --
 
 ALTER TABLE ONLY public.progress_status ALTER COLUMN id SET DEFAULT nextval('public.progress_status_id_seq'::regclass);
-
---
--- Name: progress_status progress_status_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.progress_status
-    ADD CONSTRAINT progress_status_pkey PRIMARY KEY (id);

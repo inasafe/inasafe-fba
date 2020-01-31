@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS public.report_notes (
     id integer NOT NULL,
     notes text,
     hazard_type integer,
-    "order" integer
+    "order" integer,
+    CONSTRAINT report_notes_hazard_type_fkey FOREIGN KEY (hazard_type) REFERENCES public.hazard_type(id),
+    CONSTRAINT report_notes_pkey PRIMARY KEY (id)
 );
 
 
@@ -37,16 +39,3 @@ ALTER SEQUENCE public.report_notes_id_seq OWNED BY public.report_notes.id;
 
 ALTER TABLE ONLY public.report_notes ALTER COLUMN id SET DEFAULT nextval('public.report_notes_id_seq'::regclass);
 
---
--- Name: report_notes report_notes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.report_notes
-    ADD CONSTRAINT report_notes_pkey PRIMARY KEY (id);
-
---
--- Name: report_notes report_notes_hazard_type_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.report_notes
-    ADD CONSTRAINT report_notes_hazard_type_fkey FOREIGN KEY (hazard_type) REFERENCES public.hazard_type(id);

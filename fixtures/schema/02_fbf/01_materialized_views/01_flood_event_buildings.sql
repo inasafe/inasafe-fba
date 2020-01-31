@@ -1,7 +1,7 @@
 --
 -- Name: mv_flood_event_buildings; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
-
+DROP MATERIALIZED VIEW IF EXISTS public.mv_flood_event_buildings CASCADE;
 CREATE MATERIALIZED VIEW public.mv_flood_event_buildings AS
  WITH intersections AS (
          SELECT a_1.geometry,

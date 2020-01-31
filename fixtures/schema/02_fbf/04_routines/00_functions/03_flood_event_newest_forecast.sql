@@ -2,7 +2,7 @@
 --
 -- Name: flood_event_newest_forecast_f(timestamp without time zone, timestamp without time zone); Type: FUNCTION; Schema: public; Owner: -
 --
-
+DROP FUNCTION IF EXISTS public.flood_event_newest_forecast_f;
 CREATE FUNCTION public.flood_event_newest_forecast_f(forecast_date_start timestamp without time zone, forecast_date_end timestamp without time zone) RETURNS TABLE(forecast_date_str text, acquisition_date_str text, trigger_status_id integer)
     LANGUAGE plpgsql
     AS $$

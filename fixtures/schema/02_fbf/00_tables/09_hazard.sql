@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS public.hazard (
     source character varying(255),
     reporting_date_time timestamp without time zone,
     forecast_date_time timestamp without time zone,
-    station character varying(255)
+    station character varying(255),
+    constraint hazard_event_pkey primary key (id)
 );
 
 --
@@ -25,6 +26,13 @@ CREATE SEQUENCE IF NOT EXISTS public.osm_flood_id_seq
     CACHE 1;
 
 
+
+--
+-- Name: hazard id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.hazard ALTER COLUMN id SET DEFAULT nextval('public.osm_flood_id_seq'::regclass);
+
 --
 -- Name: osm_flood_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
@@ -34,18 +42,18 @@ ALTER SEQUENCE public.osm_flood_id_seq OWNED BY public.hazard.id;
 -- Name: id_osm_flood_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX id_osm_flood_idx ON public.hazard USING btree (id);
+CREATE INDEX IF NOT EXISTS id_osm_flood_idx ON public.hazard USING btree (id);
 
 
 --
 -- Name: id_osm_flood_name; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX id_osm_flood_name ON public.hazard USING btree (name);
+CREATE INDEX IF NOT EXISTS id_osm_flood_name ON public.hazard USING btree (name);
 
 
 --
 -- Name: osm_flood_gix; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX osm_flood_gix ON public.hazard USING gist (geometry);
+CREATE INDEX IF NOT EXISTS osm_flood_gix ON public.hazard USING gist (geometry);

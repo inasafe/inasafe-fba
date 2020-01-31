@@ -2,7 +2,7 @@
 --
 -- Name: save_excel_as_blob(); Type: FUNCTION; Schema: public; Owner: -
 --
-
+DROP FUNCTION IF EXISTS public.save_excel_as_blob;
 CREATE FUNCTION public.save_excel_as_blob() RETURNS character varying
     LANGUAGE plpython3u
     AS $_$

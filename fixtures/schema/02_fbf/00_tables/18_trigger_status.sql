@@ -4,7 +4,9 @@
 
 CREATE TABLE IF NOT EXISTS public.trigger_status (
     id integer NOT NULL,
-    name character varying(255) NOT NULL
+    name character varying(255) NOT NULL,
+    CONSTRAINT status_name_key UNIQUE (name),
+    CONSTRAINT trigger_status_pkey PRIMARY KEY (id)
 );
 
 
@@ -34,17 +36,3 @@ ALTER SEQUENCE public.trigger_status_id_seq OWNED BY public.trigger_status.id;
 --
 
 ALTER TABLE ONLY public.trigger_status ALTER COLUMN id SET DEFAULT nextval('public.trigger_status_id_seq'::regclass);
-
---
--- Name: trigger_status status_name_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.trigger_status
-    ADD CONSTRAINT status_name_key UNIQUE (name);
-
---
--- Name: trigger_status trigger_status_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.trigger_status
-    ADD CONSTRAINT trigger_status_pkey PRIMARY KEY (id);

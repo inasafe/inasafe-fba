@@ -13,6 +13,8 @@ services:
     image: kartoza/postgis:12.0
     restart: always
     hostname: db
+    entrypoint: ${REPO_ROOT}/fixtures/tests/scripts/postgis-entrypoint.sh
+    command: ""
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -165,8 +167,8 @@ services:
 
   testrunner:
       image: python:3
-      entrypoint: ${REPO_ROOT}/scripts/testrunner-entrypoint.sh
-      working_dir: ${REPO_ROOT}
+      entrypoint: ${REPO_ROOT}/fixtures/tests/scripts/testrunner-entrypoint.sh
+      working_dir: ${REPO_ROOT}/fixtures/tests
       command: tail -f /dev/null
       environment:
         POSTGRES_DB: ${POSTGRES_DB}

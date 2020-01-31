@@ -1,8 +1,8 @@
 --
 -- Name: mv_administrative_mapping; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
-
-CREATE MATERIALIZED VIEW public.mv_administrative_mapping AS
+DROP MATERIALIZED VIEW IF EXISTS public.mv_administrative_mapping;
+CREATE  MATERIALIZED VIEW public.mv_administrative_mapping AS
  SELECT district.dc_code AS district_id,
     district.name AS district_name,
     sub_district.sub_dc_code AS sub_district_id,

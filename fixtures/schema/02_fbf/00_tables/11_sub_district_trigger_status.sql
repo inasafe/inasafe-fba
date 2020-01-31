@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS public.sub_district_trigger_status (
     id integer NOT NULL,
     sub_district_id double precision,
     trigger_status integer,
-    flood_event_id integer
+    flood_event_id integer,
+    CONSTRAINT sub_district_trigger_status_pkey PRIMARY KEY (id),
+    CONSTRAINT sub_district_trigger_status_trigger_status_fkey FOREIGN KEY (trigger_status) REFERENCES public.trigger_status(id)
 );
 
 
@@ -35,17 +37,3 @@ ALTER SEQUENCE public.sub_district_trigger_status_id_seq OWNED BY public.sub_dis
 --
 
 ALTER TABLE ONLY public.sub_district_trigger_status ALTER COLUMN id SET DEFAULT nextval('public.sub_district_trigger_status_id_seq'::regclass);
-
---
--- Name: sub_district_trigger_status sub_district_trigger_status_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sub_district_trigger_status
-    ADD CONSTRAINT sub_district_trigger_status_pkey PRIMARY KEY (id);
-
---
--- Name: sub_district_trigger_status sub_district_trigger_status_trigger_status_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sub_district_trigger_status
-    ADD CONSTRAINT sub_district_trigger_status_trigger_status_fkey FOREIGN KEY (trigger_status) REFERENCES public.trigger_status(id);

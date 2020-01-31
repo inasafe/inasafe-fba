@@ -2,7 +2,7 @@
 -- Name: vw_hazard_event_extent; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE VIEW public.vw_hazard_event_extent AS
+CREATE OR REPLACE VIEW public.vw_hazard_event_extent AS
  SELECT flood_extent.id,
     public.st_xmin((flood_extent.extent)::public.box3d) AS x_min,
     public.st_ymin((flood_extent.extent)::public.box3d) AS y_min,
