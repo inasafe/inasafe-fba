@@ -28,6 +28,7 @@ script:
   # Backend deployment tests
   - pushd deployment
   - make backend-up SERVICE=db
+  - make backend-logs SERVICE=db &
   - make wait-db-ready
   - make backend-schema-test
   - make backend-up SERVICE=imposm
