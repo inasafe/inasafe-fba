@@ -34,6 +34,7 @@ test:
 
 wait-db-ready:
 	@docker-compose exec db bash -c 'while ! su - postgres -c "psql -l" > /dev/null; do echo "Database not ready. Wait"; sleep $(or ${TIMEOUT},5); done; echo "Database ready."'
+	@docker-compose exec db bash -c 'while ! su - postgres -c "psql -t -d $${POSTGRES_DB} -c \"select name from pg_available_extensions where name = '"'"'postgis'"'"'\"" > /dev/null; do echo "Postgis extension not ready. Wait"; sleep $(or ${TIMEOUT},5); done; echo "Postgis extension ready."'
 
 wait-backend-ready:
 	@docker-compose exec testrunner bash -c 'while ! python -m unittest backend 2>&1 > /dev/null; do echo "Database not ready. Waiting"; sleep $(or ${TIMEOUT},60); done; echo "Backend ready."'

@@ -39,4 +39,6 @@ COMMENT ON SCHEMA public IS 'standard public schema';
 
 SET default_tablespace = '';
 
+SET search_path to public;
+
 CREATE EXTENSION IF NOT EXISTS postgis;
