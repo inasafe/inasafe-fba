@@ -32,8 +32,20 @@ backend-logs:
 backend-schema-test:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) schema-test
 
+backend-populate-test-data:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) populate-test-data
+
+backend-first-pbf-import:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) first-pbf-import
+
+backend-wait-first-pbf-import:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) wait-first-pbf-import
+
 backend-test:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) test
+
+backend-forecast-test:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) forecast-test
 
 wait-db-ready:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) wait-db-ready

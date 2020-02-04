@@ -5,7 +5,9 @@ CREATE FUNCTION public.kartoza_fba_forecast_glofas() RETURNS CHARACTER VARYING
 as
 $$
 from fbf.forecast.glofas.reporting_point import GloFASForecast
-job = GloFASForecast()
+import os
+postgrest_url = os.environ.get('POSTGREST_BASE_URL')
+job = GloFASForecast(postgrest_url=postgrest_url)
 job.run()
 
 return 'OK'
