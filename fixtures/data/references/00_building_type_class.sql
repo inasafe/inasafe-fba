@@ -1,0 +1,14 @@
+TRUNCATE public.building_type_class CASCADE;
+INSERT INTO public.building_type_class (id, building_class) VALUES (1, 'Clinic/Doctor');
+INSERT INTO public.building_type_class (id, building_class) VALUES (2, 'University/College');
+INSERT INTO public.building_type_class (id, building_class) VALUES (3, 'Place of Worship - Buddhist');
+INSERT INTO public.building_type_class (id, building_class) VALUES (4, 'Police Station');
+INSERT INTO public.building_type_class (id, building_class) VALUES (5, 'Sports Facility');
+INSERT INTO public.building_type_class (id, building_class) VALUES (6, 'School');
+INSERT INTO public.building_type_class (id, building_class) VALUES (7, 'Hospital');
+INSERT INTO public.building_type_class (id, building_class) VALUES (8, 'Place of Worship - Islam');
+INSERT INTO public.building_type_class (id, building_class) VALUES (9, 'Government');
+INSERT INTO public.building_type_class (id, building_class) VALUES (10, null);
+INSERT INTO public.building_type_class (id, building_class) VALUES (11, 'Residential');
+INSERT INTO public.building_type_class (id, building_class) VALUES (12, 'Fire Station');
+INSERT INTO public.building_type_class (id, building_class) VALUES (13, 'Supermarket');

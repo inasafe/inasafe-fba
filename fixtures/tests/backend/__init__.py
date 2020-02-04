@@ -23,5 +23,16 @@ class TestBackendReady(unittest.TestCase):
         self.assertTrue(
             self.dbc.table_exists('osm_roads'))
 
+    def test_osm_tables_content(self):
+        with self.dbc.conn.cursor() as cursor:
+            cursor.execute('select count(*) from osm_buildings')
+            row = cursor.fetchone()
+            self.assertTrue(row[0])
+
+        with self.dbc.conn.cursor() as cursor:
+            cursor.execute('select count(*) from osm_roads')
+            row = cursor.fetchone()
+            self.assertTrue(row[0])
+
     def tearDown(self):
         self.dbc.conn.close()

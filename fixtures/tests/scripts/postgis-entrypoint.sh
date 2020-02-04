@@ -74,13 +74,13 @@ fi
 
 
 
+echo "Postgres initialisation process completed .... restarting in background"
 
-# If no arguments passed to entrypoint, then run postgres by default
+su - postgres -c "$SETVARS $POSTGRES  -D $DATADIR  -c config_file=$CONF" > /var/log/postgres-main.log &
+
+# If no arguments passed to entrypoint, then show logs in foreground by default
 if [[ $# -eq 0 ]];
 then
-	echo "Postgres initialisation process completed .... restarting in background"
-
-	su - postgres -c "$SETVARS $POSTGRES  -D $DATADIR  -c config_file=$CONF" > /var/log/postgres-main.log &
 	tail -f /var/log/postgres-main.log
 fi
 

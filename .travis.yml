@@ -1,5 +1,7 @@
 language: python
 
+python: 3.7
+
 services:
   - docker
 
@@ -33,16 +35,16 @@ script:
   # Twice because db is restarting when initialized
   - make wait-db-ready
   - make backend-schema-test
+  - make backend-populate-test-data
   - make backend-up SERVICE=imposm
   - make backend-up SERVICE=testrunner
   - make backend-up SERVICE=postgrest
   - make backend-up SERVICE=swagger
   - make backend-logs SERVICE=imposm &
+  - make backend-first-pbf-import
+  - make backend-wait-first-pbf-import
   - make wait-backend-ready
   - make backend-test
-  - popd
   # forecast test
-  - pushd forecast_script
-  - make build up wait-entrypoint-scripts-ready
-  - make test
+  - make backend-forecast-test
   - popd

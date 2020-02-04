@@ -41,4 +41,6 @@ SET default_tablespace = '';
 
 SET search_path to public;
 
+DROP SCHEMA IF EXISTS backup CASCADE ;
+
 CREATE EXTENSION IF NOT EXISTS postgis;

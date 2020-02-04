@@ -25,15 +25,20 @@ echo "REPO_ROOT: ${REPO_ROOT}"
 
 cp -rf docker-osm-settings/settings/mapping.yml docker-osm-settings/custom_settings/mapping.yml
 cp -rf docker-osm-settings/settings/qgis_style.sql docker-osm-settings/custom_settings/qgis_style.sql
-cp -rf docker-osm-settings/settings/post-pbf-import.sql docker-osm-settings/custom_settings/post-pbf-import.sql
+cp -rf docker-osm-settings/settings/post-pbf-import.sql.bu docker-osm-settings/custom_settings/post-pbf-import.sql.bu
 cp -rf ${FIXTURES_PATH}/tests/docker-osm/clip.geojson docker-osm-settings/custom_settings/clip.geojson
 
 # Download test pbf for docker-osm
 export PBF_URL=${PBF_URL:-http://cloud.kartoza.com/s/sxR8anXo5fgFN9Q/download}
 
 # Retrieve PBF test files
-echo "Downloading test PBF file: ${PBF_URL}"
-curl -L ${PBF_URL} -o docker-osm-settings/custom_settings/country.pbf
+#echo "Downloading test PBF file: ${PBF_URL}"
+#curl -L ${PBF_URL} -o docker-osm-settings/custom_settings/country.pbf
+docker pull inasafe/inasafe-fba-resources:latest
+docker run --name resources -d inasafe/inasafe-fba-resources:latest tail -f /dev/null
+docker cp resources:/home/country.pbf docker-osm-settings/custom_settings/country.pbf
+
+du -sh docker-osm-settings/custom_settings/country.pbf
 
 popd
 

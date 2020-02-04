@@ -23,3 +23,17 @@ volumes:
       type: none
       device: ${PWD}/docker-osm-settings/custom_settings
       o: bind
+
+services:
+  db:
+    build:
+      dockerfile: ${PWD}/docker/Dockerfile
+      context: ${PWD}/../../
+    image: local/postgis:11.0-2.5
+    entrypoint: ${REPO_ROOT}/fixtures/tests/scripts/postgis-entrypoint.sh
+
+  imposm:
+    environment:
+      REPO_ROOT: ${REPO_ROOT}
+    volumes:
+      - repo-volume:/opt/inasafe-fba

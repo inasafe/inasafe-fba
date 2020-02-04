@@ -1,0 +1,2 @@
+TRUNCATE public.reporting_point CASCADE ;
+INSERT INTO public.reporting_point (id, glofas_id, name, geometry) VALUES (1, 1765, 'CISADANE SERPONG', '0101000020E61000009A99999999A95A4066666666666619C0');
