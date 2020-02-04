@@ -28,7 +28,9 @@ script:
   # Backend deployment tests
   - pushd deployment
   - make backend-up SERVICE=db
-  - make backend-logs SERVICE=db &
+  - sleep 20
+  - make wait-db-ready
+  # Twice because db is restarting when initialized
   - make wait-db-ready
   - make backend-schema-test
   - make backend-up SERVICE=imposm

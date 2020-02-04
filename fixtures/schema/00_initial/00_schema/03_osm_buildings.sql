@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.osm_buildings (
     landuse character varying,
     geometry public.geometry(Geometry,4326),
     constraint osm_buildings_pkey
-        primary key (osm_id, id)
+        primary key (osm_id)
 );
 
 
