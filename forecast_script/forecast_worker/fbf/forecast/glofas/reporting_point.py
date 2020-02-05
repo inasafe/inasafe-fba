@@ -864,13 +864,14 @@ class GloFASForecast(object):
             requests.post(url, json=data)
         return True
 
-    def run(self):
+    def run(self, generate_report=True):
         self.fetch_forecast()
         self.process_forecast()
         self.calculate_impact()
         self.evaluate_trigger_status()
         self.calculate_impact()
-        self.generate_report()
+        if generate_report:
+            self.generate_report()
 
 
 if __name__ == '__main__':
