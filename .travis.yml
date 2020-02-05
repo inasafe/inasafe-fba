@@ -25,9 +25,7 @@ before_script:
   - pushd docker-osm/indonesia-buildings
   - make prepare-integration-tests
   - popd
-
-script:
-  # Backend deployment tests
+  # Schema and test data preparations
   - pushd deployment
   - make backend-up SERVICE=db
   - sleep 20
@@ -40,10 +38,14 @@ script:
   - make backend-up SERVICE=testrunner
   - make backend-up SERVICE=postgrest
   - make backend-up SERVICE=swagger
-  - make backend-logs SERVICE=imposm &
   - make backend-first-pbf-import
   - make backend-wait-first-pbf-import
   - make wait-backend-ready
+  - popd
+
+script:
+  # Backend deployment tests
+  - pushd deployment
   - make backend-test
   # forecast test
   - make backend-forecast-test
