@@ -32,3 +32,7 @@ CREATE TRIGGER building_type_mapper_tg AFTER INSERT OR UPDATE ON public.osm_buil
 --
 DROP TRIGGER IF EXISTS building_type_recode_tg ON public.osm_buildings;
 CREATE TRIGGER building_type_recode_tg AFTER INSERT OR UPDATE ON public.osm_buildings FOR EACH ROW EXECUTE PROCEDURE public.kartoza_building_recode_mapper();
+
+
+DROP TRIGGER IF EXISTS building_total_vulnerability_tg ON public.osm_buildings;
+CREATE TRIGGER building_total_vulnerability_tg AFTER INSERT OR UPDATE ON public.osm_buildings FOR EACH ROW EXECUTE PROCEDURE public.kartoza_generate_building_vulnerability();
