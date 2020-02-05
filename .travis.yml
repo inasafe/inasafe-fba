@@ -32,14 +32,15 @@ before_script:
   - make wait-db-ready
   # Twice because db is restarting when initialized
   - make wait-db-ready
+  - make backend-up SERVICE=imposm
+  - make backend-first-pbf-import
+  - make backend-wait-first-pbf-import
+  - make backend-stop SERVICE=imposm
   - make backend-schema-test
   - make backend-populate-test-data
-  - make backend-up SERVICE=imposm
   - make backend-up SERVICE=testrunner
   - make backend-up SERVICE=postgrest
   - make backend-up SERVICE=swagger
-  - make backend-first-pbf-import
-  - make backend-wait-first-pbf-import
   - make wait-backend-ready
   - popd
 

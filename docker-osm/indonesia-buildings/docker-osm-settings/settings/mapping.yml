@@ -38,7 +38,7 @@ tables:
       name: use
       type: string
     - key: religion
-      name: religon
+      name: religion
       type: string
     - name: type
       type: mapping_value

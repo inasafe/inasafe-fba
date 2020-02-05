@@ -1,0 +1,13 @@
+INSERT INTO public.road_type_class (id, road_class) VALUES (1, null) ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (2, 'Motorway or highway') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (3, 'Tertiary link') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (4, 'Secondary') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (5, 'Secondary link') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (6, 'false') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (7, 'Primary link') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (8, 'Tertiary') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (9, 'Track') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (10, 'Primary road') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (11, 'Motorway link') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (12, 'Road, residential, living street, etc.') ON CONFLICT DO NOTHING ;
+INSERT INTO public.road_type_class (id, road_class) VALUES (13, 'Bridge') ON CONFLICT DO NOTHING ;
