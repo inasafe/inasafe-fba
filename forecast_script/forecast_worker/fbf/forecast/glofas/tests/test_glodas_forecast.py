@@ -107,11 +107,11 @@ class TestGloFASForecast(unittest.TestCase):
         self.job.acquisition_time = datetime.datetime(
             year=2019, month=12, day=19, hour=0, minute=0, second=0)
         self.job.source_text = '[TEST] GloFAS - Reporting Point'
-        self.job.run()
+        self.job.run(generate_report=False)
 
         self.job.acquisition_time = datetime.datetime(
             year=2019, month=12, day=22, hour=0, minute=0, second=0)
-        self.job.run()
+        self.job.run(generate_report=False)
 
         # validate activation result
         hazard_event = self.job.flood_forecast_events[1]

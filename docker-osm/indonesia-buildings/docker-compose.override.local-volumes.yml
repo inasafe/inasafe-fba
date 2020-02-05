@@ -31,6 +31,9 @@ services:
       context: ${PWD}/../../
     image: local/postgis:11.0-2.5
     entrypoint: ${REPO_ROOT}/fixtures/tests/scripts/postgis-entrypoint.sh
+    command: /usr/sbin/sshd -D
+    ports:
+      - "${SSHD_PORT}:22"
 
   imposm:
     environment:
