@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS public.osm_buildings (
     "roof:material" character varying,
     "building:material" character varying,
     use character varying,
-    religon character varying,
+    religion character varying,
     type character varying,
     amenity character varying,
     landuse character varying,

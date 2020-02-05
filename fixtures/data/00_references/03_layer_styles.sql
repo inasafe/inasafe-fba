@@ -1,4 +1,3 @@
-TRUNCATE public.layer_styles CASCADE ;
 INSERT INTO public.layer_styles (id, f_table_catalog, f_table_schema, f_table_name, f_geometry_column, stylename, styleqml, stylesld, useasdefault, description, owner, ui, update_time) VALUES (1, 'gis', 'public', 'osm_waterareas', 'geometry', 'waterares', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="2.12.2-Lyon" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
  <edittypes>
@@ -739,7 +738,7 @@ INSERT INTO public.layer_styles (id, f_table_catalog, f_table_schema, f_table_na
   </UserStyle>
  </NamedLayer>
 </StyledLayerDescriptor>
-', false, 'mar. déc. 22 10:19:53 2015', 'docker', null, '2015-12-22 09:19:53.591458');
+', false, 'mar. déc. 22 10:19:53 2015', 'docker', null, '2015-12-22 09:19:53.591458') ON CONFLICT DO NOTHING ;
 INSERT INTO public.layer_styles (id, f_table_catalog, f_table_schema, f_table_name, f_geometry_column, stylename, styleqml, stylesld, useasdefault, description, owner, ui, update_time) VALUES (3, 'gis', 'public', 'osm_waterareas', 'geometry', 'osm_waterareas', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="2.14.3-Essen" minimumScale="-4.65661e-10" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
  <edittypes>
@@ -1514,7 +1513,7 @@ def my_form_open(dialog, layer, feature):
   </UserStyle>
  </NamedLayer>
 </StyledLayerDescriptor>
-', true, 'Wed Jul 20 01:43:14 2016', 'docker', null, '2016-07-19 18:43:14.861512');
+', true, 'Wed Jul 20 01:43:14 2016', 'docker', null, '2016-07-19 18:43:14.861512') ON CONFLICT DO NOTHING ;
 INSERT INTO public.layer_styles (id, f_table_catalog, f_table_schema, f_table_name, f_geometry_column, stylename, styleqml, stylesld, useasdefault, description, owner, ui, update_time) VALUES (4, 'gis', 'public', 'osm_waterways', 'geometry', 'osm_waterways', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="2.14.3-Essen" minimumScale="1" maximumScale="3.25069e+06" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="1" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
  <edittypes>
@@ -1785,7 +1784,7 @@ def my_form_open(dialog, layer, feature):
   </UserStyle>
  </NamedLayer>
 </StyledLayerDescriptor>
-', true, 'Wed Jul 20 01:43:27 2016', 'docker', null, '2016-07-19 18:43:27.766761');
+', true, 'Wed Jul 20 01:43:27 2016', 'docker', null, '2016-07-19 18:43:27.766761') ON CONFLICT DO NOTHING ;
 INSERT INTO public.layer_styles (id, f_table_catalog, f_table_schema, f_table_name, f_geometry_column, stylename, styleqml, stylesld, useasdefault, description, owner, ui, update_time) VALUES (5, 'gis', 'public', 'osm_roads', 'geometry', 'osm_roads', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="2.14.3-Essen" minimumScale="1" maximumScale="100000" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="1" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
  <edittypes>
@@ -2079,7 +2078,7 @@ def my_form_open(dialog, layer, feature):
   </UserStyle>
  </NamedLayer>
 </StyledLayerDescriptor>
-', true, 'Wed Jul 20 01:43:38 2016', 'docker', null, '2016-07-19 18:43:38.405347');
+', true, 'Wed Jul 20 01:43:38 2016', 'docker', null, '2016-07-19 18:43:38.405347') ON CONFLICT DO NOTHING ;
 INSERT INTO public.layer_styles (id, f_table_catalog, f_table_schema, f_table_name, f_geometry_column, stylename, styleqml, stylesld, useasdefault, description, owner, ui, update_time) VALUES (6, 'gis', 'public', 'osm_buildings', 'geometry', 'osm_buildings', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="2.14.3-Essen" minimumScale="1" maximumScale="3.25069e+06" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="1" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
  <edittypes>
@@ -2348,7 +2347,7 @@ def my_form_open(dialog, layer, feature):
   </UserStyle>
  </NamedLayer>
 </StyledLayerDescriptor>
-', true, 'Wed Jul 20 01:44:05 2016', 'docker', null, '2016-07-19 18:44:05.358674');
+', true, 'Wed Jul 20 01:44:05 2016', 'docker', null, '2016-07-19 18:44:05.358674') ON CONFLICT DO NOTHING ;
 INSERT INTO public.layer_styles (id, f_table_catalog, f_table_schema, f_table_name, f_geometry_column, stylename, styleqml, stylesld, useasdefault, description, owner, ui, update_time) VALUES (2, 'gis', 'public', 'osm_places', 'geometry', 'osm_places', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="2.14.3-Essen" minimumScale="1" maximumScale="176471" simplifyDrawingHints="0" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="1" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
  <edittypes>
@@ -2952,7 +2951,7 @@ def my_form_open(dialog, layer, feature):
   </UserStyle>
  </NamedLayer>
 </StyledLayerDescriptor>
-', true, 'Wed Jul 20 01:43:55 2016', 'docker', null, '2015-12-22 09:20:12.897576');
+', true, 'Wed Jul 20 01:43:55 2016', 'docker', null, '2015-12-22 09:20:12.897576') ON CONFLICT DO NOTHING ;
 INSERT INTO public.layer_styles (id, f_table_catalog, f_table_schema, f_table_name, f_geometry_column, stylename, styleqml, stylesld, useasdefault, description, owner, ui, update_time) VALUES (7, 'gis', 'public', 'osm_admin', 'geometry', 'osm_admin', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="2.14.3-Essen" minimumScale="100000" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
  <edittypes>
@@ -3222,4 +3221,4 @@ def my_form_open(dialog, layer, feature):
   </UserStyle>
  </NamedLayer>
 </StyledLayerDescriptor>
-', true, 'Wed Jul 20 01:44:15 2016', 'docker', null, '2016-07-19 18:44:15.125991');
+', true, 'Wed Jul 20 01:44:15 2016', 'docker', null, '2016-07-19 18:44:15.125991') ON CONFLICT DO NOTHING ;

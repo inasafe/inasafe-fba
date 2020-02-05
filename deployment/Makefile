@@ -26,6 +26,9 @@ backend-up:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) up SERVICE=$(SERVICE)
 #	@cd ../geoserver; $(MAKE) up
 
+backend-stop:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) stop SERVICE=$(SERVICE)
+
 backend-logs:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) logs SERVICE=$(SERVICE)
 

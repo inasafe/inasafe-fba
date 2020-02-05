@@ -1,0 +1,52 @@
+[
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201250,
+    "village_id": 3201250009,
+    "building_type": "Residential",
+    "district_count": 25986,
+    "sub_district_count": 25986,
+    "village_count": 25986,
+    "building_type_count": 25941
+  },
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201250,
+    "village_id": 3201250009,
+    "building_type": "School",
+    "district_count": 25986,
+    "sub_district_count": 25986,
+    "village_count": 25986,
+    "building_type_count": 4
+  },
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201250,
+    "village_id": 3201250009,
+    "building_type": "Sports Facility",
+    "district_count": 25986,
+    "sub_district_count": 25986,
+    "village_count": 25986,
+    "building_type_count": 2
+  },
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201250,
+    "village_id": 3201250009,
+    "building_type": "University/College",
+    "district_count": 25986,
+    "sub_district_count": 25986,
+    "village_count": 25986,
+    "building_type_count": 2
+  },
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201250,
+    "village_id": 3201250009,
+    "building_type": null,
+    "district_count": 25986,
+    "sub_district_count": 25986,
+    "village_count": 25986,
+    "building_type_count": 37
+  }
+]

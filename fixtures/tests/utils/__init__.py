@@ -6,7 +6,7 @@ import os
 class DBConnection:
 
     def __init__(self):
-        self.conn = DBConnection.conn()
+        self.conn = DBConnection.create_conn()
 
     def table_exists(self, table_name, table_schema='public'):
         cur = self.conn.cursor()
@@ -24,7 +24,10 @@ class DBConnection:
             return False
 
     @staticmethod
-    def conn():
+    def create_conn():
+        """
+        :return: psycopg2.connection
+        """
         return psycopg2.connect(
             host=os.environ.get('POSTGRES_HOST'),
             database=os.environ.get('POSTGRES_DB'),
@@ -32,3 +35,6 @@ class DBConnection:
             password=os.environ.get('POSTGRES_PASS'),
             port=os.environ.get('POSTGRES_PORT')
         )
+
+    def cursor(self):
+        return self.conn.cursor()
