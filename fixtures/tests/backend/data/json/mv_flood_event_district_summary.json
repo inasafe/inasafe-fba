@@ -1,0 +1,31 @@
+[
+  {
+    "flood_event_id": 257,
+    "district_id": 3201,
+    "name": "Bogor",
+    "building_count": 25986,
+    "flooded_building_count": 10743,
+    "total_vulnerability_score": 6353.533333334395,
+    "residential_flooded_building_count": 10731,
+    "clinic_dr_flooded_building_count": 0,
+    "fire_station_flooded_building_count": 0,
+    "school_flooded_building_count": 2,
+    "university_flooded_building_count": 0,
+    "government_flooded_building_count": 0,
+    "hospital_flooded_building_count": 0,
+    "police_station_flooded_building_count": 0,
+    "supermarket_flooded_building_count": 0,
+    "sports_facility_flooded_building_count": 0,
+    "residential_building_count": 25941,
+    "clinic_dr_building_count": 0,
+    "fire_station_building_count": 0,
+    "school_building_count": 4,
+    "university_building_count": 2,
+    "government_building_count": 0,
+    "hospital_building_count": 0,
+    "police_station_building_count": 0,
+    "supermarket_building_count": 0,
+    "sports_facility_building_count": 2,
+    "trigger_status": null
+  }
+]

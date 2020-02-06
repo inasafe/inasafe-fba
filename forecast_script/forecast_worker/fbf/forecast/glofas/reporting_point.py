@@ -3,6 +3,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 
 import requests
+from dateutil.parser import isoparse
 from glofas.layer.reporting_point import (
     ReportingPointAPI,
     ReportingPointResult)
@@ -706,7 +707,6 @@ class GloFASForecast(object):
         return updated
 
     def evaluate_trigger_status(self, forecast_events=None):
-        today = self.acquisition_time
         self.flood_forecast_events = (
             forecast_events or self.flood_forecast_events)
 
@@ -732,7 +732,7 @@ class GloFASForecast(object):
                 continue
 
             # Create village trigger status mapping
-            village_trigger_status =[
+            village_trigger_status = [
                 {
                     'flood_event_id': flood_forecast['id'],
                     'village_id': v['village_id'],
@@ -743,6 +743,7 @@ class GloFASForecast(object):
             # Evaluate activation criteria
             # Check previous forecast activation
             forecast_date = flood_forecast['forecast_date']
+            today = flood_forecast['acquisition_date']
             acquisition_date = today - timedelta(days=1)
             if self.use_plpy:
                 flood_event = self.find_previous_flood_forecast_plpy(

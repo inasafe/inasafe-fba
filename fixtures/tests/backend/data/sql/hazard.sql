@@ -1,4 +1,3 @@
-
 -- hazard_map
 INSERT INTO public.hazard_map (id, notes, measuring_station_id, place_name, return_period) VALUES (85, 'Draw', 1, 'Serpong', 20);
 
@@ -17,4 +16,4 @@ INSERT INTO public.hazard_areas (id, flood_map_id, flooded_area_id) VALUES (1118
 
 
 -- hazard_event
-INSERT INTO public.hazard_event (id, flood_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress, hazard_type_id) VALUES (257, 89, '2019-12-16 00:00:00.000000', '2019-12-19 00:00:00.000000', 'GloFAS - Reporting Point', 'Alert Warning Level: SEVERE', 'https://globalfloods.eu/', 1, 2, null);
+INSERT INTO public.hazard_event (id, flood_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress, hazard_type_id) VALUES (257, 85, '2019-12-16 00:00:00.000000', '2019-12-19 00:00:00.000000', 'GloFAS - Reporting Point', 'Alert Warning Level: SEVERE', 'https://globalfloods.eu/', 1, 2, null);
