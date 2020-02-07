@@ -27,6 +27,7 @@ services:
      - repo-volume:/opt/inasafe-fba
     ports:
       - "${POSTGRES_PORT}:5432"
+    network_mode: bridge
 
   osm_downloader:
     image: kartoza/docker-osm:pbf-downloader
@@ -40,6 +41,7 @@ services:
       - BASE_URL=${PBF_URL}
       - MAPPING_URL=${MAPPING_URL}
       - GEOJSON_URL=${GEOJSON_URL}
+    network_mode: bridge
 
   imposm:
     image: kartoza/docker-osm:imposm-latest
@@ -83,6 +85,7 @@ services:
       # Use clip in the database
       - CLIP=${CLIP_BOOLEAN}
     command: bash -c "while [ ! -f /home/settings/country.pbf ] ; do sleep 1; done && python3 -u /home/importer.py"
+    network_mode: bridge
 
   osmupdate:
     image: kartoza/docker-osm:osmupdate-latest
@@ -117,7 +120,7 @@ services:
       # if 0, then no update will be done, only the first initial import from the PBF
       - TIME=${UPDATE_TIME}
     command: bash -c "while [ ! -f /home/settings/country.pbf ] ; do sleep 1; done && python3 -u /home/download.py"
-
+    network_mode: bridge
 #  osmenrich:
 #    image: kartoza/docker-osm:osmenrich-latest
 #    restart: always
@@ -155,6 +158,7 @@ services:
       - db:db
     ports:
       - "${PGRST_PORT}:3000"
+    network_mode: bridge
 
   swagger:
     image: swaggerapi/swagger-ui
@@ -162,6 +166,7 @@ services:
       - "${SWAGGER_UI_PORT}:8080"
     environment:
       API_URL: ${PGRST_SERVER_PROXY_URI}
+    network_mode: bridge
 
   testrunner:
       image: python:3
@@ -180,3 +185,4 @@ services:
         - db
       volumes:
         - repo-volume:${REPO_ROOT}
+      network_mode: bridge

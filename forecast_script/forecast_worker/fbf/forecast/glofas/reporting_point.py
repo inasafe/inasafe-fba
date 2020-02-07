@@ -326,7 +326,7 @@ class GloFASForecast(object):
                 'flood_map_id': flood_map_id,
                 'acquisition_date': acquisition_date,
                 'forecast_date': forecast_date,
-                'source': 'GloFAS - Reporting Point',
+                'source': self.source_text,
                 'alert_level_key': alert_level,
                 'notes': 'Alert Warning Level: {alert_level}'.format(
                     alert_level=alert_level.upper()),
@@ -463,7 +463,6 @@ class GloFASForecast(object):
             headers=headers)
         # Get the returned ids
         created = response.json()
-
         return [c['id'] for c in created]
 
     def push_flood_forecast_event_plpy(self, flood_forecast_events):

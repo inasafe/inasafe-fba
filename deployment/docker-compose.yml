@@ -14,3 +14,4 @@ services:
       POSTGREST_BASE_URL: ${POSTGREST_BASE_URL}
     ports:
       - "80:80"
+    network_mode: bridge
