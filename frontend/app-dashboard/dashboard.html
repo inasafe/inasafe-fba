@@ -509,14 +509,14 @@
     <tr>
         <td class="box-count-left">
             <div class="box-count">
-                <div class="score"><%= flooded_vulnerability_total %></div>
-                <div class="subtext">Total Vulnerability Score for Buildings</div>
+                <div class="score"><%= flooded_building_count %></div>
+                <div class="subtext">Potentially affected buildings</div>
             </div>
         </td>
         <td class="box-count-right">
-            <div class="box-count">
-                <div class="score"><%= flooded_building_count %></div>
-                <div class="subtext">Potentially affected buildings</div>
+            <div class="box-count" data-road-region-id="<%= id %>">
+                <div class="score"><%= flooded_road_count %></div>
+                <div class="subtext">Potentially affected roads</div>
             </div>
         </td>
     </tr>

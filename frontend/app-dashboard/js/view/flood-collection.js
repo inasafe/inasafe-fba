@@ -579,15 +579,15 @@ define([
                 'village': 'village_id'
             };
 
-            let buildings = [];
+            let roads = [];
             let overall = [];
             let region_render;
             if (renderRegionDetail) {
                 region_render = region;
                 $.each(data[region], function (idx, value) {
-                    buildings[idx] = [];
+                    roads[idx] = [];
                     $.each(value, function (key, value) {
-                        buildings[idx][key] = value;
+                        roads[idx][key] = value;
                         if (!overall[key]) {
                             overall[key] = value
                         } else {
@@ -619,9 +619,9 @@ define([
 
                 if (region !== 'village') {
                     $.each(statData, function (idx, value) {
-                        buildings[idx] = [];
+                        roads[idx] = [];
                         $.each(value, function (key, value) {
-                            buildings[idx][key] = value;
+                            roads[idx][key] = value;
                         })
                     });
                 }
@@ -635,6 +635,9 @@ define([
                 overall['region'] = region;
             }
             dispatcher.trigger('dashboard:render-chart-road', overall);
+            if (region !== 'village') {
+                dispatcher.trigger('dashboard:inject-road-region-summary', roads, region_render, key[region_render]);
+            }
         },
         fetchRoadDistrictData: function (flood_event_id) {
             let that = this;

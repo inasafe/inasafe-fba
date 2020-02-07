@@ -36,6 +36,7 @@ define([
             dispatcher.on('dashboard:reset', this.resetDashboard, this);
             dispatcher.on('dashboard:hide', this.hideDashboard, this);
             dispatcher.on('dashboard:render-region-summary', this.renderRegionSummary, this);
+            dispatcher.on('dashboard:inject-road-region-summary', this.injectRoadRegionSummary, this);
             dispatcher.on('dashboard:change-trigger-status', this.changeStatus, this);
 
             this.$el = $(this.el);
@@ -373,6 +374,7 @@ define([
             });
         },
         renderRegionSummary: function (data, region, id_field) {
+            let that = this;
             let $wrapper = $('#region-summary-panel');
             let title = this.sub_region_title_template;
             $wrapper.html(title({
@@ -383,18 +385,26 @@ define([
             for(let u=0; u<data.length; u++){
                 let item = data[u];
                 let trigger_status = data[u].trigger_status || 0;
-                let total_vulnerability_score = item['total_vulnerability_score'] ? item['total_vulnerability_score'].toFixed(2) : 0;
                 let building_total_score = item['flooded_building_count'] ? item['flooded_building_count'] : '-';
                 $table.append(item_template({
                     region: region,
                     id: item[id_field],
                     name: item['name'],
-                    flooded_vulnerability_total: total_vulnerability_score,
+                    flooded_road_count: that.loading_template,
                     flooded_building_count: building_total_score,
                     trigger_status: trigger_status
                 }));
             }
             $wrapper.append($table);
+        },
+        injectRoadRegionSummary: function (data, region, id_field) {
+            let $wrapper = $('#region-summary-panel');
+            for(let u=0; u<data.length; u++){
+                let item = data[u];
+                let road_total_score = item['flooded_flooded_road_count'] ? item['flooded_flooded_road_count'] : '-';
+                let div = $wrapper.find('[data-road-region-id=' + item[id_field] + ']');
+                $(div).find('.score').html(road_total_score);
+            }
         },
         changeStatus: function (status) {
             status = status || 0;
