@@ -744,6 +744,9 @@ class GloFASForecast(object):
             # Check previous forecast activation
             forecast_date = flood_forecast['forecast_date']
             today = flood_forecast['acquisition_date']
+            if isinstance(today, str):
+                today = isoparse(today)
+
             acquisition_date = today - timedelta(days=1)
             if self.use_plpy:
                 flood_event = self.find_previous_flood_forecast_plpy(
