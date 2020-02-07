@@ -16,6 +16,7 @@ define([
         wmsExposedRoadsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_roads&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
         markers: [],
         exposed_road_layer: null,
+        reportingPointMarkers: [],
         initialize: function () {
             // constructor
             this.map = L.map('map').setView([51.505, -0.09], 13).fitBounds(this.initBounds);
@@ -190,6 +191,8 @@ define([
                 dispatcher.trigger('map:update-polygon', that.postgrestFilter());
                 that.redraw();
             });
+
+            this.addReportingPoints();
 
             this.side_panel = new SidePanelView();
             this.intro_view = new IntroView();
@@ -430,6 +433,31 @@ define([
             this.generalLegendControl.options.position = 'topleft';
             this.map.addControl(this.generalLegendControl);
 
+        },
+        addReportingPoints: function () {
+            let that = this;
+            $.ajax({
+                url: kartozaGeoserverUrl + 'ows?service=WFS&version=1.0.0&request=GetFeature&typeName=kartoza%3Areporting_point&maxFeatures=50&outputFormat=application%2Fjson',
+                success: function (data) {
+                    if(data['features']) {
+                        let reporting_points = data['features'];
+                        for(let i=0; i<reporting_points.length; i++){
+                            let icon = L.AwesomeMarkers.icon({
+                                prefix: 'fa',
+                                icon: 'fa-life-ring',
+                                markerColor: 'cadetblue'
+                            });
+                            let marker = L.marker(
+                                [reporting_points[i]['geometry']['coordinates'][1], reporting_points[i]['geometry']['coordinates'][0]], {
+                                    icon: icon
+                                }).addTo(that.map).bindTooltip("Reporting point: " + reporting_points[i]['properties']['name']);
+                            that.reportingPointMarkers.push(marker)
+                        }
+                    }else {
+                        console.log('Reporting point data are not found.')
+                    }
+                }
+            })
         }
     });
 });
