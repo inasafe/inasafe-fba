@@ -176,6 +176,7 @@ class TestGloFASForecast(unittest.TestCase):
     def tearDown(self):
         # Remove testing related data
         # Get all forecast events
+
         event_ids = [f['id'] for f in self.job.flood_forecast_events]
         self.delete_trigger_status(event_ids)
         self.delete_spreadsheets(event_ids)
