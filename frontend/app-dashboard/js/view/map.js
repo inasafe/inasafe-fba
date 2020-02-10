@@ -437,7 +437,7 @@ define([
         addReportingPoints: function () {
             let that = this;
             $.ajax({
-                url: kartozaGeoserverUrl + 'ows?service=WFS&version=1.0.0&request=GetFeature&typeName=kartoza%3Areporting_point&maxFeatures=50&outputFormat=application%2Fjson',
+                url: geoserverUrl + '?service=WFS&version=1.0.0&request=GetFeature&typeName=kartoza%3Areporting_point&maxFeatures=50&outputFormat=application%2Fjson',
                 success: function (data) {
                     if(data['features']) {
                         let reporting_points = data['features'];

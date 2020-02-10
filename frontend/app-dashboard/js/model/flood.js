@@ -22,9 +22,9 @@ define([
 
             // attribute placeholder
             _url : {
-                flooded_area: postgresUrl + 'flooded_area',
-                flooded_areas: postgresUrl + 'flooded_areas',
-                flood_map: postgresUrl + 'flood_map'
+                flooded_area: postgresUrl + 'hazard_area',
+                flooded_areas: postgresUrl + 'hazard_areas',
+                flood_map: postgresUrl + 'hazard_map'
             },
             _table_attrs: {
                 flood_map: {
@@ -32,11 +32,11 @@ define([
                     notes: 'notes',
                     return_period: 'return_period'
                 },
-                flooded_area: {
+                flooded_areas: {
                     flood_id: 'flood_map_id',
                     flooded_area_id: 'flooded_area_id'
                 },
-                flooded_areas: {
+                flooded_area: {
                     depth_class: 'depth_class',
                     geometry: 'geometry'
                 }
@@ -125,6 +125,7 @@ define([
                 const that = this
 
                 const on_post_fails = function (data) {
+                    console.log(data)
                     console.log('Flooded Area post fails: ' + data)
                 }
 
@@ -135,8 +136,8 @@ define([
                 const created_areas = areas.map(function(value){
                     // Insert flood area, one by one, as promise.
                     return that._createFloodedArea({
-                        [that._table_attrs.flooded_areas.geometry]: 'SRID=4326;' + Wellknown.stringify(value.geometry),
-                        [that._table_attrs.flooded_areas.depth_class]: value.depth_class
+                        [that._table_attrs.flooded_area.geometry]: 'SRID=4326;' + Wellknown.stringify(value.geometry),
+                        [that._table_attrs.flooded_area.depth_class]: value.depth_class
                     }).catch(on_post_fails)
                 })
 
@@ -146,8 +147,8 @@ define([
                         // Make lists of Flood_Area - Flood_Areas relationship
                         const relations = values.map(function (value) {
                             return {
-                                [that._table_attrs.flooded_area.flood_id]: flood_map_id,
-                                [that._table_attrs.flooded_area.flooded_area_id]: value.id
+                                [that._table_attrs.flooded_areas.flood_id]: flood_map_id,
+                                [that._table_attrs.flooded_areas.flooded_area_id]: value.id
                             }
                         })
                         // Bulk insert relationship

@@ -25,8 +25,6 @@ define([
             this.$return_period = $form.find("select[name='return_period']");
             this.$acquisition_date = $form.find("input[name='acquisition_date']");
             this.$forecast_date = $form.find("input[name='forecast_date']");
-
-            dispatcher.on('flood:update-forecast-collection', this.selectUploadedForecast, this);
         },
 
         submitForm: function(e){
@@ -89,40 +87,64 @@ define([
         uploadFloodFinished: function (layer) {
             // upload forecast event
             const that = this;
+            let options = {
+                'headers': {
+                    'prefer': 'return=representation'
+                }
+            };
             this.forecast_event.save(
                 {
                     flood_map_id: layer.get('id')
-                })
-                .fail(function(response, textStatus)
-                {
-                    if(textStatus === "parsererror" && response.status === 201){
+                }, options)
+                .then(function (response, textStatus) {
+                    if(response){
+                        console.log(response)
                         // parser error but successfully sent to server
-                        alert('Flood map successfully uploaded.');
+                        alert('Flood map successfully uploaded!');
                         that.$el.find('[type=submit]').show();
+                        $('form').trigger('reset');
                         that.progressbar.hide();
+                        let forecast_date = new Date(response[0]['forecast_date']);
+                        let acquisition_date = new moment(response[0]['acquisition_date']);
+                        let id = response[0]['id'];
+                        let predefined_event = {
+                            'forecast_date': forecast_date,
+                            'id': id
+                        };
+                        that.triggerCalculation(id);
+
+                        let today = new Date();
+                        if(acquisition_date < today){
+                            let end_date_range = acquisition_date.clone().add(1, 'month');
+                            let start_date_range = acquisition_date.clone().subtract(1, 'month');
+                            dispatcher.trigger('flood:fetch-historical-forecast', start_date_range, end_date_range);
+                        }
 
                         // New data has been uploaded
                         // Refresh forecast list
-                        dispatcher.trigger('flood:fetch-forecast-collection');
+                        dispatcher.trigger('flood:fetch-forecast-collection', predefined_event);
                     }
                     else if(textStatus !== 'success') {
                         alert('Upload Failed. Forecast information failed to save');
                         that.$el.find('[type=submit]').show();
                         that.progressbar.hide();
                     }
+                })
+                .fail(function(response, textStatus)
+                {
+                    console.log(response)
                 });
 
         },
-
-        selectUploadedForecast: function(forecast_collection_view){
-            if(this.forecast_event) {
-                let forecast_date = moment(this.forecast_event.get('forecast_date'));
-                forecast_collection_view.fetchForecast(
-                    forecast_date.local().formatDate(),
-                    this.forecast_event.get('id'));
-            }
+        triggerCalculation: function (id) {
+            AppRequest.post(postgresBaseUrl + '/rpc/kartoza_fba_forecast_glofas',
+                {
+                    'hazard_event_id': id
+                }
+            ).then(function (value) {
+                console.log(value)
+            })
         },
-
         setProgressBar: function(value){
             this.progressbar.find(".progress-bar")
                 .css("width", value+"%")
