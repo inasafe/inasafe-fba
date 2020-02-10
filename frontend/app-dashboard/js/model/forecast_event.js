@@ -43,11 +43,13 @@ define([
                 WMS_LAYER_NAME: 'kartoza:flood_forecast_layer'
             },
 
-            urlRoot: postgresUrl + 'flood_event',
+            urlRoot: postgresUrl + 'hazard_event',
 
             initialize: function(){
-                this.lead_time();
-                this.is_historical();
+                if(this.id) {
+                    this.lead_time();
+                    this.is_historical();
+                }
             },
 
             url: function () {

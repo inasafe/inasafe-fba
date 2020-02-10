@@ -69,6 +69,7 @@ define([
             dispatcher.on('flood:fetch-stats-data', this.fetchStatisticData, this);
             dispatcher.on('flood:fetch-stats-data-road', this.fetchRoadStatisticData, this);
             dispatcher.on('flood:deselect-forecast', this.deselectForecast, this);
+            dispatcher.on('flood:fetch-historical-forecast', this.fetchHistoricalForecastCollection, this);
 
 
             // get forecast collections
@@ -106,7 +107,7 @@ define([
                     that.fetchHistoricalForecastCollection(previous_months, today);
                 });
         },
-        initializeDatePickerBrowse: function () {
+        initializeDatePickerBrowse: function (predefined_event) {
             const that = this;
             if (this.datepicker_browse) {
                 // we need to recreate datepicker
@@ -163,6 +164,9 @@ define([
             // change message
             this.$datepicker_browse.val('Select forecast date');
             this.datepicker_browse = this.$datepicker_browse.data('datepicker');
+            if(predefined_event){
+                that.fetchForecast(predefined_event.forecast_date, predefined_event.id)
+            }
         },
         updateDatePicker: function(){
             if(this.datepicker_browse){
@@ -210,7 +214,7 @@ define([
                 })
 
         },
-        fetchForecastCollection: function () {
+        fetchForecastCollection: function (predefined_event) {
             const today = moment().utc();
             const that = this;
 
@@ -233,7 +237,7 @@ define([
 
                     _.extend(that.event_date_hash, date_hash);
 
-                    dispatcher.trigger('flood:update-forecast-collection', that);
+                    dispatcher.trigger('flood:update-forecast-collection', predefined_event);
                     that.updateForecastsSummary();
                     that.getListCentroid()
             })
