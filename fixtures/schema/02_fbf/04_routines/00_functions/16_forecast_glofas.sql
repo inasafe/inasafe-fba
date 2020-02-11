@@ -5,8 +5,9 @@ CREATE OR REPLACE FUNCTION public.kartoza_fba_forecast_glofas() RETURNS CHARACTE
 as
 $$
 from fbf.forecast.glofas.reporting_point import GloFASForecast
-import os
-postgrest_url = os.environ.get('POSTGREST_BASE_URL')
+import json
+rv = plpy.execute("SELECT value FROM config WHERE key = 'POSTGREST_BASE_URL'")
+postgrest_url = json.loads(rv[0]['value'])
 job = GloFASForecast(postgrest_url=postgrest_url)
 job.run()
 
@@ -18,9 +19,10 @@ CREATE OR REPLACE FUNCTION public.kartoza_fba_forecast_glofas(hazard_event_id bi
 as
 $$
 from fbf.forecast.glofas.reporting_point import GloFASForecast
-import os
 import requests
-postgrest_url = os.environ.get('POSTGREST_BASE_URL')
+import json
+rv = plpy.execute("SELECT value FROM config WHERE key = 'POSTGREST_BASE_URL'")
+postgrest_url = json.loads(rv[0]['value'])
 job = GloFASForecast(postgrest_url=postgrest_url)
 
 url = '{postgrest_url}{endpoint}{query_param}'.format(

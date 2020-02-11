@@ -5,7 +5,7 @@ source /env-data.sh
 echo "Imported directory: $1"
 RETVAL=0
 
-for f in $(find $1 -name '*.sql' -o -name '*.sh' | sort -n); do
+for f in $(find $1 -name '*.sql' -o -name '*.sh' -o -name '*.py' | sort -n); do
 	case "$f" in
 		*.sql)
 			echo "Importing $f"
@@ -19,6 +19,16 @@ for f in $(find $1 -name '*.sql' -o -name '*.sh' | sort -n); do
 		*.sh)
 			echo "Executing $f"
 			if ! . $f; then
+				echo "Execution failed on file $f"
+				echo "Cancel import"
+				RETVAL=1
+				break
+			fi
+			;;
+		*.py)
+			echo "Executing $f"
+			export PYTHONPATH=${REPO_ROOT}/fixtures/tests
+			if ! python3 $f; then
 				echo "Execution failed on file $f"
 				echo "Cancel import"
 				RETVAL=1

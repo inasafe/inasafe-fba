@@ -37,10 +37,10 @@ wait-first-pbf-import:
 	@until docker-compose exec imposm bash -c 'ls /home/settings/.first-pbf-import.lock > /dev/null'; do echo "First PBF import not done."; sleep $(or ${TIMEOUT},30); done; echo "Initial OSM tables ready."
 
 schema-test:
-	@docker-compose exec db bash -c '$${REPO_ROOT}/fixtures/tests/scripts/import-sql.sh $${REPO_ROOT}/fixtures/schema$(SCHEMA)'
+	@docker-compose exec db bash -c '$${REPO_ROOT}/fixtures/tests/scripts/import-fixtures.sh $${REPO_ROOT}/fixtures/schema$(SCHEMA)'
 
 populate-test-data:
-	@docker-compose exec db bash -c '$${REPO_ROOT}/fixtures/tests/scripts/import-sql.sh $${REPO_ROOT}/fixtures/data'
+	@docker-compose exec db bash -c '$${REPO_ROOT}/fixtures/tests/scripts/import-fixtures.sh $${REPO_ROOT}/fixtures/data'
 
 test:
 	@docker-compose exec db bash -c 'cd $${REPO_ROOT}/fixtures; python3 -m unittest discover -v'

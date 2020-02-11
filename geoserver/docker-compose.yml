@@ -1,0 +1,15 @@
+version: '2.1'
+volumes:
+  geoserver-data:
+services:
+  geoserver:
+    image: kartoza/geoserver:2.15.2
+    environment:
+      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_ADMIN_PASSWORD:-myawesomegeoserverpassword}
+      ENABLE_JSONP: 'true'
+      INITIAL_MEMORY: 3G
+      MAXIMUM_MEMORY: 8G
+    volumes:
+      - geoserver-data:/opt/geoserver/data_dir
+    user: root
+    network_mode: bridge

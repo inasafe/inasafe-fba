@@ -24,7 +24,7 @@ build-archive:
 
 backend-up:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) up SERVICE=$(SERVICE)
-#	@cd ../geoserver; $(MAKE) up
+	@cd ../geoserver; $(MAKE) up
 
 backend-stop:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) stop SERVICE=$(SERVICE)
@@ -55,7 +55,8 @@ wait-db-ready:
 
 wait-backend-ready:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) wait-backend-ready
+	@cd ../geoserver; $(MAKE) wait-geoserver-ready
 
 backend-down:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) down
-#	@cd ../geoserver; $(MAKE) down
+	@cd ../geoserver; $(MAKE) down

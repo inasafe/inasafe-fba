@@ -1,0 +1,20 @@
+version: '2.1'
+volumes:
+  # When using bind mount, make sure all these folders exists
+  repo-volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/../../
+      o: bind
+  geoserver-data:
+    driver_opts:
+      type: none
+      device: ${PWD}/.geoserver-data
+      o: bind
+
+services:
+  geoserver:
+    volumes:
+      - repo-volume:/opt/inasafe-fba
+    ports:
+      - "${GEOSERVER_PORT}:8080"
