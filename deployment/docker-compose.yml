@@ -10,8 +10,7 @@ services:
     environment:
       POSTGREST_SERVER: ${POSTGREST_SERVER:-postgrest.fbf.test:3000}
       SWAGGER_SERVER: ${SWAGGER_SERVER:-swagger.fbf.test:3080}
+      GEOSERVER_SERVER: ${GEOSERVER_SERVER:-geoserver.fbf.test:8000}
       GEOSERVER_BASE_URL: ${GEOSERVER_BASE_URL}
       POSTGREST_BASE_URL: ${POSTGREST_BASE_URL}
-    ports:
-      - "80:80"
     network_mode: bridge
