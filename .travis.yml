@@ -27,6 +27,8 @@ before_script:
   - popd
   # Schema and test data preparations
   - pushd deployment
+  - make up
+  - make geoserver-up
   - make backend-up SERVICE=db
   - sleep 20
   - make wait-db-ready
@@ -37,6 +39,7 @@ before_script:
   - make backend-wait-first-pbf-import
   - make backend-stop SERVICE=imposm
   - make backend-schema-test
+  - make wait-geoserver-ready
   - make backend-populate-test-data
   - make backend-up SERVICE=testrunner
   - make backend-up SERVICE=postgrest
