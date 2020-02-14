@@ -8,9 +8,11 @@ CREATE FUNCTION public.kartoza_fba_generate_excel_report_for_flood(flood_event_i
     AS $_$
     import io
     import sys
-
+    import json
     plpy.execute("select * from satisfy_dependency('xlsxwriter')")
     plpy.execute("select * from satisfy_dependency('openpyxl')")
+    result = plpy.execute("select value from config where key = 'WMS_BASE_URL'")
+    wms_base_url = json.loads(result[0]['value'])
 
     from smartexcel.smart_excel import SmartExcel
     from smartexcel.fbf.data_model import FbfFloodData
@@ -20,6 +22,7 @@ CREATE FUNCTION public.kartoza_fba_generate_excel_report_for_flood(flood_event_i
         output=io.BytesIO(),
         definition=FBF_DEFINITION,
         data=FbfFloodData(
+            wms_base_url=wms_base_url,
             flood_event_id=flood_event_id,
             pl_python_env=True
         )

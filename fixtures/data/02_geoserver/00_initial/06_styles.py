@@ -60,6 +60,7 @@ if __name__ == '__main__':
     with runner.session() as s:
 
         styles = [
+            'red_outline',
             'building_vulnerability',
             'exposed_roads',
             'flood_depth_class',
