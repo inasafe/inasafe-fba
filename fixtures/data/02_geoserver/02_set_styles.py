@@ -27,6 +27,18 @@ if __name__ == '__main__':
 
         layer_and_style = [
             {
+                'layer_name': 'district_boundary',
+                'style_name': 'red_outline',
+            },
+            {
+                'layer_name': 'sub_district_boundary',
+                'style_name': 'red_outline',
+            },
+            {
+                'layer_name': 'village_boundary',
+                'style_name': 'red_outline',
+            },
+            {
                 'layer_name': 'exposed_buildings',
                 'style_name': 'building_vulnerability'
             },
