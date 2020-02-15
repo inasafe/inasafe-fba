@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS public.config (
     id integer NOT NULL default nextval('public.config_id_sq'::regclass),
     key character varying(255),
     value json,
-    constraint config_id_pkey primary key (id)
+    constraint config_id_pkey primary key (id),
+    constraint config_key_unique unique (key)
 );

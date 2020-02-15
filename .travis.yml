@@ -1,9 +1,20 @@
 language: python
 
+sudo: true
+
 python: 3.7
 
 services:
   - docker
+
+env:
+  # HTTP Port for the whole stack (nginx frontend proxy)
+  # We can't use port 80 on travis
+  - HTTP_PORT=8080
+    WMS_BASE_URL=http://fbf.test:8080/geoserver/wms
+    GEOSERVER_BASE_URL=http://fbf.test:8080/geoserver
+    POSTGREST_BASE_URL=http://fbf.test:8080/api
+    PGRST_SERVER_PROXY_URI=http://fbf.test:8080/api
 
 addons:
   hosts:
@@ -14,23 +25,36 @@ addons:
 
 before_install:
   # We use makefile to control build
-  - sudo apt -y update; sudo apt -y install make zip wget curl
+  - sudo apt -y update; sudo apt -y install make zip wget curl net-tools
+  # We use dnsmasq to resolve domain name
+  - pushd fixtures/tests/scripts
+  - sudo bash extract-interface-ip.sh
+  - export IP_ADDR=$(cat ip-address.txt)
+  - echo $IP_ADDR
+  - sudo bash modify-dnsmasq-config.sh
+  - popd
 
 before_script:
   # Frontend deployment
+  - sudo netstat -tulnp
   - pushd deployment
   - cp .sample.env .env
+  - cp docker-compose.override.local-volumes.yml docker-compose.override.yml
   - popd
   # Docker OSM backend
   - pushd docker-osm/indonesia-buildings
   - make prepare-integration-tests
+  - popd
+  # Geoserver
+  - pushd geoserver
+  - cp .sample.env .env
+  - cp docker-compose.override.local-volumes.yml docker-compose.override.yml
   - popd
   # Schema and test data preparations
   - pushd deployment
   - make up
   - make geoserver-up
   - make backend-up SERVICE=db
-  - sleep 20
   - make wait-db-ready
   # Twice because db is restarting when initialized
   - make wait-db-ready
@@ -52,5 +76,7 @@ script:
   - pushd deployment
   - make backend-test
   # forecast test
+  # forecast test needs hazard map model
+  - make backend-import-fixtures TARGET=tests/backend/data/sql/hazard_map.sql
   - make backend-forecast-test
   - popd

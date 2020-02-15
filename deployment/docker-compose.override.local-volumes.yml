@@ -4,4 +4,4 @@ services:
     volumes:
       - ../frontend/app-dashboard:/usr/share/nginx/app-dashboard
     ports:
-      - "8080:80"
+      - "${HTTP_PORT}:80"

@@ -4,49 +4,289 @@
     "sub_district_id": 3201250,
     "village_id": 3201250009,
     "building_type": "Residential",
-    "district_count": 25986,
-    "sub_district_count": 25986,
-    "village_count": 25986,
-    "building_type_count": 25941
+    "district_count": 5156,
+    "sub_district_count": 2958,
+    "village_count": 742,
+    "building_type_count": 742
   },
   {
     "district_id": 3201,
     "sub_district_id": 3201250,
-    "village_id": 3201250009,
+    "village_id": 3201250010,
+    "building_type": "Residential",
+    "district_count": 5156,
+    "sub_district_count": 2958,
+    "village_count": 2216,
+    "building_type_count": 2216
+  },
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201260,
+    "village_id": 3201260012,
+    "building_type": "Residential",
+    "district_count": 5156,
+    "sub_district_count": 2198,
+    "village_count": 2198,
+    "building_type_count": 2198
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603070,
+    "village_id": 3603070005,
+    "building_type": "Residential",
+    "district_count": 11906,
+    "sub_district_count": 466,
+    "village_count": 466,
+    "building_type_count": 466
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081002,
+    "building_type": "Residential",
+    "district_count": 11906,
+    "sub_district_count": 11440,
+    "village_count": 23,
+    "building_type_count": 23
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081003,
+    "building_type": "Residential",
+    "district_count": 11906,
+    "sub_district_count": 11440,
+    "village_count": 4475,
+    "building_type_count": 4456
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081003,
+    "building_type": null,
+    "district_count": 11906,
+    "sub_district_count": 11440,
+    "village_count": 4475,
+    "building_type_count": 19
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081004,
+    "building_type": "Residential",
+    "district_count": 11906,
+    "sub_district_count": 11440,
+    "village_count": 1653,
+    "building_type_count": 1652
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081004,
+    "building_type": null,
+    "district_count": 11906,
+    "sub_district_count": 11440,
+    "village_count": 1653,
+    "building_type_count": 1
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081005,
+    "building_type": "Residential",
+    "district_count": 11906,
+    "sub_district_count": 11440,
+    "village_count": 634,
+    "building_type_count": 633
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081005,
+    "building_type": "University/College",
+    "district_count": 11906,
+    "sub_district_count": 11440,
+    "village_count": 634,
+    "building_type_count": 1
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081006,
+    "building_type": "Residential",
+    "district_count": 11906,
+    "sub_district_count": 11440,
+    "village_count": 4655,
+    "building_type_count": 4654
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081006,
+    "building_type": null,
+    "district_count": 11906,
+    "sub_district_count": 11440,
+    "village_count": 4655,
+    "building_type_count": 1
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010001,
+    "building_type": "Residential",
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 632,
+    "building_type_count": 632
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010002,
+    "building_type": "Residential",
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 1006,
+    "building_type_count": 1004
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010002,
     "building_type": "School",
-    "district_count": 25986,
-    "sub_district_count": 25986,
-    "village_count": 25986,
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 1006,
+    "building_type_count": 1
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010002,
+    "building_type": null,
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 1006,
+    "building_type_count": 1
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010003,
+    "building_type": "Residential",
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 3468,
+    "building_type_count": 3457
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010003,
+    "building_type": "School",
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 3468,
+    "building_type_count": 2
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010003,
+    "building_type": null,
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 3468,
+    "building_type_count": 9
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010004,
+    "building_type": "Residential",
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 954,
+    "building_type_count": 946
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010004,
+    "building_type": "School",
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 954,
+    "building_type_count": 1
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010004,
+    "building_type": "Sports Facility",
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 954,
+    "building_type_count": 2
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010004,
+    "building_type": "University/College",
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 954,
+    "building_type_count": 1
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010004,
+    "building_type": null,
+    "district_count": 8801,
+    "sub_district_count": 6060,
+    "village_count": 954,
     "building_type_count": 4
   },
   {
-    "district_id": 3201,
-    "sub_district_id": 3201250,
-    "village_id": 3201250009,
-    "building_type": "Sports Facility",
-    "district_count": 25986,
-    "sub_district_count": 25986,
-    "village_count": 25986,
-    "building_type_count": 2
+    "district_id": 3674,
+    "sub_district_id": 3674020,
+    "village_id": 3674020012,
+    "building_type": "Residential",
+    "district_count": 8801,
+    "sub_district_count": 2741,
+    "village_count": 255,
+    "building_type_count": 255
   },
   {
-    "district_id": 3201,
-    "sub_district_id": 3201250,
-    "village_id": 3201250009,
-    "building_type": "University/College",
-    "district_count": 25986,
-    "sub_district_count": 25986,
-    "village_count": 25986,
-    "building_type_count": 2
+    "district_id": 3674,
+    "sub_district_id": 3674020,
+    "village_id": 3674020013,
+    "building_type": "Residential",
+    "district_count": 8801,
+    "sub_district_count": 2741,
+    "village_count": 2486,
+    "building_type_count": 2484
   },
   {
-    "district_id": 3201,
-    "sub_district_id": 3201250,
-    "village_id": 3201250009,
+    "district_id": 3674,
+    "sub_district_id": 3674020,
+    "village_id": 3674020013,
     "building_type": null,
-    "district_count": 25986,
-    "sub_district_count": 25986,
-    "village_count": 25986,
-    "building_type_count": 37
+    "district_count": 8801,
+    "sub_district_count": 2741,
+    "village_count": 2486,
+    "building_type_count": 2
+  },
+  {
+    "district_id": null,
+    "sub_district_id": null,
+    "village_id": null,
+    "building_type": "Residential",
+    "district_count": 123,
+    "sub_district_count": 123,
+    "village_count": 123,
+    "building_type_count": 123
   }
 ]

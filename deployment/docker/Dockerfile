@@ -1,6 +1,6 @@
 FROM nginx
 
-RUN apt -y update; apt -y install make zip python3 python3-pip
+RUN apt -y update; apt -y install make zip python3 python3-pip wget curl
 
 ADD . /opt/inasafe-fba
 
