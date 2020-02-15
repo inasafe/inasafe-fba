@@ -49,6 +49,9 @@ backend-test:
 backend-forecast-test:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) forecast-test
 
+backend-import-fixtures:
+	@cd ../docker-osm/indonesia-buildings; $(MAKE) import-fixtures TARGET=$(TARGET)
+
 wait-db-ready:
 	@cd ../docker-osm/indonesia-buildings; $(MAKE) wait-db-ready
 

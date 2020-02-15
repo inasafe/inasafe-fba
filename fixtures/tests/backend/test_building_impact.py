@@ -15,6 +15,10 @@ class TestBuildingImpact(DatabaseTestCase):
         self.dbc.conn.autocommit = False
         with self.dbc.conn.cursor(cursor_factory=DictCursor) as c:
 
+            # populate hazard map model
+            hazard_map = self.sql_path('hazard_map.sql')
+            self.execute_sql_file(hazard_map, cursor=c)
+
             # populate hazard event data
             hazard_insert = self.sql_path('hazard.sql')
             self.execute_sql_file(hazard_insert, cursor=c)
@@ -80,3 +84,28 @@ class TestBuildingImpact(DatabaseTestCase):
             _test_summary_stats(self, results)
 
             self.dbc.conn.rollback()
+
+    def test_generate_spreadsheets(self):
+        self.dbc.conn.autocommit = False
+        with self.dbc.conn.cursor(cursor_factory=DictCursor) as c:
+
+            # populate hazard map model
+            hazard_map = self.sql_path('hazard_map.sql')
+            self.execute_sql_file(hazard_map, cursor=c)
+
+            # populate hazard event data
+            hazard_insert = self.sql_path('hazard.sql')
+            self.execute_sql_file(hazard_insert, cursor=c)
+
+            # trigger spreadsheets calculations
+            spreadsheet = self.sql_path('spreadsheet.sql')
+            self.execute_sql_file(spreadsheet, cursor=c)
+            results = c.fetchone()
+
+            self.assertEqual(results[0], 'OK')
+
+            spreadsheet_reports = self.sql_path('spreadsheet_content.sql')
+            self.execute_sql_file(spreadsheet_reports, cursor=c)
+            results = c.fetchone()
+
+            self.assertTrue(results['spreadsheet'])

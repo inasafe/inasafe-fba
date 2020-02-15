@@ -42,6 +42,9 @@ schema-test:
 populate-test-data:
 	@docker-compose exec db bash -c '$${REPO_ROOT}/fixtures/tests/scripts/import-fixtures.sh $${REPO_ROOT}/fixtures/data'
 
+import-fixtures:
+	@docker-compose exec db /opt/inasafe-fba/fixtures/tests/scripts/import-fixtures.sh /opt/inasafe-fba/fixtures/${TARGET}
+
 test:
 	@docker-compose exec db bash -c 'cd $${REPO_ROOT}/fixtures; python3 -m unittest discover -v'
 

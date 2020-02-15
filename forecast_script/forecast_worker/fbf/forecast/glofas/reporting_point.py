@@ -181,7 +181,7 @@ class GloFASForecast(object):
             return_period_min=return_period_min,
             return_period_max=return_period_max
         )
-        url = '{postgrest_url}{query_param}'.format(
+        url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=query_param)
         response = requests.get(url)
@@ -198,7 +198,7 @@ class GloFASForecast(object):
             acquisition_date=maximum_acquisition_date,
             forecast_date=forecast_date,
             source=source)
-        url = '{postgrest_url}{query_param}'.format(
+        url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=query_param)
         response = requests.get(url)
@@ -426,7 +426,7 @@ class GloFASForecast(object):
         return current_flood_forecast
 
     def push_flood_forecast_event_postgrest(self, flood_forecast_events):
-        url = '{postgrest_url}{query_param}'.format(
+        url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=self.flood_event_insert_endpoint)
         headers = {
@@ -591,7 +591,7 @@ class GloFASForecast(object):
         query_param = self.impacted_village_query_filter.format(
             flood_event_id=flood_event_id,
             impact_limit=impact_limit)
-        url = '{postgrest_url}{query_param}'.format(
+        url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=query_param)
         response = requests.get(url)
@@ -601,7 +601,7 @@ class GloFASForecast(object):
         query_param = self.region_trigger_status_query_filter.format(
             region=region,
             flood_event_id=flood_event_id)
-        url = '{postgrest_url}{query_param}'.format(
+        url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=query_param)
         response = requests.get(url)
@@ -619,7 +619,7 @@ class GloFASForecast(object):
     def push_region_trigger_status(self, region, trigger_status_array):
         endpoint = self.region_trigger_status_endpoint.format(
             region=region)
-        url = '{postgrest_url}{endpoint}'.format(
+        url = '{postgrest_url}/{endpoint}'.format(
             postgrest_url=self.postgrest_url,
             endpoint=endpoint)
 
@@ -660,7 +660,7 @@ class GloFASForecast(object):
             parent_region=parent_region,
             child_region=child_region,
             child_ids=json_array)
-        url = '{postgrest_url}{query_param}'.format(
+        url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=query_param)
         response = requests.get(url)
@@ -681,7 +681,7 @@ class GloFASForecast(object):
         return self.fetch_parent_administrative_mapping('district', 'sub_district', child_ids)
 
     def update_flood_event_forecast(self, flood_event):
-        url = '{postgrest_url}{query_param}'.format(
+        url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=self.flood_event_insert_endpoint)
         headers = {
@@ -848,7 +848,7 @@ class GloFASForecast(object):
     def calculate_impact(self):
         # We calculate impact by triggering database functions.
         # Calculations happens in database
-        url = '{postgrest_url}{query_param}'.format(
+        url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=self.rpc_calculate_impact)
         response = requests.post(url)
@@ -857,7 +857,7 @@ class GloFASForecast(object):
     def generate_report(self):
         # We generate report by triggering database functions.
 
-        url = '{postgrest_url}{query_param}'.format(
+        url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
             query_param=self.rpc_generate_report)
         for f in self.flood_forecast_events:

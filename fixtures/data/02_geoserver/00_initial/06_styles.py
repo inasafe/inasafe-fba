@@ -31,6 +31,17 @@ def create_styles(runner, session, style_name):
             validate=True
         )
 
+    # Check if style body already exists
+    response = runner.assert_get(
+        session,
+        '/workspaces/kartoza/styles/{style_name}.sld'.format(
+            style_name=style_name))
+
+    if response.ok:
+        print('SLD Style already exits')
+        runner.print_response(response)
+        return response
+
     sld_path = os.path.join(
         os.path.dirname(__file__),
         'sld/{style_name}.sld'.format(

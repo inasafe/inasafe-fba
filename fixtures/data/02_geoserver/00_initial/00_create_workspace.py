@@ -28,4 +28,4 @@ if __name__ == '__main__':
 
         runner.print_response(response)
 
-        exit(response.ok)
+        exit(not response.ok)

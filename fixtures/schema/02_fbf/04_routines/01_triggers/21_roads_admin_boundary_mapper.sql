@@ -5,10 +5,10 @@ BEGIN
     SELECT
            v.village_code, s.sub_dc_code, d.dc_code
     INTO new.village_id, new.sub_district_id, new.district_id
-    FROM gis.public.osm_roads b
-        JOIN village v ON st_within(b.geometry, v.geom)
-        JOIN sub_district s ON st_within(b.geometry, s.geom)
-        JOIN district d ON st_within(b.geometry, d.geom);
+    FROM village v
+             JOIN sub_district s ON st_within(v.geom, s.geom)
+             JOIN district d ON st_within(s.geom, d.geom)
+    WHERE st_within(new.geometry, v.geom);
     RETURN NEW;
 END
 $$;

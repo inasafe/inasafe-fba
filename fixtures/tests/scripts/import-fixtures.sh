@@ -18,7 +18,7 @@ for f in $(find $1 -name '*.sql' -o -name '*.sh' -o -name '*.py' | sort -n); do
 			;;
 		*.sh)
 			echo "Executing $f"
-			if ! . $f; then
+			if ! bash $f; then
 				echo "Execution failed on file $f"
 				echo "Cancel import"
 				RETVAL=1
