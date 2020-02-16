@@ -86,26 +86,46 @@ class TestBuildingImpact(DatabaseTestCase):
             self.dbc.conn.rollback()
 
     def test_generate_spreadsheets(self):
-        self.dbc.conn.autocommit = False
+        # Spreadsheet generator relies on Geoserver to get the map,
+        # So we can't use rollback because that means GeoServer won't have
+        # the data to display the map
+        def _cleanup(self, c):
+
+            cleanup = self.sql_path('hazard_event_cleanup.sql')
+            self.execute_sql_file(cleanup, cursor=c)
+
+        self.dbc.conn.autocommit = True
+        # Cleanup first in case of artifacts from previous tests
+        with self.dbc.conn.cursor(cursor_factory=DictCursor) as c:
+            _cleanup(self, c)
+
         with self.dbc.conn.cursor(cursor_factory=DictCursor) as c:
 
-            # populate hazard map model
-            hazard_map = self.sql_path('hazard_map.sql')
-            self.execute_sql_file(hazard_map, cursor=c)
+            try:
+                # populate hazard map model
+                hazard_map = self.sql_path('hazard_map.sql')
+                self.execute_sql_file(hazard_map, cursor=c)
 
-            # populate hazard event data
-            hazard_insert = self.sql_path('hazard.sql')
-            self.execute_sql_file(hazard_insert, cursor=c)
+                # populate hazard event data
+                hazard_insert = self.sql_path('hazard.sql')
+                self.execute_sql_file(hazard_insert, cursor=c)
 
-            # trigger spreadsheets calculations
-            spreadsheet = self.sql_path('spreadsheet.sql')
-            self.execute_sql_file(spreadsheet, cursor=c)
-            results = c.fetchone()
+                # make sure materialized views are refreshed
+                calculate_impact = self.sql_path('calculate_impact.sql')
+                self.execute_sql_file(calculate_impact, cursor=c)
 
-            self.assertEqual(results[0], 'OK')
+                # trigger spreadsheets calculations
+                spreadsheet = self.sql_path('spreadsheet.sql')
+                self.execute_sql_file(spreadsheet, cursor=c)
+                results = c.fetchone()
 
-            spreadsheet_reports = self.sql_path('spreadsheet_content.sql')
-            self.execute_sql_file(spreadsheet_reports, cursor=c)
-            results = c.fetchone()
+                self.assertEqual(results[0], 'OK')
 
-            self.assertTrue(results['spreadsheet'])
+                spreadsheet_reports = self.sql_path('spreadsheet_content.sql')
+                self.execute_sql_file(spreadsheet_reports, cursor=c)
+                results = c.fetchone()
+
+                self.assertTrue(results['spreadsheet'])
+            finally:
+                cleanup = self.sql_path('hazard_event_cleanup.sql')
+                self.execute_sql_file(cleanup, cursor=c)
