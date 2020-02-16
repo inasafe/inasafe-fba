@@ -11,7 +11,7 @@ ps:
 	@docker-compose ps
 
 logs:
-	@docker-compose logs -f geoserver
+	@docker-compose logs -f --tail=30 geoserver
 
 shell:
 	@docker-compose exec geoserver bash
