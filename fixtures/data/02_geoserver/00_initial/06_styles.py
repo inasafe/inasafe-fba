@@ -37,9 +37,8 @@ def create_styles(runner, session, style_name):
         '/workspaces/kartoza/styles/{style_name}.sld'.format(
             style_name=style_name))
 
-    if response.ok:
+    if response.ok and response.text.strip():
         print('SLD Style already exits')
-        runner.print_response(response)
         return response
 
     sld_path = os.path.join(
@@ -77,7 +76,14 @@ if __name__ == '__main__':
             'flood_depth_class',
             'osm_buildings',
             'osm_roads',
-            'osm_waterways_scale'
+            'osm_waterways_scale',
+            'district_map',
+            'sub_district_map',
+            'village_map',
+            'osm_admin_web',
+            'BlueprintBuildings',
+            'BlueprintRoads',
+            'BlueprintRivers',
         ]
 
         for style in styles:
