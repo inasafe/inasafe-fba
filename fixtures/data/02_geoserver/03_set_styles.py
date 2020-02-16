@@ -52,16 +52,32 @@ if __name__ == '__main__':
             },
             {
                 'layer_name': 'osm_buildings',
-                'style_name': 'osm_buildings'
+                'style_name': 'BlueprintBuildings'
             },
             {
                 'layer_name': 'osm_roads',
-                'style_name': 'osm_roads'
+                'style_name': 'BlueprintRoads'
             },
             {
                 'layer_name': 'osm_waterways',
-                'style_name': 'osm_waterways_scale'
-            }
+                'style_name': 'BlueprintRivers'
+            },
+            {
+                'layer_name': 'osm_admin',
+                'style_name': 'osm_admin_web'
+            },
+            {
+                'layer_name': 'flood_map_district',
+                'style_name': 'district_map'
+            },
+            {
+                'layer_name': 'flood_map_sub_district',
+                'style_name': 'sub_district_map'
+            },
+            {
+                'layer_name': 'flood_map_village',
+                'style_name': 'village_map'
+            },
         ]
 
         for entry in layer_and_style:
