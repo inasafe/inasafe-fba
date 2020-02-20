@@ -1,0 +1,142 @@
+[
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201250,
+    "village_id": 3201250008,
+    "population": 11105,
+    "males": 5456,
+    "females": 5649,
+    "elderly": 2067,
+    "unemployed": 1751
+  },
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201250,
+    "village_id": 3201250009,
+    "population": 11277,
+    "males": 5559,
+    "females": 5718,
+    "elderly": 1905,
+    "unemployed": 1690
+  },
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201250,
+    "village_id": 3201250010,
+    "population": 8745,
+    "males": 4310,
+    "females": 4435,
+    "elderly": 1538,
+    "unemployed": 1408
+  },
+  {
+    "district_id": 3201,
+    "sub_district_id": 3201260,
+    "village_id": 3201260012,
+    "population": 12185,
+    "males": 5845,
+    "females": 6340,
+    "elderly": 2131,
+    "unemployed": 2589
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603070,
+    "village_id": 3603070005,
+    "population": 7838,
+    "males": 3880,
+    "females": 3958,
+    "elderly": 1357,
+    "unemployed": 1732
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081002,
+    "population": 6438,
+    "males": 3118,
+    "females": 3320,
+    "elderly": 914,
+    "unemployed": 1557
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081003,
+    "population": 25715,
+    "males": 12610,
+    "females": 13105,
+    "elderly": 3477,
+    "unemployed": 5736
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081004,
+    "population": 14140,
+    "males": 6918,
+    "females": 7222,
+    "elderly": 2325,
+    "unemployed": 3145
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081005,
+    "population": 6828,
+    "males": 3358,
+    "females": 3470,
+    "elderly": 1157,
+    "unemployed": 1473
+  },
+  {
+    "district_id": 3603,
+    "sub_district_id": 3603081,
+    "village_id": 3603081006,
+    "population": 14817,
+    "males": 7291,
+    "females": 7526,
+    "elderly": 2338,
+    "unemployed": 3041
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010002,
+    "population": 9838,
+    "males": 4870,
+    "females": 4968,
+    "elderly": 1445,
+    "unemployed": 1839
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010003,
+    "population": 21723,
+    "males": 10748,
+    "females": 10975,
+    "elderly": 3775,
+    "unemployed": 3836
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674010,
+    "village_id": 3674010004,
+    "population": 13187,
+    "males": 6558,
+    "females": 6629,
+    "elderly": 2511,
+    "unemployed": 2239
+  },
+  {
+    "district_id": 3674,
+    "sub_district_id": 3674020,
+    "village_id": 3674020013,
+    "population": 19902,
+    "males": 9974,
+    "females": 9928,
+    "elderly": 3331,
+    "unemployed": 3391
+  }
+]
