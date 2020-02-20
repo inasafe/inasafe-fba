@@ -30,7 +30,6 @@ first-pbf-import:
 	@docker-compose exec imposm bash -c 'rm -f /home/settings/.first-pbf-import.lock'
 	@make schema-test SCHEMA=/00_initial/00_schema/00_initial.sql
 	@until docker-compose exec imposm bash -c 'PYTHONPATH=/home python3 $${REPO_ROOT}/fixtures/tests/scripts/first_pbf_import.py'; do echo "Retrying..."; sleep $(or ${TIMEOUT}, 30); done
-	# Add flag to tell that first-pbf-import finishes
 	@docker-compose exec imposm bash -c 'touch /home/settings/.first-pbf-import.lock'
 
 wait-first-pbf-import:
@@ -38,6 +37,9 @@ wait-first-pbf-import:
 
 schema-test:
 	@docker-compose exec db bash -c '$${REPO_ROOT}/fixtures/tests/scripts/import-fixtures.sh $${REPO_ROOT}/fixtures/schema$(SCHEMA)'
+
+db-image-snapshot:
+	@docker commit fbf-backend_db_1 local/postgis:11.0-2.5
 
 populate-test-data:
 	@docker-compose exec db bash -c '$${REPO_ROOT}/fixtures/tests/scripts/import-fixtures.sh $${REPO_ROOT}/fixtures/data'
@@ -67,6 +69,9 @@ up:
 	@echo "Bringing up docker osm instance with default prod configuration"
 	@echo "------------------------------------------------------------------"
 	@docker-compose up -d $(SERVICE)
+
+build:
+	@docker-compose build
 
 stop:
 	@docker-compose stop $(or $(SERVICE),db)

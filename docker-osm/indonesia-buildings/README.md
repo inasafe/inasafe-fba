@@ -41,18 +41,59 @@ Important keys like `PGRST_SERVER_PROXY_URI` and `PBF_URL` have comments on it t
 
 ### Spin up the services
 
+Before you start up the service, first you need to build the service for local development.
+
+```bash
+make build
+```
+
 Simply execute:
 
-```
+```bash
 make up
 ```
 
 To start the service.
 To stop the service use:
 
-```
+```bash
 make down
 ```
+
+If you want to start specific service only, use:
+
+```bash
+make up SERVICE=<name>
+```
+
+Where `<name>` is the service name defined by docker-compose files.
+Some commands like `make logs` can also use SERVICE parameter
+
+Very often, because you are setting up the service for development, you will need to install or run setup scripts from inside the container.
+You can use
+
+```bash
+make shell SERVICE=<name>
+```
+
+to get inside the shell of the SERVICE.
+Sometimes you modify the containers, like installing things.
+When you do this, remember that if you recreate the service (happens if you do `make down up`), your changes is lost if it was not persisted in your volume.
+If this is not what you want, you should commit your container state.
+
+For example use case, after generating the schema, the container now have external python modules installed.
+If you recreate the service, you had to reinstall the modules.
+To avoid this, you commit the container state of the db service like this:
+
+```bash
+docker commit <db container name> <image name>
+```
+
+Where, container name is usually `fbf-backend_db_1` if you use our default 
+settings, and image name for the container is `local/postgis:11.0-2.5` as 
+described in `docker-compose.override.yml`.
+This way, when you recreate container `make down up`, it will use the previous state because you already overwrite the image name.
+You don't have to reinstall the python modules again.
 
 ### Verify backend is running
 
