@@ -54,7 +54,7 @@ class TestBuildingImpact(DatabaseTestCase):
 
                     # Sanity check
                     # total exposed count must be less or equal from
-                    # total exposed count (because there might be
+                    # total count (because there might be
                     # uncategorized building) from the field
                     self.assertLessEqual(
                         sum_exposed_count, row['flooded_building_count'])
