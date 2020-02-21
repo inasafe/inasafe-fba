@@ -33,8 +33,6 @@ class TestPopulationImpact(DatabaseTestCase):
                     'unemployed',
                 ]
                 for row in results:
-                    sum_exposed_count = 0
-                    sum_total_count = 0
                     for key in keys_to_check:
                         # Do sanity count check
                         # exposed count must less than total count
@@ -44,13 +42,13 @@ class TestPopulationImpact(DatabaseTestCase):
                             '{0}_population_count'.format(key)]
                         self.assertLessEqual(exposed_count, total_count)
 
-                # Sanity check
-                # total exposed count must be less or equal from
-                # total count (because there might be
-                # uncategorized) from the field
-                self.assertLessEqual(
-                    row['flooded_population_count'],
-                    row['population_count'])
+                    # Sanity check
+                    # total exposed count must be less or equal from
+                    # total count (because there might be
+                    # uncategorized) from the field
+                    self.assertLessEqual(
+                        row['flooded_population_count'],
+                        row['population_count'])
 
             mv_district_summary = self.sql_path(
                 'mv_flood_event_population_district_summary.sql')
