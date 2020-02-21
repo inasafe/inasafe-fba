@@ -31,8 +31,8 @@ define([
         },
         initialize: function () {
             this.referer_region = [];
-            dispatcher.on('dashboard:render-chart-2', this.renderChart2, this);
-            dispatcher.on('dashboard:render-chart-road', this.renderChartRoad, this);
+            dispatcher.on('dashboard:render-chart-building', this.renderChartBuilding, this);
+            dispatcher.on('dashboard:render-chart-element', this.renderChartElement, this);
             dispatcher.on('dashboard:reset', this.resetDashboard, this);
             dispatcher.on('dashboard:hide', this.hideDashboard, this);
             dispatcher.on('dashboard:render-region-summary', this.renderRegionSummary, this);
@@ -73,12 +73,12 @@ define([
             $('#road-count').html(that.loading_template);
             this.changeStatus(floodCollectionView.selected_forecast.attributes.trigger_status);
         },
-        renderChartRoad: function (data) {
+        renderChartElement: function (data, element) {
             let $parentWrapper = $('#chart-score-panel');
-            $parentWrapper.find('#summary-chart-road').remove();
-            $parentWrapper.find('.panel-chart-road').html('<canvas id="summary-chart-road"></canvas>');
-            $parentWrapper.find('#summary-chart-road-residential').remove();
-            $parentWrapper.find('.panel-chart-road-residential').html('<canvas id="summary-chart-road-residential" style="height: 50px"></canvas>');
+            $parentWrapper.find('#summary-chart-' + element).remove();
+            $parentWrapper.find('.panel-chart-' + element).html('<canvas id="summary-chart-'+ element +'"></canvas>');
+            $parentWrapper.find('#summary-chart-' + element + '-residential').remove();
+            $parentWrapper.find('.panel-chart-' + element + '-residential').html('<canvas id="summary-chart-'+ element +'-residential" style="height: 50px"></canvas>');
 
             let total_road_array = [];
             let graph_data = [];
@@ -175,11 +175,11 @@ define([
             };
 
             let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2): 0;
-            $('#vulnerability-score-road').html(total_vulnerability_score);
-            $('#road-count').html(data['flooded_flooded_road_count']);
-            this.renderChartData(datasets, ctx, 'Residential Roads', datasetsResidential, ctxResidential, 'Other Roads');
+            $('#vulnerability-score-' + element).html(total_vulnerability_score);
+            $('#'+ element +'-count').html(data['flooded_flooded_road_count']);
+            this.renderChartData(datasets, ctx, 'Residential ' + toTitleCase(element) + 's', datasetsResidential, ctxResidential, 'Other ' + toTitleCase(element) + 's');
         },
-        renderChart2: function (data, main_panel) {
+        renderChartBuilding: function (data, main_panel) {
             let that = this;
             let id_key = {
                 'district': 'district_id',
@@ -392,6 +392,7 @@ define([
                     name: item['name'],
                     flooded_road_count: that.loading_template,
                     flooded_building_count: building_total_score,
+                    flooded_population_count: '-',
                     trigger_status: trigger_status
                 }));
             }
@@ -578,8 +579,16 @@ define([
             let $div = $(e.target).closest('.tab-title');
             if(!$div.hasClass('tab-active')) {
                 $('.tab-wrapper').hide();
-                $('.tab-title').removeClass('tab-active');
-                $div.addClass('tab-active');
+                $('.tab-title').removeClass('tab-active').removeClass('col-lg-6');
+                $('.tab-title').each(function () {
+                    let that = this;
+                    if(!$(that).hasClass('col-lg-3')){
+                        $(that).addClass('col-lg-3')
+                    }
+                });
+                $div.addClass('tab-active').removeClass('col-lg-3').addClass('col-lg-6');
+                $('.tab-name').hide();
+                $div.find('.tab-name').show();
                 let target = $div.attr('tab-target');
                 $('.tab-' + target).show();
             }

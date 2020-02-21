@@ -284,13 +284,18 @@ form label {
 }
 
 .box-count-left {
-    padding: 0 5px 5px 15px;
-    width: 180px;
+    padding: 0 2px 5px 5px;
+    width: 33%;
 }
 
 .box-count-right {
-    padding: 0 15px 5px 5px;
-    width: 170px;
+    padding: 0 5px 5px 2px;
+    width: 33%;
+}
+
+.box-count-middle {
+    padding: 0 2px 5px 2px;
+    width: 33%;
 }
 
 #building-count, #vulnerability-score, .score, #road-count, #vulnerability-score-road{

@@ -12,8 +12,14 @@ define([
     'js/model/village_summary.js',
     'js/model/road_district_summary.js',
     'js/model/road_sub_district_summary.js',
-    'js/model/road_village_summary.js'
-], function (Backbone, _, moment, L, Wellknown, utils, ForecastEvent, TriggerStatusCollection, DistrictSummaryCollection, SubDistrictSummaryCollection, VillageSummaryCollection, RoadDistrictSummaryCollection, RoadSubDistrictSummaryCollection, RoadVillageSummaryCollection) {
+    'js/model/road_village_summary.js',
+    'js/model/population_district_summary.js',
+    'js/model/population_sub_district_summary.js',
+    'js/model/population_village_summary.js'
+], function (Backbone, _, moment, L, Wellknown, utils, ForecastEvent, TriggerStatusCollection,
+             DistrictSummaryCollection, SubDistrictSummaryCollection, VillageSummaryCollection,
+             RoadDistrictSummaryCollection, RoadSubDistrictSummaryCollection, RoadVillageSummaryCollection,
+             PopulationDistrictSummaryCollection, PopulationSubDistrictSummaryCollection, PopulationVillageSummaryCollection) {
     return Backbone.View.extend({
         el: '.panel-browse-flood',
         forecasts_list: [],
@@ -31,6 +37,9 @@ define([
         roadVillageStats: null,
         roadSubDistrictStats: null,
         roadDistrictStats: null,
+        populationVillageStats: null,
+        populationSubDistrictStats: null,
+        populationDistrictStats: null,
         areaLookup: null,
         fetchedDate: {},
         events: {
@@ -40,6 +49,11 @@ define([
             'blur': 'onFocusOut'
         },
         legend: [],
+        keyStats: {
+            'district': 'district_id',
+            'sub_district': 'sub_district_id',
+            'village': 'village_id'
+        },
         initialize: function () {
             // jquery element
             this.$flood_info = this.$el.find('.flood-info');
@@ -61,6 +75,10 @@ define([
             this.road_village_summaries = new RoadVillageSummaryCollection();
             this.road_district_summaries = new RoadDistrictSummaryCollection();
             this.road_subdistrict_summaries = new RoadSubDistrictSummaryCollection();
+            // Uncomment this when population table is ready
+            // this.population_village_summaries = new PopulationVillageSummaryCollection();
+            // this.population_district_summaries = new PopulationDistrictSummaryCollection();
+            // this.population_subdistrict_summaries = new PopulationSubDistrictSummaryCollection();
 
             // dispatcher registration
             dispatcher.on('flood:fetch-forecast-collection', this.fetchForecastCollection, this);
@@ -306,6 +324,10 @@ define([
                 that.fetchRoadVillageData(that.selected_forecast.id);
                 that.fetchRoadSubDistrictData(that.selected_forecast.id);
                 that.fetchRoadDistrictData(that.selected_forecast.id);
+                // uncomment this when population table is ready.
+                // that.fetchPopulationVillageData(that.selected_forecast.id);
+                // that.fetchPopulationSubDistrictData(that.selected_forecast.id);
+                // that.fetchPopulationDistrictData(that.selected_forecast.id);
             });
 
             // dispatch event to draw flood
@@ -395,12 +417,6 @@ define([
                 'sub_district': that.subDistrictStats
             };
 
-            let key = {
-                'district': 'district_id',
-                'sub_district': 'sub_district_id',
-                'village': 'village_id'
-            };
-
             let buildings = [];
             let overall = [];
             let region_render;
@@ -440,7 +456,7 @@ define([
                 let statData = [];
                 let subRegionList = that.getListSubRegion(sub_region, region_id);
                 $.each(data[sub_region], function (index, value) {
-                    if (subRegionList.indexOf(value[key[sub_region]]) >= 0) {
+                    if (subRegionList.indexOf(value[that.keyStats[sub_region]]) >= 0) {
                         statData.push(value)
                     }
                 });
@@ -458,7 +474,7 @@ define([
                 }
 
                 for (let index = 0; index < data[region].length; index++) {
-                    if (data[region][index][key[region]] === parseInt(region_id)) {
+                    if (data[region][index][that.keyStats[region]] === parseInt(region_id)) {
                         overall = data[region][index];
                         if (overall.hasOwnProperty('police_flooded_building_count')) {
                             overall['police_station_flooded_building_count'] = overall['police_flooded_building_count'];
@@ -469,10 +485,10 @@ define([
                 }
                 overall['region'] = region;
             }
-            dispatcher.trigger('dashboard:render-chart-2', overall, main_panel);
+            dispatcher.trigger('dashboard:render-chart-building', overall, main_panel);
 
             if (region !== 'village') {
-                dispatcher.trigger('dashboard:render-region-summary', buildings, region_render, key[region_render]);
+                dispatcher.trigger('dashboard:render-region-summary', buildings, region_render, that.keyStats[region_render]);
             }
         },
         fetchVillageData: function (flood_event_id) {
@@ -577,12 +593,6 @@ define([
                 'sub_district': that.roadSubDistrictStats
             };
 
-            let key = {
-                'district': 'district_id',
-                'sub_district': 'sub_district_id',
-                'village': 'village_id'
-            };
-
             let roads = [];
             let overall = [];
             let region_render;
@@ -616,7 +626,7 @@ define([
                 let statData = [];
                 let subRegionList = that.getListSubRegion(sub_region, region_id);
                 $.each(data[sub_region], function (index, value) {
-                    if (subRegionList.indexOf(value[key[sub_region]]) >= 0) {
+                    if (subRegionList.indexOf(value[that.keyStats[sub_region]]) >= 0) {
                         statData.push(value)
                     }
                 });
@@ -631,16 +641,16 @@ define([
                 }
 
                 for (let index = 0; index < data[region].length; index++) {
-                    if (data[region][index][key[region]] === parseInt(region_id)) {
+                    if (data[region][index][that.keyStats[region]] === parseInt(region_id)) {
                         overall = data[region][index];
                         break
                     }
                 }
                 overall['region'] = region;
             }
-            dispatcher.trigger('dashboard:render-chart-road', overall);
+            dispatcher.trigger('dashboard:render-chart-element', overall, 'road');
             if (region !== 'village') {
-                dispatcher.trigger('dashboard:inject-road-region-summary', roads, region_render, key[region_render]);
+                dispatcher.trigger('dashboard:inject-road-region-summary', roads, region_render, that.keyStats[region_render]);
             }
         },
         fetchRoadDistrictData: function (flood_event_id) {
@@ -680,6 +690,129 @@ define([
         fetchRoadVillageData: function (flood_event_id) {
             let that = this;
             this.road_village_summaries.fetch({
+                data: {
+                    flood_event_id: `eq.${flood_event_id}`,
+                    order: 'trigger_status.desc,total_vulnerability_score.desc'
+                }
+            }).then(function (data) {
+                that.roadVillageStats = data;
+                if (that.roadVillageStats !== null && that.roadDistrictStats !== null && that.roadSubDistrictStats !== null) {
+                    that.fetchRoadStatisticData('district', that.selected_forecast.id, true);
+                }
+            }).catch(function (data) {
+                    console.log('Village stats request failed');
+                    console.log(data)
+            });
+        },
+        fetchPopulationStatisticData: function (region, region_id, renderRegionDetail) {
+            if (!region) {
+                return []
+            }
+
+            let that = this;
+            let data = {
+                'village': that.populationVillageStats,
+                'district': that.populationDistrictStats,
+                'sub_district': that.populationSubDistrictStats
+            };
+
+            let roads = [];
+            let overall = [];
+            let region_render;
+            if (renderRegionDetail) {
+                region_render = region;
+                $.each(data[region], function (idx, value) {
+                    roads[idx] = [];
+                    $.each(value, function (key, value) {
+                        roads[idx][key] = value;
+                        if (!overall[key]) {
+                            overall[key] = value
+                        } else {
+                            overall[key] += value
+                        }
+                    })
+                });
+                delete overall['region_id'];
+                delete overall[region + '_id'];
+                delete overall['name'];
+                delete overall['village_id'];
+                delete overall['sub_district_id'];
+                delete overall['district_id'];
+                delete overall['trigger_status'];
+            } else {
+                let sub_region = 'sub_district';
+                if (region === 'sub_district') {
+                    sub_region = 'village'
+                }
+                region_render = sub_region;
+
+                let statData = [];
+                let subRegionList = that.getListSubRegion(sub_region, region_id);
+                $.each(data[sub_region], function (index, value) {
+                    if (subRegionList.indexOf(value[that.keyStats[sub_region]]) >= 0) {
+                        statData.push(value)
+                    }
+                });
+
+                if (region !== 'village') {
+                    $.each(statData, function (idx, value) {
+                        roads[idx] = [];
+                        $.each(value, function (key, value) {
+                            roads[idx][key] = value;
+                        })
+                    });
+                }
+
+                for (let index = 0; index < data[region].length; index++) {
+                    if (data[region][index][that.keyStats[region]] === parseInt(region_id)) {
+                        overall = data[region][index];
+                        break
+                    }
+                }
+                overall['region'] = region;
+            }
+            dispatcher.trigger('dashboard:render-chart-element', overall, 'population');
+            if (region !== 'village') {
+                dispatcher.trigger('dashboard:inject-population-region-summary', roads, region_render, that.keyStats[region_render]);
+            }
+        },
+        fetchPopulationDistrictData: function (flood_event_id) {
+            let that = this;
+            this.population_district_summaries.fetch({
+                data: {
+                    flood_event_id: `eq.${flood_event_id}`,
+                    order: 'trigger_status.desc,total_vulnerability_score.desc'
+                }
+            }).then(function (data) {
+                that.roadDistrictStats = data;
+                if (that.roadVillageStats !== null && that.roadDistrictStats !== null && that.roadSubDistrictStats !== null) {
+                    that.fetchRoadStatisticData('district', that.selected_forecast.id, true);
+                }
+            }).catch(function (data) {
+                console.log('District stats request failed');
+                console.log(data);
+            });
+        },
+        fetchPopulationSubDistrictData: function (flood_event_id) {
+            let that = this;
+            this.population_subdistrict_summaries.fetch({
+                data: {
+                    flood_event_id: `eq.${flood_event_id}`,
+                    order: 'trigger_status.desc,total_vulnerability_score.desc'
+                }
+            }).then(function (data) {
+                that.roadSubDistrictStats = data;
+                if (that.roadVillageStats !== null && that.roadDistrictStats !== null && that.roadSubDistrictStats !== null) {
+                    that.fetchRoadStatisticData('district', that.selected_forecast.id, true);
+                }
+            }).catch(function (data) {
+                console.log('Sub district stats request failed');
+                console.log(data);
+            })
+        },
+        fetchPopulationVillageData: function (flood_event_id) {
+            let that = this;
+            this.population_village_summaries.fetch({
                 data: {
                     flood_event_id: `eq.${flood_event_id}`,
                     order: 'trigger_status.desc,total_vulnerability_score.desc'
