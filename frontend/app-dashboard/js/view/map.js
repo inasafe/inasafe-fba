@@ -11,9 +11,36 @@ define([
 ], function (Backbone, $, Basemap, Layers, SidePanelView, IntroView, DepthClassCollection, LeafletWMSLegend, leafletAwesomeIcon) {
     return Backbone.View.extend({
         initBounds: [[-21.961179941367273,93.86358289827513],[16.948660219367564,142.12675002072507]],
-        wmsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_buildings&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
-        wmsFloodDepthLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:flood_forecast_layer&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
-        wmsExposedRoadsLegendURI: geoserverUrl + '?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=kartoza:exposed_roads&LEGEND_OPTIONS=fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on',
+        wmsLegendURI: `${geoserverUrl}?${$.param({
+            SERVICE: 'WMS',
+            REQUEST: 'GetLegendGraphic',
+            VERSION: '1.0.0',
+            FORMAT: 'image/png',
+            WIDTH: 20,
+            HEIGHT: 20,
+            LAYER: 'kartoza:exposed_buildings',
+            LEGEND_OPTIONS: 'fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on'
+        })}`,
+        wmsFloodDepthLegendURI: `${geoserverUrl}?${$.param({
+            SERVICE: 'WMS',
+            REQUEST: 'GetLegendGraphic',
+            VERSION: '1.0.0',
+            FORMAT: 'image/png',
+            WIDTH: 20,
+            HEIGHT: 20,
+            LAYER: 'kartoza:flood_forecast_layer',
+            LEGEND_OPTIONS: 'fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on'
+        })}`,
+        wmsExposedRoadsLegendURI: `${geoserverUrl}?${$.param({
+            SERVICE: 'WMS',
+            REQUEST: 'GetLegendGraphic',
+            VERSION: '1.0.0',
+            FORMAT: 'image/png',
+            WIDTH: 20,
+            HEIGHT: 20,
+            LAYER: 'kartoza:exposed_roads',
+            LEGEND_OPTIONS: 'fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on'
+        })}`,
         markers: [],
         exposed_road_layer: null,
         reportingPointMarkers: [],
@@ -280,6 +307,7 @@ define([
                     format: 'image/png',
                     transparent: true,
                     srs: 'EPSG:4326',
+                    tiled: true,
                     cql_filter: `id_code=${region_id}`,
                 });
             this.region_layer.setZIndex(20);
@@ -312,6 +340,7 @@ define([
                         format: 'image/png',
                         transparent: true,
                         srs: 'EPSG:4326',
+                        tiled: true,
                         cql_filter: `flood_event_id=${forecast_id} AND ${id_key[region]}=${region_id} AND depth_class=${depth_class.id}`,
                     }
                 );
@@ -352,6 +381,7 @@ define([
                     format: 'image/png',
                     transparent: true,
                     srs: 'EPSG:4326',
+                    tiled: true,
                     cql_filter: `flood_event_id=${forecast_id} AND ${id_key[region]}=${region_id}`,
                 }
             );
@@ -437,7 +467,14 @@ define([
         addReportingPoints: function () {
             let that = this;
             $.ajax({
-                url: geoserverUrl + '?service=WFS&version=1.0.0&request=GetFeature&typeName=kartoza%3Areporting_point&maxFeatures=50&outputFormat=application%2Fjson',
+                url: `${geoserverUrl}?${$.param({
+                        SERVICE: 'WFS',
+                        VERSION: '1.0.0',
+                        REQUEST: 'GetFeature',
+                        TYPENAME: 'kartoza:reporting_point',
+                        MAXFEATURES: 50,
+                        OUTPUTFORMAT: 'application/json'
+                    })}`,
                 success: function (data) {
                     if(data['features']) {
                         let reporting_points = data['features'];

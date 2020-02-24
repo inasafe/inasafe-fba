@@ -2,7 +2,7 @@ define([
     'backbone', 'leaflet'], function (Backbone, L) {
     return Backbone.View.extend({
         _id: 0,
-        _url: geoserverUrl,
+        _url: gwcURL,
         _layers: '',
         _layersByIntersect: '',
         _layersByNotIntersect: '',

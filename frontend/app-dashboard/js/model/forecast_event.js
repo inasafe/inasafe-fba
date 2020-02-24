@@ -135,6 +135,7 @@ define([
                         format: 'image/png',
                         transparent: true,
                         srs: 'EPSG:4326',
+                        tiled: true,
                         cql_filter: `id=${this.get('id')}`
                     });
             }
