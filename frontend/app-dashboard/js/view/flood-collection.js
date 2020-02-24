@@ -75,10 +75,9 @@ define([
             this.road_village_summaries = new RoadVillageSummaryCollection();
             this.road_district_summaries = new RoadDistrictSummaryCollection();
             this.road_subdistrict_summaries = new RoadSubDistrictSummaryCollection();
-            // Uncomment this when population table is ready
-            // this.population_village_summaries = new PopulationVillageSummaryCollection();
-            // this.population_district_summaries = new PopulationDistrictSummaryCollection();
-            // this.population_subdistrict_summaries = new PopulationSubDistrictSummaryCollection();
+            this.population_village_summaries = new PopulationVillageSummaryCollection();
+            this.population_district_summaries = new PopulationDistrictSummaryCollection();
+            this.population_subdistrict_summaries = new PopulationSubDistrictSummaryCollection();
 
             // dispatcher registration
             dispatcher.on('flood:fetch-forecast-collection', this.fetchForecastCollection, this);
@@ -324,10 +323,9 @@ define([
                 that.fetchRoadVillageData(that.selected_forecast.id);
                 that.fetchRoadSubDistrictData(that.selected_forecast.id);
                 that.fetchRoadDistrictData(that.selected_forecast.id);
-                // uncomment this when population table is ready.
-                // that.fetchPopulationVillageData(that.selected_forecast.id);
-                // that.fetchPopulationSubDistrictData(that.selected_forecast.id);
-                // that.fetchPopulationDistrictData(that.selected_forecast.id);
+                that.fetchPopulationVillageData(that.selected_forecast.id);
+                that.fetchPopulationSubDistrictData(that.selected_forecast.id);
+                that.fetchPopulationDistrictData(that.selected_forecast.id);
             });
 
             // dispatch event to draw flood
@@ -781,12 +779,12 @@ define([
             this.population_district_summaries.fetch({
                 data: {
                     flood_event_id: `eq.${flood_event_id}`,
-                    order: 'trigger_status.desc,total_vulnerability_score.desc'
+                    order: 'trigger_status.desc'
                 }
             }).then(function (data) {
-                that.roadDistrictStats = data;
-                if (that.roadVillageStats !== null && that.roadDistrictStats !== null && that.roadSubDistrictStats !== null) {
-                    that.fetchRoadStatisticData('district', that.selected_forecast.id, true);
+                that.populationDistrictStats = data;
+                if (that.populationVillageStats !== null && that.populationDistrictStats !== null && that.populationSubDistrictStats !== null) {
+                    that.fetchPopulationStatisticData('district', that.selected_forecast.id, true);
                 }
             }).catch(function (data) {
                 console.log('District stats request failed');
@@ -798,12 +796,12 @@ define([
             this.population_subdistrict_summaries.fetch({
                 data: {
                     flood_event_id: `eq.${flood_event_id}`,
-                    order: 'trigger_status.desc,total_vulnerability_score.desc'
+                    order: 'trigger_status.desc'
                 }
             }).then(function (data) {
-                that.roadSubDistrictStats = data;
-                if (that.roadVillageStats !== null && that.roadDistrictStats !== null && that.roadSubDistrictStats !== null) {
-                    that.fetchRoadStatisticData('district', that.selected_forecast.id, true);
+                that.populationSubDistrictStats = data;
+                if (that.populationVillageStats !== null && that.populationDistrictStats !== null && that.populationSubDistrictStats !== null) {
+                    that.fetchPopulationStatisticData('district', that.selected_forecast.id, true);
                 }
             }).catch(function (data) {
                 console.log('Sub district stats request failed');
@@ -815,12 +813,12 @@ define([
             this.population_village_summaries.fetch({
                 data: {
                     flood_event_id: `eq.${flood_event_id}`,
-                    order: 'trigger_status.desc,total_vulnerability_score.desc'
+                    order: 'trigger_status.desc'
                 }
             }).then(function (data) {
-                that.roadVillageStats = data;
-                if (that.roadVillageStats !== null && that.roadDistrictStats !== null && that.roadSubDistrictStats !== null) {
-                    that.fetchRoadStatisticData('district', that.selected_forecast.id, true);
+                that.populationVillageStats = data;
+                if (that.populationVillageStats !== null && that.populationDistrictStats !== null && that.populationSubDistrictStats !== null) {
+                    that.fetchPopulationStatisticData('district', that.selected_forecast.id, true);
                 }
             }).catch(function (data) {
                     console.log('Village stats request failed');

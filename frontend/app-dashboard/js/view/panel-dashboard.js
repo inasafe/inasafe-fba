@@ -176,7 +176,7 @@ define([
 
             let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2): 0;
             $('#vulnerability-score-' + element).html(total_vulnerability_score);
-            $('#'+ element +'-count').html(data['flooded_flooded_road_count']);
+            $('#'+ element +'-count').html(data['flooded_road_count']);
             this.renderChartData(datasets, ctx, 'Residential ' + toTitleCase(element) + 's', datasetsResidential, ctxResidential, 'Other ' + toTitleCase(element) + 's');
         },
         renderChartBuilding: function (data, main_panel) {
@@ -402,7 +402,7 @@ define([
             let $wrapper = $('#region-summary-panel');
             for(let u=0; u<data.length; u++){
                 let item = data[u];
-                let road_total_score = item['flooded_flooded_road_count'] ? item['flooded_flooded_road_count'] : '-';
+                let road_total_score = item['flooded_road_count'] ? item['flooded_road_count'] : '-';
                 let div = $wrapper.find('[data-road-region-id=' + item[id_field] + ']');
                 $(div).find('.score').html(road_total_score);
             }
