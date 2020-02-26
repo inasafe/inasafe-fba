@@ -85,8 +85,8 @@ define([
             $wrapper.show();
             $wrapper.parent().show("slide", { direction: "right" }, 400);
         },
-        openDashboard: function () {
-            this.dashboard.render();
+        openDashboard: function (callback) {
+            this.dashboard.render(callback);
             $('.panel-body-wrapper').not('.floating-panel').hide();
             $('#panel-dashboard').show("slide", { direction: "right" }, 400);
         },

@@ -264,7 +264,7 @@ form label {
     padding-top: 10px;
 }
 
-.box-vulnerability, .box-building {
+.box-vulnerability, .box-exposed {
     height: 70px;
     border: 2px solid #CA6060;
     margin-top: 10px;
@@ -298,18 +298,18 @@ form label {
     width: 33%;
 }
 
-#building-count, #vulnerability-score, .score, #road-count, #vulnerability-score-road{
+.exposed-count, .vulnerability-score, .score{
     font-size: 30px;
     height: 42px;
 }
 
-#building-count, #vulnerability-score, #road-count, #vulnerability-score-road {
+.exposed-count, .vulnerability-score{
     height: 42px;
     text-align: center;
     width: 100%;
 }
 
-.box-building {
+.box-exposed {
     float: right;
 }
 

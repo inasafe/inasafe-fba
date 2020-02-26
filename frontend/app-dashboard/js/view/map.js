@@ -126,7 +126,6 @@ define([
                     that.showExposedBuildings(null, null, null);
                     that.wmsFloodLegend = L.wmsLegend(that.wmsFloodDepthLegendURI, that.map, 'wms-legend-icon fa fa-map-signs', 'bottomleft');
                     that.addLegendControl();
-                    dispatcher.trigger('side-panel:open-dashboard');
                     if(callback) {
                         callback();
                     }
