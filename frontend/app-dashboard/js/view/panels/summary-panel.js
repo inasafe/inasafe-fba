@@ -6,6 +6,9 @@ define([
     return Backbone.View.extend({
         _panel_key: 'generic',
         stats_data: [],
+        primary_exposure_key: 'residential',
+        primary_exposure_label: `Residential ${this._panel_key}`,
+        other_category_exposure_label: `Other ${this._panel_key}`,
         initialize: function(panel_dashboard){
             this.panel_dashboard = panel_dashboard;
         },
@@ -20,8 +23,8 @@ define([
             let $parentWrapper = $(`#chart-score-panel .tab-${exposure_name}`);
             $parentWrapper.find('.summary-chart').remove();
             $parentWrapper.find('.panel-chart').html('<canvas class="summary-chart" style="height: 250px"></canvas>');
-            $parentWrapper.find('.summary-chart-residential').remove();
-            $parentWrapper.find('.panel-chart-residential').html('<canvas class="summary-chart-residential" style="height: 100px"></canvas>');
+            $parentWrapper.find('.summary-chart-primary').remove();
+            $parentWrapper.find('.panel-chart-primary').html('<canvas class="summary-chart-primary" style="height: 100px"></canvas>');
 
             let total_building_array = [];
             let graph_data = [];
@@ -34,8 +37,8 @@ define([
                 'village_id', 'name', 'region', 'district_id', 'sub_district_id', 'sub_dc_code', 'village_code', 'dc_code',
                 'trigger_status'
             ];
-            let residential_flood_data = [];
-            let residential_data = [];
+            let primary_exposure_flood_data = [];
+            let primary_exposure_data = [];
             let flooded_count_key_suffix = `_flooded_${exposure_name}_count`;
             let total_count_key_suffix = `_${exposure_name}_count`;
             let label = [];
@@ -44,12 +47,12 @@ define([
                 if(is_in_unlisted) { continue; }
 
                 let is_flooded_count = key.endsWith(flooded_count_key_suffix);
-                let is_residential = key.indexOf('residential') > -1;
+                let is_primary_exposure = key.indexOf(this.primary_exposure_key) > -1;
 
-                if(is_residential && is_flooded_count){
-                    // Record residential data for pie chart
-                    residential_flood_data = data[key];
-                    residential_data = data[key.replace(flooded_count_key_suffix, total_count_key_suffix)];
+                if(is_primary_exposure && is_flooded_count){
+                    // Record primary exposure data for pie chart
+                    primary_exposure_flood_data = data[key];
+                    primary_exposure_data = data[key.replace(flooded_count_key_suffix, total_count_key_suffix)];
                 }
                 else if(is_flooded_count){
                     // Record flooded data for bar chart
@@ -87,8 +90,8 @@ define([
 
             for(let i in total_building_array){
                 let o = total_building_array[i]
-                let is_residential = o.key.indexOf('residential') > -1;
-                if(! is_residential){
+                let is_primary_exposure = o.key.indexOf(this.primary_exposure_key) > -1;
+                if(! is_primary_exposure){
                     label.push(o.key);
                 }
             }
@@ -106,11 +109,11 @@ define([
                 humanLabel.push(toTitleCase(label[i].replace('_', ' ')))
             }
 
-            let ctxResidential = $parentWrapper.find('.summary-chart-residential').get(0).getContext('2d');
-            let datasetsResidential = {
+            let ctxPrimaryExposure = $parentWrapper.find('.summary-chart-primary').get(0).getContext('2d');
+            let datasetsPrimaryExposure = {
                 labels: ["Not Flooded", "Flooded"],
                 datasets: [{
-                    data: [residential_data - residential_flood_data, residential_flood_data],
+                    data: [primary_exposure_data - primary_exposure_flood_data, primary_exposure_flood_data],
                     backgroundColor: ['#e5e5e5', '#82B7CA']
                 }]
             };
@@ -128,16 +131,24 @@ define([
                     }]
             };
 
-            let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2) : 0;
-            $parentWrapper.find('.vulnerability-score').html(total_vulnerability_score);
+            let is_vulnerability_score_exists = data['total_vulnerability_score'] !== undefined;
+            let $vulnerability_info = $parentWrapper.find('.vulnerability-score');
+            if(is_vulnerability_score_exists){
+                let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2) : 0;
+                $vulnerability_info.html(total_vulnerability_score);
+                $vulnerability_info.parent().show();
+            }
+            else{
+                $vulnerability_info.parent().hide();
+            }
             $parentWrapper.find('.exposed-count').html(data[total_flooded_count_key]);
 
-            this.renderChartData(datasets, ctx, 'Residential Buildings', datasetsResidential, ctxResidential, 'Other Buildings');
+            this.renderChartData(datasets, ctx, this.primary_exposure_label, datasetsPrimaryExposure, ctxPrimaryExposure, this.other_category_exposure_label);
         },
-        renderChartData: function (datasets, ctx, title, datasetsResidential, ctxResidential, title2) {
-            new Chart(ctxResidential, {
+        renderChartData: function (datasets, ctx, title, datasetsPrimaryExposure, ctxPrimaryExposure, title2) {
+            new Chart(ctxPrimaryExposure, {
                 type: 'pie',
-                data: datasetsResidential,
+                data: datasetsPrimaryExposure,
                 options: {
                     legend: {
                         display: true

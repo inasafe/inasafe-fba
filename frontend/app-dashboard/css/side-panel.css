@@ -426,6 +426,6 @@ form label {
     display: none;
 }
 
-.panel-chart, .panel-chart-road, .panel-chart-residential, .panel-chart-road-residential {
+.panel-chart, .panel-chart-road, .panel-chart-primary {
     margin-top: 15px
 }
