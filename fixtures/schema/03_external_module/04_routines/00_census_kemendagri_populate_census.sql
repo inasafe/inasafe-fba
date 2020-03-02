@@ -6,8 +6,8 @@ BEGIN
     (population, elderly, females, males, unemployed, village_id)
         (select
              c.jumlah_pen,
-             -- Elderly is defined to be age over 50
-             c.u50 + c.u55 + c.u60 + c.u65 + c.u70 + c.u75,
+             -- Elderly is defined to be age over 65
+             c.u65 + c.u70 + c.u75,
              c.pria,
              c.wanita,
              c.p01_belum_,

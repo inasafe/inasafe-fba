@@ -148,7 +148,7 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_road_village_summary AS
             a.motorway_link_flooded_road_count,
             a.residential_flooded_road_count,
             a.total_vulnerability_score,
-            sub_district.name,
+            village.name,
             b_1.road_count,
             b_1.motorway_highway_road_count,
             b_1.tertiary_link_road_count,
@@ -161,8 +161,11 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_road_village_summary AS
             b_1.motorway_link_road_count,
             b_1.residential_road_count
            FROM ((flooded_count_selection a
-             JOIN non_flooded_count_selection b_1 ON (((a.district_id = b_1.district_id) AND (a.sub_district_id = b_1.sub_district_id))))
-             JOIN public.sub_district ON ((sub_district.sub_dc_code = a.sub_district_id)))
+                 JOIN non_flooded_count_selection b_1 ON ((
+                         (a.district_id = b_1.district_id) AND
+                         (a.sub_district_id = b_1.sub_district_id) AND
+                         (a.village_id = b_1.village_id))))
+                      JOIN village ON ((village.village_code = a.village_id)))
         )
  SELECT flooded_aggregate_count.flood_event_id,
     flooded_aggregate_count.district_id,
@@ -194,5 +197,8 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_road_village_summary AS
     flooded_aggregate_count.residential_road_count,
     b.trigger_status
    FROM (flooded_aggregate_count
-     LEFT JOIN public.sub_district_trigger_status b ON (((b.sub_district_id = (flooded_aggregate_count.sub_district_id)::double precision) AND (flooded_aggregate_count.flood_event_id = b.flood_event_id))))
-  WITH NO DATA;
+     LEFT JOIN village_trigger_status b ON (((b.village_id =
+                                                      flooded_aggregate_count.village_id) AND
+                                                     (flooded_aggregate_count.flood_event_id =
+                                                      b.flood_event_id))))
+    WITH NO DATA;
