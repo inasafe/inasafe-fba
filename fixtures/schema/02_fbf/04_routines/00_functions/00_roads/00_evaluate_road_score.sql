@@ -19,6 +19,22 @@ BEGIN
                         WHEN "type" ILIKE 'track' then 'Track'
                         WHEN "type" ILIKE 'cycleway' OR "type" ILIKE 'footpath' OR "type" ILIKE 'pedestrian'
                             OR "type" ILIKE 'footway' OR "type" ILIKE 'path' then 'Cycleway, footpath, etc.'
-        END;
+    END
+    WHERE road_type is null;
+    UPDATE osm_roads
+    SET road_type_score = CASE
+                              WHEN road_type = 'Motorway link' THEN 1
+                              WHEN road_type = 'Motorway or highway' THEN 0.8
+                              WHEN road_type = 'Primary link' THEN 0.7
+                              WHEN road_type = 'Primary road' THEN 0.6
+                              WHEN road_type = 'Road,residential,living street, etc' THEN 0.2
+                              WHEN road_type = 'Secondary' THEN 0.3
+                              WHEN road_type = 'Secondary link' THEN 0.3
+                              WHEN road_type = 'Tertiary' THEN 0.4
+                              WHEN road_type = 'Tertiary link' THEN 0.4
+                              WHEN road_type = 'Track' THEN 0.1
+        END
+    WHERE road_type_score is null;
+    RETURN 'OK';
 END;
 $$;

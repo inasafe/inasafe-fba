@@ -4,7 +4,8 @@ CREATE OR REPLACE FUNCTION public.kartoza_evaluate_building_score() RETURNS VARC
 AS $$
 BEGIN
     UPDATE osm_buildings
-    SET building_area = st_area(gis.public.osm_buildings.geometry::geography);
+    SET building_area = st_area(gis.public.osm_buildings.geometry::geography)
+    WHERE building_area is null;
     UPDATE osm_buildings
     SET building_area_score = CASE
                                   WHEN building_area <= 10 THEN 1
@@ -12,31 +13,16 @@ BEGIN
                                   WHEN building_area > 30 and building_area <= 100 THEN 0.5
                                   WHEN building_area > 100 THEN 0.3
                                   ELSE 0.3
-    END;
+    END
+    WHERE building_area_score is null;
     UPDATE osm_buildings
     SET building_material_score =
             CASE
                 WHEN "building:material" ILIKE 'brick%' THEN 0.5
                 WHEN "building:material" = 'concrete' THEN 0.1
                 ELSE 0.3
-                END;
-    UPDATE osm_buildings
-    SET building_type_score =
-            CASE
-                WHEN building_type = 'Clinic/Doctor' THEN 0.7
-                WHEN building_type = 'Commercial' THEN 0.7
-                WHEN building_type = 'School' THEN 1
-                WHEN building_type = 'Government' THEN 0.7
-                WHEN building_type ILIKE 'Place of Worship%' THEN 0.5
-                WHEN building_type = 'Residential' THEN 1
-                WHEN building_type = 'Police Station' THEN 0.7
-                WHEN building_type = 'Fire Station' THEN 0.7
-                WHEN building_type = 'Hospital' THEN 0.7
-                WHEN building_type = 'Supermarket' THEN 0.7
-                WHEN building_type = 'Sports Facility' THEN 0.3
-                WHEN building_type = 'University/College' THEN 1.0
-                ELSE 0.3
-                END;
+                END
+    WHERE building_material_score is null;
     UPDATE osm_buildings
     SET building_type = CASE
                             WHEN amenity ILIKE '%school%' OR amenity ILIKE '%kindergarten%' THEN 'School'
@@ -68,9 +54,29 @@ BEGIN
                             WHEN use = 'utility' AND "type" IS NULL THEN 'Utility'
         -- Add default type
                             WHEN "type" IS NULL THEN 'Residential'
-        END;
+        END
+    WHERE building_type is null;
     UPDATE osm_buildings
-    SET total_vulnerability = (building_area_score + building_material_score + building_type_score) / 3;
+    SET building_type_score =
+            CASE
+                WHEN building_type = 'Clinic/Doctor' THEN 0.7
+                WHEN building_type = 'Commercial' THEN 0.7
+                WHEN building_type = 'School' THEN 1
+                WHEN building_type = 'Government' THEN 0.7
+                WHEN building_type ILIKE 'Place of Worship%' THEN 0.5
+                WHEN building_type = 'Residential' THEN 1
+                WHEN building_type = 'Police Station' THEN 0.7
+                WHEN building_type = 'Fire Station' THEN 0.7
+                WHEN building_type = 'Hospital' THEN 0.7
+                WHEN building_type = 'Supermarket' THEN 0.7
+                WHEN building_type = 'Sports Facility' THEN 0.3
+                WHEN building_type = 'University/College' THEN 1.0
+                ELSE 0.3
+                END
+    WHERE building_type_score is null;
+    UPDATE osm_buildings
+    SET total_vulnerability = (building_area_score + building_material_score + building_type_score) / 3
+    WHERE total_vulnerability is null;
     RETURN 'OK';
 END
 $$;
