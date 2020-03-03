@@ -6,7 +6,7 @@
     "population": 11105,
     "males": 5456,
     "females": 5649,
-    "elderly": 2067,
+    "elderly": 472,
     "unemployed": 1751
   },
   {
@@ -16,7 +16,7 @@
     "population": 11277,
     "males": 5559,
     "females": 5718,
-    "elderly": 1905,
+    "elderly": 441,
     "unemployed": 1690
   },
   {
@@ -26,7 +26,7 @@
     "population": 8745,
     "males": 4310,
     "females": 4435,
-    "elderly": 1538,
+    "elderly": 374,
     "unemployed": 1408
   },
   {
@@ -36,7 +36,7 @@
     "population": 12185,
     "males": 5845,
     "females": 6340,
-    "elderly": 2131,
+    "elderly": 429,
     "unemployed": 2589
   },
   {
@@ -46,7 +46,7 @@
     "population": 7838,
     "males": 3880,
     "females": 3958,
-    "elderly": 1357,
+    "elderly": 340,
     "unemployed": 1732
   },
   {
@@ -56,7 +56,7 @@
     "population": 6438,
     "males": 3118,
     "females": 3320,
-    "elderly": 914,
+    "elderly": 212,
     "unemployed": 1557
   },
   {
@@ -66,7 +66,7 @@
     "population": 25715,
     "males": 12610,
     "females": 13105,
-    "elderly": 3477,
+    "elderly": 584,
     "unemployed": 5736
   },
   {
@@ -76,7 +76,7 @@
     "population": 14140,
     "males": 6918,
     "females": 7222,
-    "elderly": 2325,
+    "elderly": 541,
     "unemployed": 3145
   },
   {
@@ -86,7 +86,7 @@
     "population": 6828,
     "males": 3358,
     "females": 3470,
-    "elderly": 1157,
+    "elderly": 278,
     "unemployed": 1473
   },
   {
@@ -96,7 +96,7 @@
     "population": 14817,
     "males": 7291,
     "females": 7526,
-    "elderly": 2338,
+    "elderly": 498,
     "unemployed": 3041
   },
   {
@@ -106,7 +106,7 @@
     "population": 9838,
     "males": 4870,
     "females": 4968,
-    "elderly": 1445,
+    "elderly": 341,
     "unemployed": 1839
   },
   {
@@ -116,7 +116,7 @@
     "population": 21723,
     "males": 10748,
     "females": 10975,
-    "elderly": 3775,
+    "elderly": 589,
     "unemployed": 3836
   },
   {
@@ -126,7 +126,7 @@
     "population": 13187,
     "males": 6558,
     "females": 6629,
-    "elderly": 2511,
+    "elderly": 578,
     "unemployed": 2239
   },
   {
@@ -136,7 +136,7 @@
     "population": 19902,
     "males": 9974,
     "females": 9928,
-    "elderly": 3331,
+    "elderly": 773,
     "unemployed": 3391
   }
 ]

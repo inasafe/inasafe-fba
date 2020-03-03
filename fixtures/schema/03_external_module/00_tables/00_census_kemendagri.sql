@@ -1,7 +1,7 @@
 -- Table structure taken from ArcGIS REST API of GIS Dukcapil Kemendagri Indonesia:
 -- source: https://gis.dukcapil.kemendagri.go.id/peta/
 -- ArcGIS REST API Endpoint: https://gis.dukcapil.kemendagri.go.id/arcgis/rest/services/Data_Baru_26092017/MapServer/
-create table census_kemendagri
+create table if not exists census_kemendagri
 (
     objectid bigint not null,
     no_prop double precision,
@@ -38,5 +38,5 @@ create table census_kemendagri
         primary key (nama_kab_s, nama_kec_s, nama_kel_s)
 );
 
-create unique index census_kemendagri_objectid_uindex
+create unique index if not exists census_kemendagri_objectid_uindex
     on census_kemendagri (objectid);
