@@ -47,7 +47,7 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_population_village_summary AS
            trigger_status.trigger_status
     from
          flooded_count
-         LEFT JOIN village_trigger_status trigger_status on flooded_count.flood_event_id = trigger_status.flood_event_id
+         LEFT JOIN village_trigger_status trigger_status on flooded_count.flood_event_id = trigger_status.flood_event_id and flooded_count.village_id = trigger_status.village_id
          JOIN non_flooded_count on flooded_count.village_id = non_flooded_count.village_id
          JOIN village region on flooded_count.village_id = region.village_code
   WITH NO DATA;
