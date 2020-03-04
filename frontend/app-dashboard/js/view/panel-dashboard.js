@@ -7,7 +7,14 @@ define([
     'chartPluginLabel',
     'filesaver',
     'js/model/trigger_status.js',
-], function (Backbone, _, $, JqueryUi, Chart, ChartJsPlugin, fileSaver, TriggerStatusCollection) {
+    'js/view/panels/building-summary-panel.js',
+    'js/view/panels/road-summary-panel.js',
+    'js/view/panels/population-summary-panel.js',
+], function (Backbone, _, $, JqueryUi, Chart, ChartJsPlugin, fileSaver, TriggerStatusCollection,
+            BuildingSummaryPanel,
+            RoadSummaryPanel,
+            PopulationSummaryPanel
+) {
     return Backbone.View.extend({
         template: _.template($('#dashboard-template').html()),
         loading_template: '<i class="fa fa-spinner fa-spin fa-fw"></i>',
@@ -30,18 +37,31 @@ define([
             'click .tab-title': 'switchTab'
         },
         initialize: function () {
+
+            panel_handlers = [
+                new BuildingSummaryPanel(this),
+                new RoadSummaryPanel(this),
+                new PopulationSummaryPanel(this)
+            ]
+            this.panel_handlers = panel_handlers
+            this.panel_handlers_hash = {}
+            this.panel_handlers.map(o => this.panel_handlers_hash[o.panelKey()] = o)
+
+            panel_handlers.map(p => {
+               let key = p.panelKey();
+               dispatcher.on(`dashboard:render-chart-${key}`, p.renderChartElement, p);
+            });
+
             this.referer_region = [];
-            dispatcher.on('dashboard:render-chart-building', this.renderChartBuilding, this);
-            dispatcher.on('dashboard:render-chart-element', this.renderChartElement, this);
             dispatcher.on('dashboard:reset', this.resetDashboard, this);
             dispatcher.on('dashboard:hide', this.hideDashboard, this);
             dispatcher.on('dashboard:render-region-summary', this.renderRegionSummary, this);
-            dispatcher.on('dashboard:inject-road-region-summary', this.injectRoadRegionSummary, this);
+            dispatcher.on('dashboard:inject-exposed-region-summary', this.injectExposedRegionSummary, this);
             dispatcher.on('dashboard:change-trigger-status', this.changeStatus, this);
 
             this.$el = $(this.el);
         },
-        render: function () {
+        render: function (callback) {
             this.referer_region = [];
             let that = this;
             let $action = $(that.status_wrapper);
@@ -72,114 +92,12 @@ define([
             $('#vulnerability-score-road').html(that.loading_template);
             $('#road-count').html(that.loading_template);
             this.changeStatus(floodCollectionView.selected_forecast.attributes.trigger_status);
+            if(callback){
+                callback();
+            }
         },
-        renderChartElement: function (data, element) {
-            let $parentWrapper = $('#chart-score-panel');
-            $parentWrapper.find('#summary-chart-' + element).remove();
-            $parentWrapper.find('.panel-chart-' + element).html('<canvas id="summary-chart-'+ element +'"></canvas>');
-            $parentWrapper.find('#summary-chart-' + element + '-residential').remove();
-            $parentWrapper.find('.panel-chart-' + element + '-residential').html('<canvas id="summary-chart-'+ element +'-residential" style="height: 50px"></canvas>');
-
-            let total_road_array = [];
-            let graph_data = [];
-            let flood_graph_data = [];
-            let backgroundColours = [];
-            let unlisted_key = [
-                'id', 'flood_event_id', 'total_vulnerability_score', 'flooded_building_count', 'building_count',
-                'village_id', 'name', 'region', 'district_id', 'sub_district_id', 'sub_dc_code', 'village_code', 'dc_code',
-                'trigger_status', 'road_count'
-            ];
-            let residential_flood_data = [];
-            let residential_data = [];
-            for(var key in data) {
-                if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') > -1) {
-                    if(key.indexOf('residential') > -1){
-                        residential_flood_data = data[key]
-                    }else {
-                        flood_graph_data.push({
-                            y: key.replace('_flooded_road_count', ''),
-                            x: data[key]
-                        });
-                    }
-                }
-
-                if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') === -1) {
-                    let flood_key = key.replace('_road_count', '_flooded_road_count');
-                    let count = data[key] - data[flood_key];
-                    if(!count === NaN){
-                        count = 0
-                    }
-
-                    if(key.indexOf('residential') > -1){
-                        residential_data = count
-                    }else {
-                        graph_data.push({
-                            y: key.replace('_road_count', ''),
-                            x: count
-                        });
-                    }
-
-                    total_road_array.push({
-                        key: key.replace('_road_count', ''),
-                        value: data[key]
-                    })
-                }
-                backgroundColours.push('#82B7CA');
-            }
-
-            total_road_array.sort(function(a, b){return b.value - a.value});
-
-            var label = [];
-            for(var o in total_road_array) {
-                if(total_road_array[o].key.indexOf('residential') === -1) {
-                    label.push(total_road_array[o].key);
-                }
-            }
-
-            graph_data.sort(function(a, b){
-              return label.indexOf(a.y) - label.indexOf(b.y);
-            });
-
-            flood_graph_data.sort(function(a, b){
-              return label.indexOf(a.y) - label.indexOf(b.y);
-            });
-
-            let humanLabel = [];
-            for(let i=0; i<label.length; i++) {
-                humanLabel.push(toTitleCase(label[i].replace('_', ' ')))
-            }
-
-            var ctxResidential = document.getElementById('summary-chart-road-residential').getContext('2d');
-            var datasetsResidential = {
-                labels: ["Not Flooded", "Flooded"],
-                datasets: [
-                    {
-                        data: [residential_data, residential_flood_data],
-                        backgroundColor: ['#e5e5e5', '#82B7CA']
-                    }
-                ],
-            };
-
-            var ctx = document.getElementById('summary-chart-road').getContext('2d');
-            var datasets = {
-                labels: humanLabel,
-                datasets: [
-                    {
-                        label: "Not Flooded",
-                        data: graph_data
-                    }, {
-                        label: "Flooded",
-                        data: flood_graph_data,
-                        backgroundColor: backgroundColours
-                    }]
-            };
-
-            let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2): 0;
-            $('#vulnerability-score-' + element).html(total_vulnerability_score);
-            $('#'+ element +'-count').html(data['flooded_road_count']);
-            this.renderChartData(datasets, ctx, 'Residential ' + toTitleCase(element) + 's', datasetsResidential, ctxResidential, 'Other ' + toTitleCase(element) + 's');
-        },
-        renderChartBuilding: function (data, main_panel) {
+        renderRegionSummary: function (overall, data, main_panel, sub_region, id_field, exposure_name) {
+            // main panel title (the region)
             let that = this;
             let id_key = {
                 'district': 'district_id',
@@ -187,224 +105,86 @@ define([
                 'village': 'village_id'
             };
             let trigger_status = $("#status").attr('data-region-trigger-status');
-            if(main_panel){
+            let region = overall['region'];
+            if (main_panel) {
                 $('.btn-back-summary-panel').hide();
                 let referer = {
                     region: 'district',
                     id: 'main',
                     trigger_status: trigger_status
                 };
-                if(!that.containsReferer(referer, that.referer_region)) {
+                if (!that.containsReferer(referer, that.referer_region)) {
                     that.referer_region.push(referer);
                 }
                 $('#main-panel-header').html('Summary for Flood ' + floodCollectionView.selected_forecast.attributes.notes)
-            }else {
+            } else {
                 $('.btn-back-summary-panel').show();
-                let region = data['region'];
                 let referer = {
                     region: region,
-                    id: data[id_key[region]],
+                    id: overall[id_key[region]],
                     trigger_status: trigger_status
                 };
-                if(!that.containsReferer(referer, that.referer_region)) {
+                if (!that.containsReferer(referer, that.referer_region)) {
                     that.referer_region.push(referer);
                 }
-                $('#main-panel-header').html('Summary For ' + toTitleCase(region.replace('_', ' ')) + ' ' + data["name"])
+                $('#main-panel-header').html('Summary For ' + toTitleCase(region.replace('_', ' ')) + ' ' + overall["name"])
             }
-
-            let $parentWrapper = $('#chart-score-panel');
-            $parentWrapper.find('#summary-chart').remove();
-            $parentWrapper.find('.panel-chart').html('<canvas id="summary-chart" style="height: 250px"></canvas>');
-            $parentWrapper.find('#summary-chart-residential').remove();
-            $parentWrapper.find('.panel-chart-residential').html('<canvas id="summary-chart-residential" style="height: 100px"></canvas>');
-            $('#region-summary-panel').html('');
-
-            let total_building_array = [];
-            let graph_data = [];
-            let flood_graph_data = [];
-            let backgroundColours = [];
-            let unlisted_key = [
-                'id', 'flood_event_id', 'total_vulnerability_score', 'flooded_building_count', 'building_count',
-                'village_id', 'name', 'region', 'district_id', 'sub_district_id', 'sub_dc_code', 'village_code', 'dc_code',
-                'trigger_status'
-            ];
-            let residential_flood_data = [];
-            let residential_data = [];
-            for(var key in data) {
-                if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') > -1) {
-                    if(key.indexOf('residential') > -1){
-                        residential_flood_data = data[key]
-                    }else {
-                        flood_graph_data.push({
-                            y: key.replace('_flooded_building_count', ''),
-                            x: data[key]
-                        });
-                    }
-                }
-
-                if(unlisted_key.indexOf(key) === -1 && key.indexOf('flood') === -1) {
-                    let flood_key = key.replace('_building_count', '_flooded_building_count');
-                    let count = data[key] - data[flood_key];
-                    if(!count === NaN){
-                        count = 0
-                    }
-
-                    if(key.indexOf('residential') > -1){
-                        residential_data = count
-                    }else {
-                        graph_data.push({
-                            y: key.replace('_building_count', ''),
-                            x: count
-                        });
-                    }
-
-                    total_building_array.push({
-                        key: key.replace('_building_count', ''),
-                        value: data[key]
-                    })
-                }
-                backgroundColours.push('#82B7CA');
-            }
-
-            total_building_array.sort(function(a, b){return b.value - a.value});
-
-            var label = [];
-            for(var o in total_building_array) {
-                if(total_building_array[o].key.indexOf('residential') === -1) {
-                    label.push(total_building_array[o].key);
-                }
-            }
-
-            graph_data.sort(function(a, b){
-              return label.indexOf(a.y) - label.indexOf(b.y);
-            });
-
-            flood_graph_data.sort(function(a, b){
-              return label.indexOf(a.y) - label.indexOf(b.y);
-            });
-
-            let humanLabel = [];
-            for(let i=0; i<label.length; i++) {
-                humanLabel.push(toTitleCase(label[i].replace('_', ' ')))
-            }
-
-            var ctxResidential = document.getElementById('summary-chart-residential').getContext('2d');
-            var datasetsResidential = {
-                labels: ["Not Flooded", "Flooded"],
-                datasets: [{
-                    data: [residential_data, residential_flood_data],
-                    backgroundColor: ['#e5e5e5', '#82B7CA']
-                }]
-            };
-            var ctx = document.getElementById('summary-chart').getContext('2d');
-            var datasets = {
-                labels: humanLabel,
-                datasets: [
-                    {
-                        label: "Not Flooded",
-                        data: graph_data
-                    }, {
-                        label: "Flooded",
-                        data: flood_graph_data,
-                        backgroundColor: backgroundColours
-                    }]
-            };
-
-            let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2): 0;
-            $('#vulnerability-score').html(total_vulnerability_score);
-            $('#building-count').html(data['flooded_building_count']);
-
-            this.renderChartData(datasets, ctx, 'Residential Buildings', datasetsResidential, ctxResidential, 'Other Buildings');
-        },
-        renderChartData: function (datasets, ctx, title, datasetsResidential, ctxResidential, title2) {
-            new Chart(ctxResidential, {
-                type: 'pie',
-                data: datasetsResidential,
-                options: {
-                    legend: {
-                        display: true
-                    },
-                    title: {
-                        display: true,
-                        text: title
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        labels: {
-                            render: 'value',
-                            position: 'outside',
-                            textMargin: 4
-                        }
-                    }
-                }
-            });
-
-            new Chart(ctx, {
-                type: 'horizontalBar',
-                data: datasets,
-                options: {
-                    legend: {
-                        display: true
-                    },
-                    scales: {
-                        xAxes: [{
-                            stacked: true,
-                            gridLines: {
-                                display:false
-                            },
-                            ticks: {
-                                min: 0
-                            }
-                        }],
-                        yAxes: [{
-                            stacked: true,
-                            gridLines: {
-                                display:false
-                            },
-                        }]
-                    },
-                    title: {
-                        display: true,
-                        text: title2
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-        },
-        renderRegionSummary: function (data, region, id_field) {
-            let that = this;
+            // register stats_data
+            this.panel_handlers_hash[exposure_name].stats_data = data;
+            // sub region summary
+            // only populate sub region summary when all data has completely fetched
             let $wrapper = $('#region-summary-panel');
-            let title = this.sub_region_title_template;
-            $wrapper.html(title({
-                region: toTitleCase(region.replace('_', ''))
-            }));
-            let item_template = this.sub_region_item_template;
-            let $table = $('<table></table>');
-            for(let u=0; u<data.length; u++){
-                let item = data[u];
-                let trigger_status = data[u].trigger_status || 0;
-                let building_total_score = item['flooded_building_count'] ? item['flooded_building_count'] : '-';
-                $table.append(item_template({
-                    region: region,
-                    id: item[id_field],
-                    name: item['name'],
-                    flooded_road_count: that.loading_template,
-                    flooded_building_count: building_total_score,
-                    flooded_population_count: '-',
-                    trigger_status: trigger_status
+            if(sub_region === undefined){
+                // nothing to render
+                $wrapper.html('');
+                return;
+            }
+            let is_data_ready = true;
+            for(let i in this.panel_handlers){
+                let handler = this.panel_handlers[i];
+                if(handler.stats_data.length === 0){
+                    is_data_ready = false;
+                    break;
+                }
+            }
+            if(is_data_ready){
+                let title = this.sub_region_title_template;
+                let item_template = this.sub_region_item_template;
+                let $table = $('<table></table>');
+                let pivot_data = this.panel_handlers_hash['population'].stats_data
+                for(let u=0; u<pivot_data.length; u++){
+                    let item = pivot_data[u];
+                    let trigger_status = pivot_data[u].trigger_status || 0;
+                    $table.append(item_template({
+                        region: sub_region,
+                        id: item[id_field],
+                        name: item['name'],
+                        flooded_road_count: that.loading_template,
+                        flooded_building_count: that.loading_template,
+                        flooded_population_count: that.loading_template,
+                        trigger_status: trigger_status
+                    }));
+                }
+                $wrapper.html(title({
+                    region: toTitleCase(sub_region.replace('_', ''))
                 }));
+                $wrapper.append($table);
+                for(let i in this.panel_handlers){
+                    let handler = this.panel_handlers[i];
+                    dispatcher.trigger(
+                        'dashboard:inject-exposed-region-summary',
+                        handler.stats_data, sub_region, id_field, handler.panelKey());
+                }
             }
-            $wrapper.append($table);
         },
-        injectRoadRegionSummary: function (data, region, id_field) {
+        injectExposedRegionSummary: function(data, region, id_field, exposure_name){
             let $wrapper = $('#region-summary-panel');
             for(let u=0; u<data.length; u++){
                 let item = data[u];
-                let road_total_score = item['flooded_road_count'] ? item['flooded_road_count'] : '-';
-                let div = $wrapper.find('[data-road-region-id=' + item[id_field] + ']');
-                $(div).find('.score').html(road_total_score);
+                let exposed_count = item[`flooded_${exposure_name}_count`];
+                let total_score = exposed_count ? exposed_count : '-';
+                let $el = $wrapper.find(`[data-region-id=${item[id_field]}] .score.${exposure_name}`);
+                $el.html(total_score);
             }
         },
         changeStatus: function (status) {
@@ -414,6 +194,7 @@ define([
         },
         resetDashboard: function () {
             this.referer_region = [];
+            this.panel_handlers.map(o => o.stats_data = []);
             $(this.status_wrapper).html('-');
             $(this.general_summary).empty().html('' +
                 '<div class="panel-title">' +
@@ -434,6 +215,7 @@ define([
             let region = $button.attr('data-region');
             let region_id = parseInt($button.attr('data-region-id'));
             let trigger_status = $button.attr('data-region-trigger-status');
+            this.panel_handlers.map(o => o.stats_data = []);
             $('.btn-back-summary-panel')
                 .attr('data-region', that.referer_region[that.referer_region.length - 1].region)
                 .attr('data-region-id', that.referer_region[that.referer_region.length -1].id)
@@ -441,6 +223,7 @@ define([
             this.changeStatus(trigger_status);
             dispatcher.trigger('flood:fetch-stats-data', region, region_id, false);
             dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, false);
+            dispatcher.trigger('flood:fetch-stats-data-population', region, region_id, false);
             this.fetchExtent(region_id, region);
             let forecast_id = floodCollectionView.selected_forecast.id;
             dispatcher.trigger('map:show-exposed-roads', forecast_id, region, region_id);
@@ -480,8 +263,10 @@ define([
                 .attr('data-region-id', referer_region_id)
                 .attr('data-region-trigger-status', referer_trigger_status);
             this.changeStatus(trigger_status);
+            this.panel_handlers.map(o => o.stats_data = []);
             dispatcher.trigger('flood:fetch-stats-data', region, region_id, main);
             dispatcher.trigger('flood:fetch-stats-data-road', region, region_id, main);
+            dispatcher.trigger('flood:fetch-stats-data-population', region, region_id, main);
             this.fetchExtent(region_id, region);
             let forecast_id = floodCollectionView.selected_forecast.id;
             dispatcher.trigger('map:show-exposed-roads', forecast_id, region, region_id);

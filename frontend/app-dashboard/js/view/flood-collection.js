@@ -85,6 +85,7 @@ define([
             dispatcher.on('flood:fetch-forecast', this.fetchForecast, this);
             dispatcher.on('flood:fetch-stats-data', this.fetchStatisticData, this);
             dispatcher.on('flood:fetch-stats-data-road', this.fetchRoadStatisticData, this);
+            dispatcher.on('flood:fetch-stats-data-population', this.fetchPopulationStatisticData, this);
             dispatcher.on('flood:deselect-forecast', this.deselectForecast, this);
             dispatcher.on('flood:fetch-historical-forecast', this.fetchHistoricalForecastCollection, this);
 
@@ -317,15 +318,17 @@ define([
             let that = this;
             this.selected_forecast = forecast;
             dispatcher.trigger('map:draw-forecast-layer', forecast, function () {
-                that.fetchVillageData(that.selected_forecast.id);
-                that.fetchSubDistrictData(that.selected_forecast.id);
-                that.fetchDistrictData(that.selected_forecast.id);
-                that.fetchRoadVillageData(that.selected_forecast.id);
-                that.fetchRoadSubDistrictData(that.selected_forecast.id);
-                that.fetchRoadDistrictData(that.selected_forecast.id);
-                that.fetchPopulationVillageData(that.selected_forecast.id);
-                that.fetchPopulationSubDistrictData(that.selected_forecast.id);
-                that.fetchPopulationDistrictData(that.selected_forecast.id);
+                dispatcher.trigger('side-panel:open-dashboard', function () {
+                    that.fetchVillageData(that.selected_forecast.id);
+                    that.fetchSubDistrictData(that.selected_forecast.id);
+                    that.fetchDistrictData(that.selected_forecast.id);
+                    that.fetchRoadVillageData(that.selected_forecast.id);
+                    that.fetchRoadSubDistrictData(that.selected_forecast.id);
+                    that.fetchRoadDistrictData(that.selected_forecast.id);
+                    that.fetchPopulationVillageData(that.selected_forecast.id);
+                    that.fetchPopulationSubDistrictData(that.selected_forecast.id);
+                    that.fetchPopulationDistrictData(that.selected_forecast.id);
+                });
             });
 
             // dispatch event to draw flood
@@ -449,6 +452,9 @@ define([
                 if (region === 'sub_district') {
                     sub_region = 'village'
                 }
+                if (region === 'village'){
+                    sub_region = undefined;
+                }
                 region_render = sub_region;
 
                 let statData = [];
@@ -483,11 +489,8 @@ define([
                 }
                 overall['region'] = region;
             }
-            dispatcher.trigger('dashboard:render-chart-building', overall, main_panel);
-
-            if (region !== 'village') {
-                dispatcher.trigger('dashboard:render-region-summary', buildings, region_render, that.keyStats[region_render]);
-            }
+            dispatcher.trigger('dashboard:render-chart-building', overall, 'building');
+            dispatcher.trigger('dashboard:render-region-summary', overall, buildings, main_panel, region_render, that.keyStats[region_render], 'building');
         },
         fetchVillageData: function (flood_event_id) {
             let that = this;
@@ -594,6 +597,7 @@ define([
             let roads = [];
             let overall = [];
             let region_render;
+            let main_panel = true;
             if (renderRegionDetail) {
                 region_render = region;
                 $.each(data[region], function (idx, value) {
@@ -619,7 +623,11 @@ define([
                 if (region === 'sub_district') {
                     sub_region = 'village'
                 }
+                if (region === 'village'){
+                    sub_region = undefined;
+                }
                 region_render = sub_region;
+                main_panel = false;
 
                 let statData = [];
                 let subRegionList = that.getListSubRegion(sub_region, region_id);
@@ -646,10 +654,8 @@ define([
                 }
                 overall['region'] = region;
             }
-            dispatcher.trigger('dashboard:render-chart-element', overall, 'road');
-            if (region !== 'village') {
-                dispatcher.trigger('dashboard:inject-road-region-summary', roads, region_render, that.keyStats[region_render]);
-            }
+            dispatcher.trigger('dashboard:render-chart-road', overall, 'road');
+            dispatcher.trigger('dashboard:render-region-summary', overall, roads, main_panel, region_render, that.keyStats[region_render], 'road');
         },
         fetchRoadDistrictData: function (flood_event_id) {
             let that = this;
@@ -714,15 +720,16 @@ define([
                 'sub_district': that.populationSubDistrictStats
             };
 
-            let roads = [];
+            let population = [];
             let overall = [];
             let region_render;
+            let main_panel = true;
             if (renderRegionDetail) {
                 region_render = region;
                 $.each(data[region], function (idx, value) {
-                    roads[idx] = [];
+                    population[idx] = [];
                     $.each(value, function (key, value) {
-                        roads[idx][key] = value;
+                        population[idx][key] = value;
                         if (!overall[key]) {
                             overall[key] = value
                         } else {
@@ -742,7 +749,11 @@ define([
                 if (region === 'sub_district') {
                     sub_region = 'village'
                 }
+                if(region === 'village'){
+                    sub_region = undefined;
+                }
                 region_render = sub_region;
+                main_panel = false;
 
                 let statData = [];
                 let subRegionList = that.getListSubRegion(sub_region, region_id);
@@ -754,9 +765,9 @@ define([
 
                 if (region !== 'village') {
                     $.each(statData, function (idx, value) {
-                        roads[idx] = [];
+                        population[idx] = [];
                         $.each(value, function (key, value) {
-                            roads[idx][key] = value;
+                            population[idx][key] = value;
                         })
                     });
                 }
@@ -769,10 +780,8 @@ define([
                 }
                 overall['region'] = region;
             }
-            dispatcher.trigger('dashboard:render-chart-element', overall, 'population');
-            if (region !== 'village') {
-                dispatcher.trigger('dashboard:inject-population-region-summary', roads, region_render, that.keyStats[region_render]);
-            }
+            dispatcher.trigger('dashboard:render-chart-population', overall, 'population');
+            dispatcher.trigger('dashboard:render-region-summary', overall, population, main_panel, region_render, that.keyStats[region_render], 'population');
         },
         fetchPopulationDistrictData: function (flood_event_id) {
             let that = this;
