@@ -16,3 +16,11 @@ INSERT INTO public.census_kemendagri (objectid, no_prop, no_kab, no_kec, no_kel,
 INSERT INTO public.census_kemendagri (objectid, no_prop, no_kab, no_kec, no_kel, kode_desa_, nama_prop_, nama_kab_s, nama_kec_s, nama_kel_s, jumlah_pen, jumlah_kk, pria, wanita, u0, u5, u10, u15, u20, u25, u30, u35, u40, u45, u50, u55, u60, u65, u70, u75, p01_belum_) VALUES (50590, 36, 74, 7, 1004, '3674071004', 'BANTEN', 'KOTA TANGERANG SELATAN', 'SETU', 'KADEMANGAN', 21723, 6731, 10975, 10748, 1764, null, null, 1637, 1966, 2010, 1814, 1837, 1757, 1615, 1434, 1078, 674, 288, 126, 175, 3836) ON CONFLICT (objectid) DO NOTHING;
 
 refresh materialized view mv_non_flooded_population_summary with data;
+
+-- check bulk update
+select kartoza_census_kemendagri_populate_all_census();
+
+-- check trigger
+update census_kemendagri set objectid = gis.public.census_kemendagri.objectid
+where objectid in (
+    select objectid from census_kemendagri limit 1)

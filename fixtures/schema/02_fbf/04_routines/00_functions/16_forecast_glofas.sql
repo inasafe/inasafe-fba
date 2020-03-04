@@ -38,6 +38,19 @@ job.calculate_impact()
 return 'OK'
 $$;
 
+CREATE OR REPLACE FUNCTION public.kartoza_fba_forecast_glofas(acquisition_date date) RETURNS CHARACTER VARYING
+language plpython3u
+as
+$$
+from fbf.forecast.glofas.reporting_point import GloFASForecast
+import json
+rv = plpy.execute("SELECT value FROM config WHERE key = 'POSTGREST_BASE_URL'")
+postgrest_url = json.loads(rv[0]['value'])
+job = GloFASForecast(postgrest_url=postgrest_url)
+job.acquisition_time = acquisition_date
+job.run()
+$$;
+
 -- Include in cron
 INSERT INTO cron.job (schedule, command)
 SELECT
