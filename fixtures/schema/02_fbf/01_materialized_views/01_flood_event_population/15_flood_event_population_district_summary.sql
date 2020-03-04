@@ -41,7 +41,7 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_population_district_summary AS
            trigger_status.trigger_status
     from
          flooded_count
-         LEFT JOIN district_trigger_status trigger_status on flooded_count.flood_event_id = trigger_status.flood_event_id
+         LEFT JOIN district_trigger_status trigger_status on flooded_count.flood_event_id = trigger_status.flood_event_id and flooded_count.district_id = trigger_status.district_id
          JOIN non_flooded_count on flooded_count.district_id = non_flooded_count.district_id
          JOIN district on flooded_count.district_id = district.dc_code
   WITH NO DATA;
