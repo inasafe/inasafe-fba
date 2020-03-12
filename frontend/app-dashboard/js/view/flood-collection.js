@@ -458,7 +458,7 @@ define([
                 region_render = sub_region;
 
                 let statData = [];
-                let subRegionList = that.getListSubRegion(sub_region, region_id);
+                let subRegionList = that.getListSubRegion(sub_region, region_id, data);
                 $.each(data[sub_region], function (index, value) {
                     if (subRegionList.indexOf(value[that.keyStats[sub_region]]) >= 0) {
                         statData.push(value)
@@ -543,7 +543,7 @@ define([
                 console.log(data);
             })
         },
-        getListSubRegion: function (region, parent_region_id) {
+        getListSubRegion: function (region, parent_region_id, stats) {
             let key = {
                 'sub_district': 'sub_district_id',
                 'village': 'village_id'
@@ -553,10 +553,6 @@ define([
                 'village': 'sub_district_id'
             };
             let that = this;
-            let stats = {
-                'village': that.villageStats,
-                'sub_district': that.subDistrictStats
-            };
             let areaLookup = stats[region]
             let listSubRegion = [];
             $.each(areaLookup, function (index, value) {
@@ -630,7 +626,7 @@ define([
                 main_panel = false;
 
                 let statData = [];
-                let subRegionList = that.getListSubRegion(sub_region, region_id);
+                let subRegionList = that.getListSubRegion(sub_region, region_id, data);
                 $.each(data[sub_region], function (index, value) {
                     if (subRegionList.indexOf(value[that.keyStats[sub_region]]) >= 0) {
                         statData.push(value)
@@ -756,7 +752,7 @@ define([
                 main_panel = false;
 
                 let statData = [];
-                let subRegionList = that.getListSubRegion(sub_region, region_id);
+                let subRegionList = that.getListSubRegion(sub_region, region_id, data);
                 $.each(data[sub_region], function (index, value) {
                     if (subRegionList.indexOf(value[that.keyStats[sub_region]]) >= 0) {
                         statData.push(value)

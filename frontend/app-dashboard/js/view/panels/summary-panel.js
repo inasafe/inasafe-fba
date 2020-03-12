@@ -132,6 +132,7 @@ define([
             };
 
             let is_vulnerability_score_exists = data['total_vulnerability_score'] !== undefined;
+            let is_exposed_count_exists = data[total_flooded_count_key] !== undefined;
             let $vulnerability_info = $parentWrapper.find('.vulnerability-score');
             if(is_vulnerability_score_exists){
                 let total_vulnerability_score = data['total_vulnerability_score'] ? data['total_vulnerability_score'].toFixed(2) : 0;
@@ -141,7 +142,7 @@ define([
             else{
                 $vulnerability_info.parent().hide();
             }
-            $parentWrapper.find('.exposed-count').html(data[total_flooded_count_key]);
+            $parentWrapper.find('.exposed-count').html(is_exposed_count_exists ? data[total_flooded_count_key] : 0);
 
             this.renderChartData(datasets, ctx, this.primary_exposure_label, datasetsPrimaryExposure, ctxPrimaryExposure, this.other_category_exposure_label);
         },

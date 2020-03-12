@@ -124,13 +124,19 @@ define([
                     id: overall[id_key[region]],
                     trigger_status: trigger_status
                 };
-                if (!that.containsReferer(referer, that.referer_region)) {
+                if (referer.id !== undefined && !that.containsReferer(referer, that.referer_region)) {
                     that.referer_region.push(referer);
                 }
                 $('#main-panel-header').html('Summary For ' + toTitleCase(region.replace('_', ' ')) + ' ' + overall["name"])
             }
             // register stats_data
-            this.panel_handlers_hash[exposure_name].stats_data = data;
+            if(data.length > 0) {
+                this.panel_handlers_hash[exposure_name].stats_data = data;
+            }
+            else {
+                // put array of undefined value, because stats_data is empty
+                this.panel_handlers_hash[exposure_name].stats_data = [undefined];
+            }
             // sub region summary
             // only populate sub region summary when all data has completely fetched
             let $wrapper = $('#region-summary-panel');
@@ -152,6 +158,8 @@ define([
                 let item_template = this.sub_region_item_template;
                 let $table = $('<table></table>');
                 let pivot_data = this.panel_handlers_hash['population'].stats_data
+                // We use population data as pivot because it always represents intersected admin boundaries
+                // If guarantees that this is a set of intersected admin boundaries with hazard
                 for(let u=0; u<pivot_data.length; u++){
                     let item = pivot_data[u];
                     let trigger_status = pivot_data[u].trigger_status || 0;
@@ -181,11 +189,17 @@ define([
             let $wrapper = $('#region-summary-panel');
             for(let u=0; u<data.length; u++){
                 let item = data[u];
+                if(item === undefined){
+                    // continue if there is no data for current row
+                    continue;
+                }
                 let exposed_count = item[`flooded_${exposure_name}_count`];
                 let total_score = exposed_count ? exposed_count : '-';
                 let $el = $wrapper.find(`[data-region-id=${item[id_field]}] .score.${exposure_name}`);
                 $el.html(total_score);
             }
+            // set count to 0 for every row that was not updated.
+            $wrapper.find(`.score.${exposure_name} i.fa`).parent().map((idx, $el) => $($el).html(0));
         },
         changeStatus: function (status) {
             status = status || 0;
