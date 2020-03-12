@@ -282,14 +282,15 @@ define([
                         .done(function (data) {
                             // we will get array of forecast event
                             let forecast_events = data.map(function (value) {
-                                let forecast_date = acquisition_date_start.clone().add(value.lead_time, 'days').local();
+                                let acquisition_date = moment.utc(value.max_acquisition_date);
+                                let forecast_date = acquisition_date.clone().add(value.lead_time, 'days').local();
                                 return {
                                     lead_time: value.lead_time,
                                     total_forecast: value.total_forecast,
                                     forecast_date: forecast_date,
                                     trigger_status_id: value.trigger_status_id,
                                     available_forecasts: function () {
-                                        return ForecastEvent.getAvailableForecast(acquisition_date_start, forecast_date);
+                                        return ForecastEvent.getAvailableForecast(acquisition_date, forecast_date);
                                     }
                                 };
                             });
