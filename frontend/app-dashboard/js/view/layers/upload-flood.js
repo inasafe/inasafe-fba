@@ -137,7 +137,7 @@ define([
 
         },
         triggerCalculation: function (id) {
-            AppRequest.post(postgresBaseUrl + '/rpc/kartoza_fba_forecast_glofas',
+            AppRequest.post(postgresBaseUrl + '/rpc/kartoza_fba_forecast_glofas_update_trigger_status',
                 {
                     'hazard_event_id': id
                 }

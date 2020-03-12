@@ -34,7 +34,7 @@ function restart_postgres_with_log {
   su - postgres -c "$SETVARS $POSTGRES  -D $DATADIR  -c config_file=$CONF" > /var/log/postgres-main.log &
 
   # wait for postgres to come up
-  until su - postgres -c "psql -l"; do
+  until su - postgres -c "psql -l > /dev/null"; do
     sleep 1
   done
   echo "postgres ready"
