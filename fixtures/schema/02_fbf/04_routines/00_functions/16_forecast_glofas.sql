@@ -49,6 +49,32 @@ postgrest_url = json.loads(rv[0]['value'])
 job = GloFASForecast(postgrest_url=postgrest_url)
 job.acquisition_time = acquisition_date
 job.run()
+return 'OK'
+$$;
+
+CREATE OR REPLACE FUNCTION public.kartoza_fba_forecast_glofas_update_trigger_status(hazard_event_id bigint) RETURNS CHARACTER VARYING
+language plpython3u
+as
+$$
+from fbf.forecast.glofas.reporting_point import GloFASForecast
+import json
+import requests
+
+rv = plpy.execute("SELECT value FROM config WHERE key = 'POSTGREST_BASE_URL'")
+postgrest_url = json.loads(rv[0]['value'])
+job = GloFASForecast(postgrest_url=postgrest_url)
+url = '{postgrest_url}/hazard_event?id=eq.{hazard_event_id}'.format(
+    postgrest_url=postgrest_url,
+    hazard_event_id=hazard_event_id)
+response = requests.get(url)
+job.flood_forecast_events = response.json()
+# Impact needs to be calculated twice to consider before and after trigger status
+job.calculate_impact()
+job.evaluate_trigger_status()
+job.calculate_impact()
+job.generate_report()
+
+return 'OK'
 $$;
 
 -- Include in cron
