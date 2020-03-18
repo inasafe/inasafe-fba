@@ -1,0 +1,68 @@
+[
+  {
+    "prov_code": 32,
+    "dc_code": 3201,
+    "sub_dc_code": 3201250,
+    "name": "Gunung Sindur",
+    "pop_sum": 232656,
+    "pop_count": 5697,
+    "pop_mean": 41,
+    "pop_min": 14,
+    "pop_max": 93
+  },
+  {
+    "prov_code": 32,
+    "dc_code": 3201,
+    "sub_dc_code": 3201260,
+    "name": "Rumpin",
+    "pop_sum": 232947,
+    "pop_count": 16177,
+    "pop_mean": 14,
+    "pop_min": 3,
+    "pop_max": 48
+  },
+  {
+    "prov_code": 36,
+    "dc_code": 3603,
+    "sub_dc_code": 3603070,
+    "name": "Pagedangan",
+    "pop_sum": 315980,
+    "pop_count": 5919,
+    "pop_mean": 53,
+    "pop_min": 17,
+    "pop_max": 112
+  },
+  {
+    "prov_code": 36,
+    "dc_code": 3603,
+    "sub_dc_code": 3603081,
+    "name": "Cisauk",
+    "pop_sum": 137266,
+    "pop_count": 3345,
+    "pop_mean": 41,
+    "pop_min": 14,
+    "pop_max": 97
+  },
+  {
+    "prov_code": 36,
+    "dc_code": 3674,
+    "sub_dc_code": 3674010,
+    "name": "Setu",
+    "pop_sum": 123713,
+    "pop_count": 1932,
+    "pop_mean": 64,
+    "pop_min": 25,
+    "pop_max": 103
+  },
+  {
+    "prov_code": 36,
+    "dc_code": 3674,
+    "sub_dc_code": 3674020,
+    "name": "Serpong",
+    "pop_sum": 261551,
+    "pop_count": 3343,
+    "pop_mean": 78,
+    "pop_min": 36,
+    "pop_max": 109
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "prov_code": 32,
+    "dc_code": 3201,
+    "name": "Bogor",
+    "pop_sum": 6610713,
+    "pop_count": 349994,
+    "pop_mean": 19,
+    "pop_min": 1,
+    "pop_max": 169
+  },
+  {
+    "prov_code": 36,
+    "dc_code": 3603,
+    "name": "Tangerang",
+    "pop_sum": 4659185,
+    "pop_count": 116500,
+    "pop_mean": 40,
+    "pop_min": 3,
+    "pop_max": 149
+  },
+  {
+    "prov_code": 36,
+    "dc_code": 3674,
+    "name": "Kota Tangerang Selatan",
+    "pop_sum": 1716439,
+    "pop_count": 19110,
+    "pop_mean": 90,
+    "pop_min": 25,
+    "pop_max": 160
+  }
+]
