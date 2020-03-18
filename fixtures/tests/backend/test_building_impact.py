@@ -26,6 +26,7 @@ class TestBuildingImpact(DatabaseTestCase):
             # check building summary
 
             def _test_summary_stats(self, results):
+                self.assertTrue(results)
                 keys_to_check = [
                     'residential',
                     'clinic_dr',

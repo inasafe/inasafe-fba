@@ -21,6 +21,11 @@ refresh materialized view mv_flood_event_population_village_summary with data;
 refresh materialized view mv_flood_event_population_sub_district_summary with data;
 refresh materialized view mv_flood_event_population_district_summary with data;
 
+refresh materialized view mv_flood_event_world_pop with data;
+refresh materialized view mv_flood_event_world_pop_village_summary with data;
+refresh materialized view mv_flood_event_world_pop_sub_district_summary with data;
+refresh materialized view mv_flood_event_world_pop_district_summary with data;
+
 RETURN 'OK';
 END
 $$;

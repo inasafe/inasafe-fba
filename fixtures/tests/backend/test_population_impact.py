@@ -26,6 +26,7 @@ class TestPopulationImpact(DatabaseTestCase):
             # check summary
 
             def _test_summary_stats(self, results):
+                self.assertTrue(results)
                 keys_to_check = [
                     'males',
                     'females',
