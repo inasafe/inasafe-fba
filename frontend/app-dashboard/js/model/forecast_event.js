@@ -24,6 +24,7 @@ define([
             // attribute placeholder
             _url: {
                 forecast_flood: _forecast_flood_url,
+                forecast_flood_queue: `${_forecast_flood_url}_queue`,
                 forecast_flood_extent: postgresUrl + 'vw_hazard_event_extent'
             },
             _table_attrs: {
@@ -43,7 +44,7 @@ define([
                 WMS_LAYER_NAME: 'kartoza:flood_forecast_layer'
             },
 
-            urlRoot: postgresUrl + 'hazard_event',
+            urlRoot: _forecast_flood_url,
 
             initialize: function(){
                 if(this.id) {
@@ -53,11 +54,13 @@ define([
             },
 
             url: function () {
+                let is_for_queue = this.get('queue_status') !== undefined;
+                let urlRoot = is_for_queue ? this._url.forecast_flood_queue : this._url.forecast_flood;
                 if(this.id){
-                    return `${this.urlRoot}?id=eq.${this.id}`;
+                    return `${urlRoot}?id=eq.${this.id}`;
                 }
                 else {
-                    return this.urlRoot;
+                    return urlRoot;
                 }
             },
 

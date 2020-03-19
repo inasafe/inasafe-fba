@@ -94,35 +94,17 @@ define([
             };
             this.forecast_event.save(
                 {
-                    flood_map_id: layer.get('id')
+                    flood_map_id: layer.get('id'),
+                    queue_status: 0
                 }, options)
                 .then(function (response, textStatus) {
                     if(response){
                         console.log(response)
                         // parser error but successfully sent to server
-                        alert('Flood map successfully uploaded!');
+                        alert('Flood map successfully uploaded! It might take a while until the process finished.');
                         that.$el.find('[type=submit]').show();
                         $('form').trigger('reset');
                         that.progressbar.hide();
-                        let forecast_date = new Date(response[0]['forecast_date']);
-                        let acquisition_date = new moment(response[0]['acquisition_date']);
-                        let id = response[0]['id'];
-                        let predefined_event = {
-                            'forecast_date': forecast_date,
-                            'id': id
-                        };
-                        that.triggerCalculation(id);
-
-                        let today = new Date();
-                        if(acquisition_date < today){
-                            let end_date_range = acquisition_date.clone().add(1, 'month');
-                            let start_date_range = acquisition_date.clone().subtract(1, 'month');
-                            dispatcher.trigger('flood:fetch-historical-forecast', start_date_range, end_date_range);
-                        }
-
-                        // New data has been uploaded
-                        // Refresh forecast list
-                        dispatcher.trigger('flood:fetch-forecast-collection', predefined_event);
                     }
                     else if(textStatus !== 'success') {
                         alert('Upload Failed. Forecast information failed to save');

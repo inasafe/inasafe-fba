@@ -167,6 +167,7 @@ define([
                         region: sub_region,
                         id: item[id_field],
                         name: item['name'],
+                        loading_template: that.loading_template,
                         flooded_road_count: that.loading_template,
                         flooded_building_count: that.loading_template,
                         flooded_population_count: that.loading_template,

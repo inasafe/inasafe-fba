@@ -264,7 +264,7 @@ form label {
     padding-top: 10px;
 }
 
-.box-vulnerability, .box-exposed {
+.box-vulnerability, .box-summary-count, .box-exposed {
     height: 70px;
     border: 2px solid #CA6060;
     margin-top: 10px;
@@ -298,12 +298,12 @@ form label {
     width: 33%;
 }
 
-.exposed-count, .vulnerability-score, .score{
+.exposed-count, .vulnerability-score, .score, .summary-count{
     font-size: 30px;
     height: 42px;
 }
 
-.exposed-count, .vulnerability-score{
+.exposed-count, .vulnerability-score, .summary-count{
     height: 42px;
     text-align: center;
     width: 100%;
