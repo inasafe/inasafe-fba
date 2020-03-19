@@ -38,6 +38,16 @@ class DatabaseTestCase(unittest.TestCase):
     def json_path(cls, *args):
         return cls._test_data_path('json', *args)
 
+    def execute_statement(self, statement, cursor=None):
+        def _execute_statement(cursor):
+            cursor.execute(statement)
+            return cursor
+        if not cursor:
+            with self.dbc.cursor() as c:
+                return _execute_statement(c)
+        else:
+            return _execute_statement(cursor)
+
     def execute_sql_file(self, sql_file, cursor=None):
         def _execute_sql_file(cursor):
             with open(sql_file) as f:

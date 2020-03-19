@@ -6,7 +6,7 @@ define([
     const WorldPopulationVillageSummary = Backbone.Model.extend({
         urlRoot: postgresUrl + 'mv_flood_event_world_pop_village_summary',
         url: function () {
-            return `${this.urlRoot}?district_id=eq.${this.attr('district_id')}`
+            return `${this.urlRoot}?flood_event_id=eq.${this.get('flood_event_id')}&village_id=eq.${this.get('village_id')}`
         }
     });
 

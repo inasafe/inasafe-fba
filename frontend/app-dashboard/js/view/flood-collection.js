@@ -823,9 +823,6 @@ define([
                 that[stats_data[0]] = merged_pop_data;
                 that[stats_data[1]] = extra_data;
                 if (that.populationVillageStats !== null && that.populationDistrictStats !== null && that.populationSubDistrictStats !== null) {
-                    console.log(that.populationVillageStats);
-                    console.log(that.populationSubDistrictStats);
-                    console.log(that.populationDistrictStats);
                     that.fetchPopulationStatisticData('district', that.selected_forecast.id, true);
                 }
             }).catch(function (data) {

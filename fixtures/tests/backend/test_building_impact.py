@@ -130,3 +130,63 @@ class TestBuildingImpact(DatabaseTestCase):
             finally:
                 cleanup = self.sql_path('hazard_event_cleanup.sql')
                 self.execute_sql_file(cleanup, cursor=c)
+
+    def test_hazard_event_queue(self):
+        # Test inserting hazard_event using hazard_event_queue table
+
+
+        # Spreadsheet generator relies on Geoserver to get the map,
+        # So we can't use rollback because that means GeoServer won't have
+        # the data to display the map
+        def _cleanup(self, c):
+
+            cleanup = self.sql_path('hazard_event_cleanup.sql')
+            self.execute_sql_file(cleanup, cursor=c)
+
+        self.dbc.conn.autocommit = True
+        # Cleanup first in case of artifacts from previous tests
+        with self.dbc.conn.cursor(cursor_factory=DictCursor) as c:
+            _cleanup(self, c)
+
+        with self.dbc.conn.cursor(cursor_factory=DictCursor) as c:
+            try:
+                # populate hazard map model
+                hazard_map = self.sql_path('hazard_map.sql')
+                self.execute_sql_file(hazard_map, cursor=c)
+
+                # populate hazard event queue data
+                hazard_insert = self.sql_path('hazard_event_queue.sql')
+                self.execute_sql_file(hazard_insert, cursor=c)
+
+                # make sure queue exists
+                self.execute_statement(
+                    'select count(*) from hazard_event_queue', cursor=c)
+                results = c.fetchone()
+                self.assertTrue(results[0] > 0)
+
+                # trigger event process
+                process_hazard_event_queue = self.sql_path('process_hazard_event_queue.sql')
+                self.execute_sql_file(process_hazard_event_queue, cursor=c)
+                results = c.fetchone()
+                # will return hazard_event_id
+                hazard_event_id = results[0]
+                self.assertTrue(hazard_event_id > 0)
+
+                # trigger event analysis
+                process_pending_analysis = self.sql_path(
+                    'process_pending_analysis.sql')
+                self.execute_sql_file(process_pending_analysis, cursor=c)
+                results = c.fetchone()
+                # will return OK
+                self.assertEqual(results[0], 'OK')
+
+                # should have spreadsheets
+                self.execute_statement(
+                    'select * from spreadsheet_reports where flood_event_id = {}'.format(hazard_event_id),
+                    cursor=c)
+                results = c.fetchone()
+
+                self.assertTrue(results['spreadsheet'])
+            finally:
+                cleanup = self.sql_path('hazard_event_cleanup.sql')
+                self.execute_sql_file(cleanup, cursor=c)
