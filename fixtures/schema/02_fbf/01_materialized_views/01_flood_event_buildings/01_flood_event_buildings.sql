@@ -26,3 +26,5 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_buildings AS
      JOIN public.osm_buildings b ON (public.st_intersects(a.geometry, b.geometry)))
   WHERE (b.building_area < (7000)::numeric)
   WITH NO DATA;
+
+create index if not exists mv_flood_event_buildings_sidx_geometry on mv_flood_event_buildings using gist (geometry);
