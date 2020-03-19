@@ -53,3 +53,5 @@ WITH NO DATA;
 comment on materialized view mv_flood_event_world_pop is 'This gives a summary of the population for each flood zone in a village region. It doesn''t aggregate per region';
 
 create unique index if not exists mv_flood_event_world_pop_uidx on mv_flood_event_world_pop(id);
+
+create index if not exists mv_flood_event_world_pop_sidx_geometry on mv_flood_event_world_pop using gist (geometry);

@@ -25,3 +25,6 @@ CREATE MATERIALIZED VIEW public.mv_flood_event_roads AS
    FROM (intersections a
      JOIN public.osm_roads b ON (public.st_intersects(a.geometry, b.geometry)))
   WITH NO DATA;
+
+
+create index if not exists mv_flood_event_roads_sidx_geometry on mv_flood_event_roads using gist (geometry);
