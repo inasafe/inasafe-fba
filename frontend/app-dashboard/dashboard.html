@@ -493,13 +493,15 @@
         </div>
         <div class="tab-wrapper tab-population" style="display: none">
             <div class="col-lg-12">
-                <div class="col-lg-5 box-vulnerability">
-                    <div class="vulnerability-score">-</div>
-                    <div class="subtext">Vulnerability Score Total</div>
+                <div class="col-lg-5 box-summary-count">
+                    <div class="exposed-census-count summary-count">-</div>
+                    <div class="subtext">Population in affected admin boundaries</div>
+                    <div class="subtext">(Census data)</div>
                 </div>
                 <div class="col-lg-5 box-exposed">
                     <div class="exposed-count">-</div>
                     <div class="subtext">Potentially affected population</div>
+                    <div class="subtext">(World Population stats)</div>
                 </div>
             </div>
             <div class="col-lg-12 panel-chart-primary" style="min-height: 250px">
@@ -543,7 +545,7 @@
         <td class="box-count-right">
             <div class="box-count">
                 <div class="score population"><%= flooded_population_count %></div>
-                <div class="subtext">Potentially affected population</div>
+                <div class="subtext">Potentially affected population (World Population stats)</div>
             </div>
         </td>
     </tr>

@@ -15,11 +15,15 @@ define([
     'js/model/road_village_summary.js',
     'js/model/population_district_summary.js',
     'js/model/population_sub_district_summary.js',
-    'js/model/population_village_summary.js'
+    'js/model/population_village_summary.js',
+    'js/model/world_population_district_summary.js',
+    'js/model/world_population_sub_district_summary.js',
+    'js/model/world_population_village_summary.js',
 ], function (Backbone, _, moment, L, Wellknown, utils, ForecastEvent, TriggerStatusCollection,
              DistrictSummaryCollection, SubDistrictSummaryCollection, VillageSummaryCollection,
              RoadDistrictSummaryCollection, RoadSubDistrictSummaryCollection, RoadVillageSummaryCollection,
-             PopulationDistrictSummaryCollection, PopulationSubDistrictSummaryCollection, PopulationVillageSummaryCollection) {
+             PopulationDistrictSummaryCollection, PopulationSubDistrictSummaryCollection, PopulationVillageSummaryCollection,
+             WorldPopulationDistrictSummaryCollection, WorldPopulationSubDistrictSummaryCollection, WorldPopulationVillageSummaryCollection) {
     return Backbone.View.extend({
         el: '.panel-browse-flood',
         forecasts_list: [],
@@ -40,6 +44,9 @@ define([
         populationVillageStats: null,
         populationSubDistrictStats: null,
         populationDistrictStats: null,
+        worldPopulationVillageStats: null,
+        worldPopulationSubDistrictStats: null,
+        worldPopulationDistrictStats: null,
         areaLookup: null,
         fetchedDate: {},
         events: {
@@ -78,6 +85,9 @@ define([
             this.population_village_summaries = new PopulationVillageSummaryCollection();
             this.population_district_summaries = new PopulationDistrictSummaryCollection();
             this.population_subdistrict_summaries = new PopulationSubDistrictSummaryCollection();
+            this.world_population_village_summaries = new WorldPopulationVillageSummaryCollection();
+            this.world_population_district_summaries = new WorldPopulationDistrictSummaryCollection();
+            this.world_population_subdistrict_summaries = new WorldPopulationSubDistrictSummaryCollection();
 
             // dispatcher registration
             dispatcher.on('flood:fetch-forecast-collection', this.fetchForecastCollection, this);
@@ -779,56 +789,76 @@ define([
             dispatcher.trigger('dashboard:render-chart-population', overall, 'population');
             dispatcher.trigger('dashboard:render-region-summary', overall, population, main_panel, region_render, that.keyStats[region_render], 'population');
         },
-        fetchPopulationDistrictData: function (flood_event_id) {
+        _merge_population_stats: function(flood_event_id, stats_data, stats_collections, region){
             let that = this;
-            this.population_district_summaries.fetch({
-                data: {
-                    flood_event_id: `eq.${flood_event_id}`,
-                    order: 'trigger_status.desc'
+            let region_id = `${region}_id`;
+            let stats_promises = stats_collections.map((o, i) => o.fetch({
+                    data: {
+                        flood_event_id: `eq.${flood_event_id}`,
+                        order: 'trigger_status.desc,flooded_population_count.desc'
+                    }
+                }));
+            Promise.all(stats_promises).then(function (data) {
+                // merge data from world pop to census population
+                // merge is done by region_id key
+                let merged_pop_data = [];
+                let base_data = data[0]
+                let extra_data = data[1]
+                while(base_data.length > 0){
+                    let base_stat = base_data.pop();
+                    let matching_extra_stat_index = extra_data.findIndex( s => s[region_id] === base_stat[region_id]);
+                    let matching_extra_stat = extra_data[matching_extra_stat_index];
+                    if(matching_extra_stat_index > -1) {
+                        extra_data.splice(matching_extra_stat_index, 1);
+                    }
+                    // mark population count of census as a census_count key
+                    base_stat['census_count'] = base_stat['flooded_population_count'];
+                    delete base_stat['flooded_population_count'];
+                    delete base_stat['population_count'];
+                    let merged_stat = {...base_stat, ...matching_extra_stat};
+                    merged_pop_data.push(merged_stat);
                 }
-            }).then(function (data) {
-                that.populationDistrictStats = data;
+                // sort by affected population (descending)
+                merged_pop_data.sort( (a,b) => b['flooded_population_count'] - a['flooded_population_count'])
+                that[stats_data[0]] = merged_pop_data;
+                that[stats_data[1]] = extra_data;
                 if (that.populationVillageStats !== null && that.populationDistrictStats !== null && that.populationSubDistrictStats !== null) {
+                    console.log(that.populationVillageStats);
+                    console.log(that.populationSubDistrictStats);
+                    console.log(that.populationDistrictStats);
                     that.fetchPopulationStatisticData('district', that.selected_forecast.id, true);
                 }
             }).catch(function (data) {
-                console.log('District stats request failed');
+                console.log(`${region} stats request failed: ${stats_data[i]}`);
                 console.log(data);
             });
+        },
+        fetchPopulationDistrictData: function (flood_event_id) {
+            let that = this;
+
+            // Population data stats are a combined data from census population and world pop population stats
+            let stats_collections = [this.population_district_summaries, this.world_population_district_summaries];
+            let stats_data = ['populationDistrictStats', 'worldPopulationDistrictStats'];
+            let region = 'district';
+            this._merge_population_stats(flood_event_id, stats_data, stats_collections, region);
         },
         fetchPopulationSubDistrictData: function (flood_event_id) {
             let that = this;
-            this.population_subdistrict_summaries.fetch({
-                data: {
-                    flood_event_id: `eq.${flood_event_id}`,
-                    order: 'trigger_status.desc'
-                }
-            }).then(function (data) {
-                that.populationSubDistrictStats = data;
-                if (that.populationVillageStats !== null && that.populationDistrictStats !== null && that.populationSubDistrictStats !== null) {
-                    that.fetchPopulationStatisticData('district', that.selected_forecast.id, true);
-                }
-            }).catch(function (data) {
-                console.log('Sub district stats request failed');
-                console.log(data);
-            })
+
+            // Population data stats are a combined data from census population and world pop population stats
+            let stats_collections = [this.population_subdistrict_summaries, this.world_population_subdistrict_summaries];
+            let stats_data = ['populationSubDistrictStats', 'worldPopulationSubDistrictStats'];
+            let region = 'sub_district';
+            this._merge_population_stats(flood_event_id, stats_data, stats_collections, region);
         },
         fetchPopulationVillageData: function (flood_event_id) {
             let that = this;
-            this.population_village_summaries.fetch({
-                data: {
-                    flood_event_id: `eq.${flood_event_id}`,
-                    order: 'trigger_status.desc'
-                }
-            }).then(function (data) {
-                that.populationVillageStats = data;
-                if (that.populationVillageStats !== null && that.populationDistrictStats !== null && that.populationSubDistrictStats !== null) {
-                    that.fetchPopulationStatisticData('district', that.selected_forecast.id, true);
-                }
-            }).catch(function (data) {
-                    console.log('Village stats request failed');
-                    console.log(data)
-            });
-        },
+
+            // Population data stats are a combined data from census population and world pop population stats
+            let stats_collections = [this.population_village_summaries, this.world_population_village_summaries];
+            let stats_data = ['populationVillageStats', 'worldPopulationVillageStats'];
+            let region = 'village';
+            this._merge_population_stats(flood_event_id, stats_data, stats_collections, region);
+        }
     })
 });
