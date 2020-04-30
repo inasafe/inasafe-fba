@@ -59,6 +59,7 @@ language plpython3u
 as
 $$
 from fbf.forecast.glofas.reporting_point import GloFASForecast
+from dateutil import parser
 import json
 rv = plpy.execute("SELECT value FROM config WHERE key = 'POSTGREST_BASE_URL'")
 postgrest_url = json.loads(rv[0]['value'])
@@ -71,7 +72,10 @@ reporting_point_source += (
 job = GloFASForecast(
     reporting_point_layer_source=reporting_point_source,
     postgrest_url=postgrest_url)
-job.acquisition_time = acquisition_date
+if isinstance(acquisition_date, str):
+    job.acquisition_time = parser.parse(acquisition_date)
+else:
+    job.acquisition_time = acquisition_date
 job.run()
 return 'OK'
 $$;
