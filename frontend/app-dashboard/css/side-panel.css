@@ -429,3 +429,42 @@ form label {
 .panel-chart, .panel-chart-road, .panel-chart-primary {
     margin-top: 15px
 }
+
+form input[type=file] {
+    height: 37px !important;
+}
+
+form label {
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.hazard-input {
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+}
+
+.hazard-input select {
+    cursor: pointer;
+}
+
+.hazard-input-guide {
+    font-size: 12px;
+}
+
+.hazard-input-guide .fa {
+    color: green;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.hazard-input-guide table {
+    margin-top: 10px;
+}
+
+.hazard-input-guide td, .hazard-input-guide th {
+    text-align: left;
+    border: 1px solid #ddd;
+    padding: 3px;
+}

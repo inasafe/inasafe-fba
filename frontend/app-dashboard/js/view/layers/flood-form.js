@@ -18,6 +18,7 @@ define([
             this.$depth_class = $form.find("input[name='depth_class']");
             this.$acquisition_date = $form.find("input[name='acquisition_date']");
             this.$forecast_date = $form.find("input[name='forecast_date']");
+            this.$hazard_type = $form.find("select[name='hazard_type']");
         },
         create_data: function (polygon) {
             const that = this;
@@ -33,6 +34,7 @@ define([
             const depth_class = this.$depth_class.val();
             const acquisition_date = new Date(this.$acquisition_date.val()).toMysqlFormat();
             const forecast_date = new Date(this.$forecast_date.val()).toMysqlFormat();
+            const hazard_type = this.$hazard_type.val();
 
             // assign depth class to geojson
             const feature = Wellknown.parse(polygon);
@@ -53,7 +55,8 @@ define([
                 link: source_url,
                 notes: event_notes,
                 acquisition_date: acquisition_date,
-                forecast_date: forecast_date
+                forecast_date: forecast_date,
+                hazard_type_id: hazard_type
             };
 
             const forecast_event = new ForecastEvent(forecast_event_attr);

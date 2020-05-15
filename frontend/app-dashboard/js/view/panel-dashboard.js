@@ -96,7 +96,7 @@ define([
                 callback();
             }
         },
-        renderRegionSummary: function (overall, data, main_panel, sub_region, id_field, exposure_name) {
+        renderRegionSummary: function (overall, data, main_panel, sub_region, id_field, exposure_name, hazard_type) {
             // main panel title (the region)
             let that = this;
             let id_key = {
@@ -116,7 +116,12 @@ define([
                 if (!that.containsReferer(referer, that.referer_region)) {
                     that.referer_region.push(referer);
                 }
-                $('#main-panel-header').html('Summary for Flood ' + floodCollectionView.selected_forecast.attributes.notes)
+                if (!hazard_type) {
+                   hazard_type = 'hazard'
+                } else {
+                    hazard_type = hazard_type['name']
+                }
+                $('#main-panel-header').html(`Summary for <b>${hazard_type}</b> ${floodCollectionView.selected_forecast.attributes.notes}`)
             } else {
                 $('.btn-back-summary-panel').show();
                 let referer = {

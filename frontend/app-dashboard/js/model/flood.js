@@ -45,7 +45,7 @@ define([
             _geojson_attrs: {
                 flood_class_field: "class"
             },
-        
+
             initialize: function (){
                 this._uploaded_features = 0;
                 this.on('feature-uploaded', this.featureUploaded, this);
@@ -66,7 +66,7 @@ define([
                 }
                 return 0;
             },
-        
+
             featureUploaded: function(feature){
                 if(feature) {
                     this._uploaded_features++;
@@ -256,7 +256,7 @@ define([
                 }
                 return false;
             },
-        
+
             _validateDepthClassAttribute: function () {
                 const geojson = this.get('geojson');
                 const areas = geojson.features;
@@ -283,7 +283,10 @@ define([
 
                     function _process_geojson(geojson){
                         try {
-                            const layer = FloodLayer.fromGeoJSON(JSON.parse(geojson));
+                            const layer = FloodLayer.fromGeoJSON(
+                                JSON.parse(geojson),
+                                {classes :flood_map_attributes.hazard_classes}
+                            );
                             layer.set({
                                 place_name: place_name,
                                 return_period: return_period,
@@ -360,8 +363,19 @@ define([
                 const validated_geojson = layer.get('geojson');
 
                 const areas = validated_geojson.features.map(function(value){
+                    // check the class based on the
+                    let hazardClass = value.properties[layer._geojson_attrs.flood_class_field]
+                    if (attributes && attributes['classes']) {
+                        if (!attributes['classes'].includes(hazardClass)){
+                            let e = {
+                                'layer': layer,
+                                'message': `Class "${hazardClass}" is not valid for selected hazard`
+                            }
+                            throw e
+                        }
+                    }
                     return {
-                        depth_class: value.properties[layer._geojson_attrs.flood_class_field],
+                        depth_class: hazardClass,
                         geometry: value.geometry
                     }
                 })

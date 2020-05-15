@@ -500,7 +500,7 @@ define([
                 overall['region'] = region;
             }
             dispatcher.trigger('dashboard:render-chart-building', overall, 'building');
-            dispatcher.trigger('dashboard:render-region-summary', overall, buildings, main_panel, region_render, that.keyStats[region_render], 'building');
+            dispatcher.trigger('dashboard:render-region-summary', overall, buildings, main_panel, region_render, that.keyStats[region_render], 'building', this.selected_forecast.get('hazard_type'));
         },
         fetchVillageData: function (flood_event_id) {
             let that = this;
@@ -661,7 +661,7 @@ define([
                 overall['region'] = region;
             }
             dispatcher.trigger('dashboard:render-chart-road', overall, 'road');
-            dispatcher.trigger('dashboard:render-region-summary', overall, roads, main_panel, region_render, that.keyStats[region_render], 'road');
+            dispatcher.trigger('dashboard:render-region-summary', overall, roads, main_panel, region_render, that.keyStats[region_render], 'road', this.selected_forecast.get('hazard_type'));
         },
         fetchRoadDistrictData: function (flood_event_id) {
             let that = this;
@@ -787,7 +787,7 @@ define([
                 overall['region'] = region;
             }
             dispatcher.trigger('dashboard:render-chart-population', overall, 'population');
-            dispatcher.trigger('dashboard:render-region-summary', overall, population, main_panel, region_render, that.keyStats[region_render], 'population');
+            dispatcher.trigger('dashboard:render-region-summary', overall, population, main_panel, region_render, that.keyStats[region_render], 'population', this.selected_forecast.get('hazard_type'));
         },
         _merge_population_stats: function(flood_event_id, stats_data, stats_collections, region){
             let that = this;

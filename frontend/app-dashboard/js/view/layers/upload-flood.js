@@ -4,8 +4,9 @@ define([
     'jquery',
     'moment',
     'js/model/flood.js',
-    'js/model/forecast_event.js'
-], function (Backbone, _, $, moment, FloodModel, ForecastEvent) {
+    'js/model/forecast_event.js',
+    'js/view/forms/hazard-type-input.js'
+], function (Backbone, _, $, moment, FloodModel, ForecastEvent, HazardTypeInput) {
     return Backbone.View.extend({
         el: "#upload-flood-form",
         events: {
@@ -25,6 +26,8 @@ define([
             this.$return_period = $form.find("select[name='return_period']");
             this.$acquisition_date = $form.find("input[name='acquisition_date']");
             this.$forecast_date = $form.find("input[name='forecast_date']");
+            this.$hazard_type = $form.find("select[name='hazard_type']");
+            this.hazardInput = new HazardTypeInput($('#upload-flood-form'));
         },
 
         submitForm: function(e){
@@ -43,14 +46,15 @@ define([
             const return_period = this.$return_period.val();
             const acquisition_date = moment.fromAirDateTimePicker(this.$acquisition_date.val()).format();
             const forecast_date = moment.fromAirDateTimePicker(this.$forecast_date.val()).format();
-
+            const hazard_type = this.$hazard_type.val();
 
             const forecast_event_attr = {
                 source: source,
                 link: source_url,
                 notes: event_notes,
                 acquisition_date: acquisition_date,
-                forecast_date: forecast_date
+                forecast_date: forecast_date,
+                hazard_type_id: hazard_type
             };
 
             const forecast_event = new ForecastEvent(forecast_event_attr);
@@ -60,7 +64,9 @@ define([
                 files: geojson,
                 place_name: place_name,
                 return_period: return_period,
-                flood_model_notes: flood_model_notes})
+                flood_model_notes: flood_model_notes,
+                hazard_classes: that.hazardInput.returnCurrentClasses()
+            })
                 .then(function(flood){
                     that.flood = flood;
 

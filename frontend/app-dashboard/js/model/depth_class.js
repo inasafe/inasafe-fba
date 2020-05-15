@@ -18,7 +18,7 @@ define([
 
     return Backbone.Collection.extend({
         model: DepthClass,
-        urlRoot: postgresUrl + 'hazard_class',
+        urlRoot: postgresUrl + 'hazard_class?order=id',
         url: function () {
             return this.urlRoot
         }

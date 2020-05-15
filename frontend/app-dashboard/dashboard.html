@@ -47,10 +47,10 @@
 					forecast dashboard to trigger Early Action.</p>
 
 					<p>To get started, use the green flood selector icon below to
-					select a historical or forecast flood event (valid 
+					select a historical or forecast flood event (valid
 					dates have circles around them).</p>
-				    
-					<p>This site is developed in collaboration with the 
+
+					<p>This site is developed in collaboration with the
 					<a href="https://www.climatecentre.org">Red
 					Cross Red Crescent Climate Centre</a> with funding from the
 					World Bank GFDRR Challenge Fund and contributing to the
@@ -96,7 +96,7 @@
             <div class="panel-body-wrapper panel-body panel-flood-scenario" style="display: none">
                 <button class="btn btn-back pull-left"><i class="fa fa-chevron-circle-left" aria-hidden="true"></i></button>
                 <div class="panel-title">
-                    Add Flood Forecast 
+                    Add Flood Forecast
                 </div>
                 <div class="panel-body">
                     <button class="btn btn-warning btn-primary-1 btn-full-width" id="draw-flood" style="display: none;">Draw Flood Forecast</button>
@@ -115,6 +115,9 @@
                     <div id="draw-flood-form">
                         <form role="form" id="draw-form" enctype="multipart/form-data" class="form-horizontal">
                             <div class="form-group">
+                                <label for="draw_hazard_type">Hazard type</label>
+                                <select class="form-control" name="hazard_type" id="draw_hazard_type" required></select>
+
                                 <label for="draw_place_name">Place name</label>
                                 <input class="form-control" name="place_name" id="draw_place_name" type="text">
                                 <label for="draw_event_notes">Event notes</label>
@@ -138,11 +141,11 @@
                                 <div class="row">
                                     <div class="col-lg-6" style="padding-right: 5px">
                                         <label for="draw_acquisition_date">Acquisition date </label>
-                                        <input class="form-control datepicker-here" data-language="en" data-timepicker="true" data-position="left bottom" type="text" name="acquisition_date" id="draw_acquisition_date" style="font-size: 10px;">
+                                        <input class="form-control datepicker-here" data-language="en" data-timepicker="true" data-position="left bottom" type="text" name="acquisition_date" id="draw_acquisition_date" style="font-size: 10px;" autocomplete="off">
                                     </div>
                                     <div class="col-lg-6" style="padding-left: 5px">
                                         <label for="draw_forecast_date">Forecast date </label>
-                                        <input class="form-control datepicker-here" data-language="en" data-timepicker="true" data-position="left bottom" type="text" name="forecast_date" id="draw_forecast_date" style="font-size: 10px;">
+                                        <input class="form-control datepicker-here" data-language="en" data-timepicker="true" data-position="left bottom" type="text" name="forecast_date" id="draw_forecast_date" style="font-size: 10px;" autocomplete="off">
                                     </div>
                                 </div>
                                 <button type="submit" value="submit" class="btn btn-warning btn-primary-1 pull-right">Save</button>
@@ -158,6 +161,15 @@
                     <div id="upload-flood-form-wrapper">
                         <form role="form" method="post" id="upload-flood-form" enctype="multipart/form-data" class="form-horizontal" action="javascript:void(0)">
                             <div class="form-group">
+                                <div class="hazard-input">
+                                    <label for="hazard_type">Hazard type</label>
+                                    <select class="form-control" name="hazard_type" id="hazard_type" required></select>
+                                    <div class="hazard-input-guide">
+                                        Geojson need <b>class</b> on property, which the value are : <i class="fa fa-caret-square-o-down" aria-hidden="true"></i>
+                                        <div class="hazard-input-guide-content" style="display: none">
+                                        </div>
+                                    </div>
+                                </div>
                                 <label for="upload_place_name">Place name</label>
                                 <input class="form-control" name="place_name" id="upload_place_name" type="text">
                                 <label for="upload_source">Source</label>
@@ -182,11 +194,11 @@
                                 <div class="row">
                                     <div class="col-lg-6" style="padding-right: 5px">
                                         <label for="upload_acquisition_date">Acquisition date </label>
-                                        <input class="form-control datepicker-here" data-date-format="yyyy-mm-dd" data-time-format="hh:ii" data-language="en" data-timepicker="true" data-position="left bottom" type="text" name="acquisition_date" id="upload_acquisition_date" style="font-size: 10px;">
+                                        <input class="form-control datepicker-here" data-date-format="yyyy-mm-dd" data-time-format="hh:ii" data-language="en" data-timepicker="true" data-position="left bottom" type="text" name="acquisition_date" id="upload_acquisition_date" style="font-size: 10px;" autocomplete="off">
                                     </div>
                                     <div class="col-lg-6" style="padding-left: 5px">
                                         <label for="upload_forecast_date">Forecast date </label>
-                                        <input class="form-control datepicker-here" data-date-format="yyyy-mm-dd" data-time-format="hh:ii" data-language="en" data-timepicker="true" data-position="left bottom" type="text" name="forecast_date" id="upload_forecast_date" style="font-size: 10px;">
+                                        <input class="form-control datepicker-here" data-date-format="yyyy-mm-dd" data-time-format="hh:ii" data-language="en" data-timepicker="true" data-position="left bottom" type="text" name="forecast_date" id="upload_forecast_date" style="font-size: 10px;" autocomplete="off">
                                     </div>
                                 </div>
                                 <br/>
