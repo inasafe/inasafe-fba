@@ -32,30 +32,36 @@ define([
                 transparent: true,
                 tiled: true,
             };
+            if (!this.layer) {
+                // add the layer
+                this.layer = L.tileLayer.wms(
+                    this._url, parameters);
+                this.group = L.layerGroup([this.layer]);
+                this.map.addLayer(this.group);
+                this._id = this.layer._leaflet_id;
+            } else {
+                this.layer.setParams(parameters);
+            }
 
+            // for bbox layer
             let parameters_bbox = {
                 layers: this._bbox_layer,
                 format: 'image/png',
                 transparent: true,
                 tiled: true,
             };
-
             if (cqlFilters) {
                 parameters_bbox['cql_filter'] = cqlFilters
             }
-            if (!this.layer) {
-                // add the layer
-                this.bbox_layer = L.tileLayer.wms(
-                    this._url, parameters_bbox);
-
-                this.layer = L.tileLayer.wms(
-                    this._url, parameters);
-                this.group = L.layerGroup([this.layer, this.bbox_layer]);
-                this.map.addLayer(this.group);
-                this._id = this.layer._leaflet_id;
+            if (!this.bbox_layer) {
+                if(parameters_bbox.layers) {
+                    // add the layer
+                    this.bbox_layer = L.tileLayer.wms(
+                        this._url, parameters_bbox);
+                    this.group.addLayer(this.bbox_layer)
+                }
             } else {
                 delete (this.bbox_layer.wmsParams.cql_filter);
-                this.layer.setParams(parameters);
                 this.bbox_layer.setParams(parameters_bbox)
             }
         },

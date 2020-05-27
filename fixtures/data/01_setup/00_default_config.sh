@@ -11,7 +11,7 @@ for i in "${env_var[@]}"
 do
 	eval value=\$$i
 	query="INSERT INTO public.config (key, value) VALUES ('$i', '\"$value\"') ON CONFLICT (key) DO UPDATE SET key = '$i', value = '\"$value\"' ;"
-	if ! PGPASSWORD=${POSTGRES_PASS} psql -d ${POSTGRES_DB} -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -v ON_ERROR_STOP=1 -c "$query" -1; then
+	if ! PGPASSWORD=${POSTGRES_PASS} psql -d ${POSTGRES_DB} -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -v ON_ERROR_STOP=1 -c "$query" -1; then
 		echo "Config failed at query $query"
 		echo "Cancel import"
 		RETVAL=1

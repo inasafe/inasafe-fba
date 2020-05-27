@@ -9,7 +9,7 @@ for f in $(find $1 -name '*.sql' -o -name '*.sh' -o -name '*.py' | sort -n); do
 	case "$f" in
 		*.sql)
 			echo "Importing $f"
-			if ! PGPASSWORD=${POSTGRES_PASS} psql -d ${POSTGRES_DB} -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -v ON_ERROR_STOP=1 -f $f -1; then
+			if ! PGPASSWORD=${POSTGRES_PASS} psql -d ${POSTGRES_DB} -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -v ON_ERROR_STOP=1 -f $f -1; then
 				echo "Import failed on file $f"
 				echo "Cancel import"
 				RETVAL=1
