@@ -12,3 +12,4 @@ services:
     volumes:
       - geoserver-data:/opt/geoserver/data_dir
     user: root
+    restart: unless-stopped

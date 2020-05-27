@@ -1,5 +1,5 @@
 with find_hazard_event as (
-    select * from hazard_event where source = '[test]GloFAS - Reporting Point'
+    select * from hazard_event where source ilike '[test]%'
 ), delete_hazard_areas as (
     delete from hazard_areas where flood_map_id in (select distinct flood_map_id from find_hazard_event) returning *
 ), delete_hazard_area as (
