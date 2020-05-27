@@ -61,7 +61,7 @@ class GloFASForecast(object):
     _default_plpy_flood_event_insert_query = 'insert into flood_event (flood_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress) select flood_map_id, acquisition_date, forecast_date, source, notes, link, trigger_status, progress from json_populate_recordset(null::flood_event, $1) returning id'
 
     # Impact query
-    _default_impacted_village_query_filter = 'vw_village_impact?flood_event_id=eq.{flood_event_id}&impact_ratio=gte.{impact_limit}'
+    _default_impacted_village_query_filter = 'rpc/kartoza_fba_calculate_village_impact'
 
     # Region trigger status query
     _default_region_trigger_status_endpoint = '{region}_trigger_status'
@@ -588,13 +588,14 @@ class GloFASForecast(object):
         self.flood_forecast_events = flood_forecast_events
 
     def fetch_impacted_village(self, flood_event_id, impact_limit):
-        query_param = self.impacted_village_query_filter.format(
-            flood_event_id=flood_event_id,
-            impact_limit=impact_limit)
         url = '{postgrest_url}/{query_param}'.format(
             postgrest_url=self.postgrest_url,
-            query_param=query_param)
-        response = requests.get(url)
+            query_param=self.impacted_village_query_filter)
+        data = {
+            'event_id': flood_event_id,
+            'impact_limit': impact_limit
+        }
+        response = requests.post(url, json=data)
         return response.json()
 
     def find_region_trigger_status(self, region, flood_event_id):

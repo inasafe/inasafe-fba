@@ -10,11 +10,11 @@ services:
 env:
   # HTTP Port for the whole stack (nginx frontend proxy)
   # We can't use port 80 on travis
-  - HTTP_PORT=8080
-    WMS_BASE_URL=http://fbf.test:8080/geoserver/wms
-    GEOSERVER_BASE_URL=http://fbf.test:8080/geoserver
-    POSTGREST_BASE_URL=http://fbf.test:8080/api
-    PGRST_SERVER_PROXY_URI=http://fbf.test:8080/api
+  - HTTP_PORT=80
+    WMS_BASE_URL=http://fbf.test/geoserver/wms
+    GEOSERVER_BASE_URL=http://fbf.test/geoserver
+    POSTGREST_BASE_URL=http://fbf.test/api
+    PGRST_SERVER_PROXY_URI=http://fbf.test/api
 
 addons:
   hosts:
@@ -58,6 +58,12 @@ before_script:
   - make wait-db-ready
   # Twice because db is restarting when initialized
   - make wait-db-ready
+  - pushd ../docker-osm/indonesia-buildings
+  - cat /etc/resolv.conf
+  - docker-compose exec db cat /etc/resolv.conf
+  - docker-compose exec db /bin/sh -c "apt -y update; apt -y install dnsutils"
+  - docker-compose exec db nslookup fbf.test
+  - popd
   - make backend-up SERVICE=imposm
   - make backend-first-pbf-import
   - make backend-wait-first-pbf-import

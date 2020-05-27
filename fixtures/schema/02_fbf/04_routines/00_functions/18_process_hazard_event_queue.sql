@@ -46,7 +46,7 @@ as
 -- include in cron
 insert into cron.job (schedule, command, nodename, username)
 select
-    '*/5 * * * *', $$ select kartoza_process_hazard_event_queue() $$, '', 'postgres'
+    '0 * * * *', $$ select kartoza_process_hazard_event_queue() $$, '', 'postgres'
 where
     not exists(
         select schedule, command, nodename, username from cron.job
@@ -55,7 +55,7 @@ where
 
 insert into cron.job (schedule, command, nodename, username)
 select
-    '*/5 * * * *', $$ select kartoza_fba_forecast_glofas_update_trigger_status(id) from hazard_event where progress = 1 $$, '', 'postgres'
+    '30 * * * *', $$ select kartoza_fba_forecast_glofas_update_trigger_status(id) from hazard_event where progress = 1 $$, '', 'postgres'
 where
     not exists(
         select schedule, command, nodename, username from cron.job
