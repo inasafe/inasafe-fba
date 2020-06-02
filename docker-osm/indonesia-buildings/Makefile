@@ -13,8 +13,15 @@ prepare-integration-tests:
 	@echo
 	@echo "------------------------------------------------------------------"
 	@echo "Do preparations for default integration tests"
+	@echo "You can specify options for RESOURCES_IMAGE_NAME:RESOURCES_IMAGE_TAG docker image resources"
+	@echo "RESOURCES_IMAGE_NAME"
+	@echo "RESOURCES_IMAGE_TAG"
 	@echo "------------------------------------------------------------------"
-	@WORKING_DIR=$(PWD); FIXTURES_PATH=$(PWD)/../../fixtures; source $${FIXTURES_PATH}/tests/scripts/integration-tests-prepare.sh
+	@WORKING_DIR=$(PWD); \
+		FIXTURES_PATH=$(PWD)/../../fixtures; \
+		RESOURCES_IMAGE_NAME=$(or ${RESOURCES_IMAGE_NAME}, inasafe/inasafe-fba-resources) \
+		RESOURCES_IMAGE_TAG=$(or ${RESOURCES_IMAGE_TAG}, latest) \
+		source $${FIXTURES_PATH}/tests/scripts/integration-tests-prepare.sh
 
 upgrade-plpython-scripts:
 	@docker-compose exec db bash -c 'wget -qO- $${ARCHIVE_BASE_URL}/install-plpython-scripts.sh | bash'

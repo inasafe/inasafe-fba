@@ -32,8 +32,11 @@ export PBF_URL=${PBF_URL:-http://cloud.kartoza.com/s/sxR8anXo5fgFN9Q/download}
 # Retrieve PBF test files
 #echo "Downloading test PBF file: ${PBF_URL}"
 #curl -L ${PBF_URL} -o docker-osm-settings/custom_settings/country.pbf
-docker pull inasafe/inasafe-fba-resources:latest
-docker run --rm --name resources -d inasafe/inasafe-fba-resources:latest tail -f /dev/null
+export RESOURCES_IMAGE_TAG=${RESOURCES_IMAGE_TAG:-latest}
+export RESOURCES_IMAGE_NAME=${RESOURCES_IMAGE_NAME:-inasafe/inasafe-fba-resources}
+echo "Image resources: ${RESOURCES_IMAGE_NAME}:${RESOURCES_IMAGE_TAG}"
+docker pull ${RESOURCES_IMAGE_NAME}:${RESOURCES_IMAGE_TAG}
+docker run --rm --name resources -d ${RESOURCES_IMAGE_NAME}:${RESOURCES_IMAGE_TAG} tail -f /dev/null
 docker cp resources:/home/country.pbf docker-osm-settings/custom_settings/country.pbf.cp
 cp -rn docker-osm-settings/custom_settings/country.pbf.cp docker-osm-settings/custom_settings/country.pbf
 rm -f docker-osm-settings/custom_settings/country.pbf.cp
