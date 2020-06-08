@@ -10,6 +10,7 @@ volumes:
     driver_opts:
       type: none
       device: ${PWD}/mapfiles
+      o: bind
 
 services:
   mapserver:
@@ -17,4 +18,4 @@ services:
       - repo-volume:/opt/inasafe-fba
       - mapfiles-volume:/etc/mapserver
     ports:
-      - "${MAPSERVER_PORT}:8080"
+      - "${MAPSERVER_PORT}:80"

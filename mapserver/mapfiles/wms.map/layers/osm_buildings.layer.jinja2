@@ -1,0 +1,21 @@
+
+    LAYER
+		NAME "osm_buildings"
+		METADATA
+			"ows_title" "osm_buildings"
+			"ows_onlineresource" "{{ MAPSERVER_PUBLIC_WMS_URL }}?SLD={{ MAPSERVER_PUBLIC_WMS_URL }}/styles/osm_buildings.sld&"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from osm_buildings using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END

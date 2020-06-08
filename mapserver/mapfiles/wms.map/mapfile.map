@@ -23,7 +23,8 @@ MAP
 	END
 
 	# Reporting point
-	LAYER
+	
+    LAYER
 		NAME "reporting_point"
 		METADATA
 			"ows_title" "reporting_point"
@@ -44,7 +45,8 @@ MAP
 	END
 
 	# District Boundary
-	LAYER
+	
+    LAYER
 		NAME "district_boundary"
 		METADATA
 			"ows_title" "district_boundary"
@@ -65,7 +67,8 @@ MAP
 	END
 
 	# Sub District Boundary
-	LAYER
+	
+    LAYER
 		NAME "sub_district_boundary"
 		METADATA
 			"ows_title" "sub_district_boundary"
@@ -86,7 +89,8 @@ MAP
 	END
 
 	# Village Boundary
-	LAYER
+	
+    LAYER
 		NAME "village_boundary"
 		METADATA
 			"ows_title" "village_boundary"
@@ -107,7 +111,8 @@ MAP
 	END
 
 	# OSM layers
-	LAYER
+	
+    LAYER
 		NAME "osm_admin"
 		METADATA
 			"ows_title" "osm_admin"
@@ -127,16 +132,12 @@ MAP
 		END
 	END
 
-	LAYER
+	
+    LAYER
 		NAME "osm_buildings"
 		METADATA
 			"ows_title" "osm_buildings"
-			"ows_onlineresource" "http://fbf.test/mapserver/wms?SLD=http://fbf.test/styles/osm_buildings.sld&"
-			"wms_style" "default"
-			"wms_style_default_legendurl_format" "image/png"
-			"wms_style_default_legendurl_width" "-1"
-			"wms_style_default_legendurl_height" "-1"
-			"wms_style_default_legendurl_href" "http://fbf.test/mapserver/wms?version=1.3.0&service=WMS&request=GetLegendGraphic&sld_version=1.1.0&layer=osm_buildings&format=image/png&STYLE=default&sld=http://fbf.test/styles/osm_buildings.sld"
+			"ows_onlineresource" "http://fbf.test/mapserver/wms?SLD=http://fbf.test/mapserver/wms/styles/osm_buildings.sld&"
 		END
 		STATUS ON
 		TYPE POLYGON
@@ -153,7 +154,8 @@ MAP
 		END
 	END
 
-	LAYER
+	
+    LAYER
 		NAME "osm_roads"
 		METADATA
 			"ows_title" "osm_roads"
@@ -173,7 +175,8 @@ MAP
 		END
 	END
 
-	LAYER
+	
+    LAYER
 		NAME "osm_waterways"
 		METADATA
 			"ows_title" "osm_waterways"
