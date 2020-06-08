@@ -7,3 +7,5 @@ docker-osm
 fixtures
 documents
 geoserver
+mapserver
+temp

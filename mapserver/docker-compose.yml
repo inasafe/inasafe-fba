@@ -1,0 +1,5 @@
+version: '2.1'
+services:
+  mapserver:
+    image: camptocamp/mapserver:7.4
+    restart: unless-stopped

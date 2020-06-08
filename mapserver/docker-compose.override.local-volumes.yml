@@ -1,0 +1,20 @@
+version: '2.1'
+volumes:
+  # When using bind mount, make sure all these folders exists
+  repo-volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/../../
+      o: bind
+  mapfiles-volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/mapfiles
+
+services:
+  mapserver:
+    volumes:
+      - repo-volume:/opt/inasafe-fba
+      - mapfiles-volume:/etc/mapserver
+    ports:
+      - "${MAPSERVER_PORT}:8080"
