@@ -1,0 +1,28 @@
+
+    LAYER
+		NAME "flood_map_district"
+		METADATA
+			"ows_title" "flood_map_district"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geom from (select row_number() OVER () AS id,
+    							a.flood_event_id,
+                                a.district_id,
+								a.name,
+								a.trigger_status,
+                                b.geom
+                                from
+                                mv_flood_event_district_summary a
+                                join district b on b.dc_code = a.district_id) as subquery using unique id using srid=4326"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END
