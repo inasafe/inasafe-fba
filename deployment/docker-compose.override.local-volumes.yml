@@ -2,6 +2,7 @@ version: '2.1'
 services:
   inasafe-fba:
     volumes:
+      - ../:${REPO_ROOT}
       - ../frontend/app-dashboard:/usr/share/nginx/app-dashboard
     ports:
       - "${HTTP_PORT}:80"

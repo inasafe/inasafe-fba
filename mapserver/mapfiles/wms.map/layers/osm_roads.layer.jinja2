@@ -1,0 +1,21 @@
+
+    LAYER
+		NAME "osm_roads"
+        GROUP "web"
+		METADATA
+			"ows_title" "osm_roads"
+		END
+		STATUS ON
+		TYPE LINE
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from osm_roads using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+                WIDTH 2
+			END
+		END
+	END

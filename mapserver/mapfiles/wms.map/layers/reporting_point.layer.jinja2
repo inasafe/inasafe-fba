@@ -1,0 +1,20 @@
+
+    LAYER
+		NAME "reporting_point"
+		METADATA
+			"ows_title" "reporting_point"
+		END
+		STATUS ON
+		TYPE POINT
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from reporting_point using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END

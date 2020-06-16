@@ -1,5 +1,8 @@
 
 
+docker-build:
+	@docker-compose build
+
 up:
 	@docker-compose up -d
 
@@ -69,3 +72,12 @@ geoserver-down:
 
 wait-geoserver-ready:
 	@cd ../geoserver; $(MAKE) wait-geoserver-ready
+
+mapserver-up:
+	@cd ../mapserver; $(MAKE) up
+
+mapserver-down:
+	@cd ../mapserver; $(MAKE) down
+
+mapserver-generate-mapfile:
+	@docker-compose exec inasafe-fba bash -c 'python3 $${REPO_ROOT}/deployment/docker/scripts/generate_conf.py $${REPO_ROOT}/mapserver/mapfiles/wms.map mapfile.map.jinja2 $${REPO_ROOT}/mapserver/mapfiles/wms.map/mapfile.map; chmod -R a+r $${REPO_ROOT}/mapserver/mapfiles'

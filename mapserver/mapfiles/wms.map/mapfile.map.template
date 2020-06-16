@@ -1,0 +1,190 @@
+MAP
+	CONFIG "MS_ERRORFILE" "/tmp/inasafe_map_error.txt"
+	DEBUG 5
+	NAME "inasafe-fba"
+	IMAGETYPE PNG
+	EXTENT -180 -90 180 90
+	SIZE 800 800
+	UNITS meters
+	IMAGECOLOR -1 -1 -1
+
+
+	PROJECTION
+		"init=epsg:4326"
+	END
+
+	WEB
+		METADATA
+			"ows_title"	"inasafe-fba"
+			"ows_onlineresource" "{{ MAPSERVER_PUBLIC_WMS_URL }}"
+			"ows_srs" "EPSG:4326"
+			"ows_enable_request" "*"
+		END
+	END
+
+	# Reporting point
+	LAYER
+		NAME "reporting_point"
+		METADATA
+			"ows_title" "reporting_point"
+		END
+		STATUS ON
+		TYPE POINT
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from reporting_point using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END
+
+	# District Boundary
+	LAYER
+		NAME "district_boundary"
+		METADATA
+			"ows_title" "district_boundary"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geom from district using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END
+
+	# Sub District Boundary
+	LAYER
+		NAME "sub_district_boundary"
+		METADATA
+			"ows_title" "sub_district_boundary"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geom from sub_district using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END
+
+	# Village Boundary
+	LAYER
+		NAME "village_boundary"
+		METADATA
+			"ows_title" "village_boundary"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geom from village using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END
+
+	# OSM layers
+	LAYER
+		NAME "osm_admin"
+		METADATA
+			"ows_title" "osm_admin"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from osm_admin using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END
+
+	LAYER
+		NAME "osm_buildings"
+		METADATA
+			"ows_title" "osm_buildings"
+			"ows_onlineresource" "{{ MAPSERVER_PUBLIC_WMS_URL }}?SLD={{ MAPSERVER_PUBLIC_WMS_URL }}/styles/osm_buildings.sld&"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from osm_buildings using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END
+
+	LAYER
+		NAME "osm_roads"
+		METADATA
+			"ows_title" "osm_roads"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from osm_roads using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END
+
+	LAYER
+		NAME "osm_waterways"
+		METADATA
+			"ows_title" "osm_waterways"
+		END
+		STATUS ON
+		TYPE POLYGON
+		CONNECTIONTYPE postgis
+		CONNECTION "host={{ POSTGRES_HOST }} port={{ POSTGRES_PORT }} dbname={{ POSTGRES_DB }} user={{ POSTGRES_USER }} password={{ POSTGRES_PASS }}"
+		DATA "geometry from osm_waterways using unique id"
+
+		CLASS
+			NAME "default"
+			STYLE
+				COLOR 255 0 0
+				OUTLINECOLOR 0 0 0
+			END
+		END
+	END
+END

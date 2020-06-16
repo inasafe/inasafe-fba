@@ -1,0 +1,58 @@
+MAP
+	CONFIG "MS_ERRORFILE" "/tmp/inasafe_map_error.txt"
+	DEBUG 5
+	NAME "inasafe-fba"
+	IMAGETYPE PNG
+	EXTENT -180 -90 180 90
+	SIZE 800 800
+	UNITS meters
+	IMAGECOLOR -1 -1 -1
+
+
+	PROJECTION
+		"init=epsg:4326"
+	END
+
+	WEB
+		METADATA
+			"ows_title"	"inasafe-fba"
+			"ows_onlineresource" "{{ MAPSERVER_PUBLIC_WMS_URL }}"
+			"ows_srs" "EPSG:4326 EPSG:3857"
+			"ows_enable_request" "*"
+		END
+	END
+
+	# Reporting point
+	{% include "layers/reporting_point.layer.jinja2" %}
+
+	# District Boundary
+	{% include "layers/district_boundary.layer.jinja2" %}
+
+	# Sub District Boundary
+	{% include "layers/sub_district_boundary.layer.jinja2" %}
+
+	# Village Boundary
+	{% include "layers/village_boundary.layer.jinja2" %}
+
+	# OSM layers
+
+	{% include "layers/osm_buildings.layer.jinja2" %}
+
+	{% include "layers/osm_admin.layer.jinja2" %}
+
+	{% include "layers/osm_roads.layer.jinja2" %}
+
+	{% include "layers/osm_waterways.layer.jinja2" %}
+
+	{% include "layers/exposed_buildings.layer.jinja2" %}
+
+	{% include "layers/exposed_roads.layer.jinja2" %}
+
+	{% include "layers/flood_forecast_layer.layer.jinja2" %}
+
+	{% include "layers/flood_map_district.layer.jinja2" %}
+
+	{% include "layers/flood_map_sub_district.layer.jinja2" %}
+
+	{% include "layers/flood_map_village.layer.jinja2" %}
+END

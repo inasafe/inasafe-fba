@@ -157,12 +157,23 @@ define([
                 let title = this.sub_region_title_template;
                 let item_template = this.sub_region_item_template;
                 let $table = $('<table></table>');
-                let pivot_data = this.panel_handlers_hash['population'].stats_data
+                let pivot_data = this.panel_handlers_hash['population'].stats_data;
+                if (!pivot_data[0]) {
+                    $.each(this.panel_handlers_hash, function( key, value ) {
+                        if(value.stats_data[0]) {
+                            pivot_data = value.stats_data
+                        }
+                    });
+                }
+                console.log('test')
                 // We use population data as pivot because it always represents intersected admin boundaries
                 // If guarantees that this is a set of intersected admin boundaries with hazard
                 for(let u=0; u<pivot_data.length; u++){
                     let item = pivot_data[u];
-                    let trigger_status = pivot_data[u].trigger_status || 0;
+                    if (!item) {
+                        continue
+                    }
+                    let trigger_status = item.trigger_status || 0;
                     $table.append(item_template({
                         region: sub_region,
                         id: item[id_field],

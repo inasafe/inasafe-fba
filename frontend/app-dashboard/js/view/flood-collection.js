@@ -721,9 +721,9 @@ define([
 
             let that = this;
             let data = {
-                'village': that.populationVillageStats,
-                'district': that.populationDistrictStats,
-                'sub_district': that.populationSubDistrictStats
+                'village': that.populationVillageStats.length ? that.populationVillageStats: that.worldPopulationVillageStats,
+                'district': that.populationDistrictStats.length ? that.populationDistrictStats: that.worldPopulationDistrictStats,
+                'sub_district': that.populationSubDistrictStats.length ? that.populationSubDistrictStats : that.worldPopulationSubDistrictStats
             };
 
             let population = [];

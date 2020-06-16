@@ -1,0 +1,51 @@
+version: '2.1'
+volumes:
+  # When using bind mount, make sure all these folders exists
+  repo-volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/../../
+      o: bind
+  mapfiles-volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/mapfiles
+      o: bind
+
+services:
+  mapserver:
+    volumes:
+      - repo-volume:/opt/inasafe-fba
+      - mapfiles-volume:/etc/mapserver
+    ports:
+      - "${MAPSERVER_PORT}:80"
+  django-web:
+    ports:
+      - "${DJANGO_PORT}:8080"
+
+  django-uwsgi:
+    build:
+      context: django
+      dockerfile: Dockerfile
+
+  django-uwsgi-dev:
+    build:
+      context: django
+      dockerfile: Dockerfile-dev
+    environment:
+      DEBUG: "True"
+      DJANGO_SETTINGS_MODULE: core.settings.prod_docker
+      MAPSERVER_PUBLIC_WMS_URL: ${MAPSERVER_PUBLIC_WMS_URL}
+      MAPSERVER_PUBLIC_OWS_URL: ${MAPSERVER_PUBLIC_OWS_URL}
+      MAPSERVER_PUBLIC_SLD_URL: ${MAPSERVER_PUBLIC_SLD_URL}
+    volumes:
+      - ./fixtures:/home/web/fixtures
+      - ./django/django_project:/home/web/django_project
+      - ./django/volumes/static:/home/web/static
+      - ./django/volumes/media:/home/web/media
+      - ./django/volumes/logs:/var/log/
+    links:
+      - mapserver:mapserver
+    ports:
+      - "${DJANGO_DEV_SSH}:22"
+      - "${DJANGO_DEV_PORT}:8080"
