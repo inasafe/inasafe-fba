@@ -318,7 +318,7 @@ define([
             this.region_layer = L.tileLayer.wms(
                 geoserverUrl,
                 {
-                    layers: `kartoza:${region}_boundary`,
+                    layers: `${layerNamespace}${region}_boundary`,
                     format: 'image/png',
                     transparent: true,
                     srs: 'EPSG:4326',
@@ -356,7 +356,7 @@ define([
                 let exposed_layer = L.tileLayer.wms(
                     geoserverUrl,
                     {
-                        layers: `kartoza:exposed_buildings`,
+                        layers: `${layerNamespace}exposed_buildings`,
                         format: 'image/png',
                         transparent: true,
                         srs: 'EPSG:4326',
