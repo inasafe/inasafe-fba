@@ -18,7 +18,7 @@ define([
             FORMAT: 'image/png',
             WIDTH: 20,
             HEIGHT: 20,
-            LAYER: 'kartoza:exposed_buildings',
+            LAYER: `${layerNamespace}exposed_buildings`,
             LEGEND_OPTIONS: 'fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on'
         })}`,
         wmsFloodDepthLegendURI: `${geoserverUrl}?${$.param({
@@ -28,7 +28,7 @@ define([
             FORMAT: 'image/png',
             WIDTH: 20,
             HEIGHT: 20,
-            LAYER: 'kartoza:flood_forecast_layer',
+            LAYER: `${layerNamespace}flood_forecast_layer`,
             LEGEND_OPTIONS: 'fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on'
         })}`,
         wmsExposedRoadsLegendURI: `${geoserverUrl}?${$.param({
@@ -38,7 +38,7 @@ define([
             FORMAT: 'image/png',
             WIDTH: 20,
             HEIGHT: 20,
-            LAYER: 'kartoza:exposed_roads',
+            LAYER: `${layerNamespace}exposed_roads`,
             LEGEND_OPTIONS: 'fontName:Ubuntu;fontSize:12;fontAntiAliasing:true;forceLabels:on'
         })}`,
         markers: [],
@@ -401,7 +401,7 @@ define([
             this.exposed_road_layer = L.tileLayer.wms(
                 geoserverUrl,
                 {
-                    layers: 'kartoza:exposed_roads',
+                    layers: `${layerNamespace}exposed_roads`,
                     format: 'image/png',
                     transparent: true,
                     srs: 'EPSG:4326',
@@ -495,7 +495,7 @@ define([
                         SERVICE: 'WFS',
                         VERSION: '1.0.0',
                         REQUEST: 'GetFeature',
-                        TYPENAME: 'kartoza:reporting_point',
+                        TYPENAME: `${layerNamespace}reporting_point`,
                         MAXFEATURES: 50,
                         OUTPUTFORMAT: 'application/json'
                     })}`,

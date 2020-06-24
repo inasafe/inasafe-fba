@@ -5,8 +5,8 @@ define([
     'js/view/layers/layer-statistic/osm-rivers.js'], function (
     Backbone, L, WMSLayer, MultiselectFilter, Statistic) {
     return WMSLayer.extend({
-        _layersByIntersect: 'kartoza:waterways_bbox',
-        _layersByNotIntersect: 'kartoza:osm_waterways',
+        _layersByIntersect: `${layerNamespace}waterways_bbox`,
+        _layersByNotIntersect: `${layerNamespace}osm_waterways`,
         filters: function () {
             let that = this;
             let filter = new MultiselectFilter(

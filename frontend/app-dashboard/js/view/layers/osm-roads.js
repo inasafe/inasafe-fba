@@ -5,8 +5,8 @@ define([
     'js/view/layers/layer-statistic/osm-roads.js'], function (
     Backbone, L, WMSLayer, MultiselectFilter, Statistic) {
     return WMSLayer.extend({
-        _layersByIntersect: 'kartoza:roads_bbox',
-        _layersByNotIntersect: 'kartoza:osm_roads',
+        _layersByIntersect: `${layerNamespace}roads_bbox`,
+        _layersByNotIntersect: `${layerNamespace}osm_roads`,
         filters: function () {
             let that = this;
             let filter = new MultiselectFilter(
