@@ -12,10 +12,22 @@
 		DATA "geometry from osm_buildings using unique id"
 
 		CLASS
-			NAME "default"
+			NAME "Buildings"
+			MAXSCALEDENOM 10000.0
+			MINSCALEDENOM 1.0
 			STYLE
-				COLOR 100 0 0
-				OUTLINECOLOR 0 0 0
+				OPACITY 100.0
+				COLOR "#d9d0c8"
+			END
+		END
+
+		CLASS
+			NAME "OSM Buildings"
+			MAXSCALEDENOM 25000.0
+			MINSCALEDENOM 10001.0
+			STYLE
+				OPACITY 100.0
+                COLOR "#d9d0c8"
 			END
 		END
 	END

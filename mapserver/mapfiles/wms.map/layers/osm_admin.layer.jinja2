@@ -12,9 +12,53 @@
 		DATA "geometry from osm_admin using unique id"
 
 		CLASS
-			NAME "default"
+			NAME "Admin level 2"
+			EXPRESSION ([admin_level] = 2)
 			STYLE
-				OUTLINECOLOR 255 0 0
+				OPACITY 100.0
+				COLOR "#808080"
+			END
+		END
+
+		CLASS
+			NAME "Admin level 4"
+			EXPRESSION ([admin_level] = 4)
+			STYLE
+				WIDTH 1.0
+				OPACITY 100.0
+				COLOR "#ffffff"
+			END
+		END
+
+		CLASS
+			NAME "Admin level 5"
+			EXPRESSION ([admin_level] = 5)
+			STYLE
+				WIDTH 1.0
+				OPACITY 100.0
+				COLOR "#ffffff"
+			END
+		END
+
+		CLASS
+			NAME "Admin level 6"
+			EXPRESSION ([admin_level] = 6)
+			STYLE
+				WIDTH 1.0
+				OPACITY 100.0
+				COLOR "#ffffff"
+			END
+		END
+
+		CLASS
+			NAME "Admin level bigger than 7"
+			EXPRESSION (([admin_level] >= 7) OR ([admin_level] = 1) OR ([admin_level] is NULL))
+			MAXSCALEDENOM 500000.0
+			MINSCALEDENOM 1.0
+			STYLE
+				WIDTH 1.0
+				OPACITY 100.0
+				COLOR "#ffffff"
 			END
 		END
 	END

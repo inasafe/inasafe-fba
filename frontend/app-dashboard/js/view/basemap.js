@@ -4,7 +4,7 @@ define([
         basemaps: {
             "Kartoza": L.tileLayer.wms(
                 gwcURL, {
-                    layers: 'kartoza:web',
+                    layers: `${layerNamespace}web`,
                     format: 'image/png',
                     transparent: true,
                     TILED: true,
@@ -36,7 +36,7 @@ define([
                 })
         },
         initialize: function (mapView) {
-            this.basemaps[Object.keys(this.basemaps)[0]].addTo(mapView.map);
+            this.basemaps[defaultBasemap ? defaultBasemap : Object.keys(this.basemaps)[0]].addTo(mapView.map);
 
         },
     });

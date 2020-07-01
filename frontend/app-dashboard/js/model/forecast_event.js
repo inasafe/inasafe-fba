@@ -41,7 +41,7 @@ define([
             _constants: {
                 PRE_ACTIVATION_TRIGGER: 1,
                 ACTIVATION_TRIGGER: 2,
-                WMS_LAYER_NAME: 'kartoza:flood_forecast_layer'
+                WMS_LAYER_NAME: `${layerNamespace}flood_forecast_layer`
             },
 
             urlRoot: _forecast_flood_url,

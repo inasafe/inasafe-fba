@@ -6,8 +6,8 @@ define([
     'js/view/layers/layer-statistic/osm-buildings.js'], function (
     Backbone, L, WMSLayer, MultiselectFilter, SingleRangeFilter, Statistic) {
     return WMSLayer.extend({
-        _layersByIntersect: 'kartoza:buildings_bbox',
-        _layersByNotIntersect: 'kartoza:osm_buildings',
+        _layersByIntersect: `${layerNamespace}buildings_bbox`,
+        _layersByNotIntersect: `${layerNamespace}osm_buildings`,
         filters: function () {
             let that = this;
             let databaseModel = 'osm_buildings';

@@ -12,10 +12,25 @@
 		DATA "geometry from osm_waterways using unique id"
 
 		CLASS
-			NAME "default"
+			NAME "Rivers"
+			EXPRESSION (("[waterway]" = "river") OR ("[waterway]" = "riverbank"))
+			MAXSCALEDENOM 2000000.0
+			MINSCALEDENOM 250001.0
 			STYLE
-				COLOR 0 0 255
-                WIDTH 2
+				WIDTH 1.2
+                OPACITY 100.0
+                COLOR "#00baf8"
+			END
+		END
+
+		CLASS
+			NAME "Other"
+			MAXSCALEDENOM 250000.0
+			MINSCALEDENOM 0.0
+			STYLE
+				WIDTH 1.2
+                OPACITY 100.0
+                COLOR "#00baf8"
 			END
 		END
 	END
