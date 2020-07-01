@@ -20,10 +20,57 @@
                                 join village b on b.village_code = a.village_id) as subquery using unique id using srid=4326"
 
 		CLASS
-			NAME "default"
+			NAME "No Activation"
+			EXPRESSION ([trigger_status] = 0)
 			STYLE
-				COLOR 255 0 0
-				OUTLINECOLOR 0 0 0
+				OPACITY 100.0
+				COLOR "#72ca7a"
+				OUTLINECOLOR "#232323"
+				OUTLINEWIDTH 0.05
+			END
+		END
+
+		CLASS
+			NAME "Preactivation"
+			EXPRESSION ([trigger_status] = 1)
+			STYLE
+				OPACITY 100.0
+				COLOR "#d39858"
+				OUTLINECOLOR "#232323"
+				OUTLINEWIDTH 0.05
+			END
+		END
+
+		CLASS
+			NAME "Activation"
+			EXPRESSION ([trigger_status] = 2)
+			STYLE
+				OPACITY 100.0
+				COLOR "#ca6060"
+				OUTLINECOLOR "#ff0000"
+				OUTLINEWIDTH 0.05
+			END
+		END
+
+		CLASS
+			NAME "Stop"
+			EXPRESSION ([trigger_status] = 3)
+			STYLE
+				OPACITY 100.0
+				COLOR "#ff0000"
+				OUTLINECOLOR "#232323"
+				OUTLINEWIDTH 0.05
+			END
+		END
+
+		CLASS
+			NAME "None"
+			EXPRESSION ([trigger_status] is NULL )
+			STYLE
+				OPACITY 100.0
+				COLOR "#dddddd"
+				OUTLINECOLOR "#dddddd"
+				OUTLINEWIDTH 0.05
 			END
 		END
 	END

@@ -11,10 +11,90 @@
 		DATA "geometry from mv_flood_event_roads using unique id"
 
 		CLASS
-			NAME "default"
+			NAME "Exposed Roads (Vulnerability Score)"
+			EXPRESSION ([depth_class] = 0)
 			STYLE
-				COLOR 255 0 0
-                WIDTH 2
+				WIDTH 1
+                OPACITY 0.0
+                COLOR "#4a98e1"
+			END
+		END
+
+		CLASS
+			NAME "Vulnerability: Low - Hazard level >= 2"
+			EXPRESSION (([depth_class] >= 6) AND ([total_vulnerability] <= 0.3))
+			STYLE
+				WIDTH 2.5
+                OPACITY 100.0
+                COLOR "#ff0820"
+			END
+
+			STYLE
+				WIDTH 1.72
+                OPACITY 100.0
+                COLOR "#c9fbc6"
+			END
+		END
+
+		CLASS
+			NAME "Vulnerability: Low - Hazard level  < 2"
+			EXPRESSION (([depth_class] < 6) AND ([total_vulnerability] <= 0.3))
+			STYLE
+				WIDTH 1.72
+                OPACITY 100.0
+                COLOR "#c9fbc6"
+			END
+		END
+
+		CLASS
+			NAME "Vulnerability: Medium - Hazard level >= 2"
+			EXPRESSION ((([depth_class] >= 6) AND ([total_vulnerability] > 0.3)) AND ([total_vulnerability] <= 0.6))
+			STYLE
+				WIDTH 2.5
+                OPACITY 100.0
+                COLOR "#ff0000"
+			END
+
+			STYLE
+				WIDTH 1.72
+                OPACITY 100.0
+                COLOR "#f8ca34"
+			END
+		END
+
+		CLASS
+			NAME "Vulnerability: Medium - Hazard level  < 2"
+			EXPRESSION ((([depth_class] < 6) AND ([total_vulnerability] > 0.3)) AND ([total_vulnerability] <= 0.6))
+			STYLE
+				WIDTH 1.72
+                OPACITY 100.0
+                COLOR "#f8ca34"
+			END
+		END
+
+		CLASS
+			NAME "Vulnerability: High - Hazard level >= 2"
+			EXPRESSION (([depth_class] >= 6) AND ([total_vulnerability] > 0.6))
+			STYLE
+				WIDTH 2.5
+                OPACITY 100.0
+                COLOR "#ff0000"
+			END
+
+			STYLE
+				WIDTH 1.72
+                OPACITY 100.0
+                COLOR "#e53123"
+			END
+		END
+
+		CLASS
+			NAME "Vulnerability: High - Hazard level  < 2"
+			EXPRESSION (([depth_class] < 6) AND ([total_vulnerability] > 0.6))
+			STYLE
+				WIDTH 1.72
+                OPACITY 100.0
+                COLOR "#e53123"
 			END
 		END
 	END

@@ -20,10 +20,57 @@
          using unique gid using srid=4326"
 
 		CLASS
-			NAME "default"
+			NAME "1:50 year extent"
+			EXPRESSION ([depth_class] = 5)
 			STYLE
-				COLOR 255 0 0
-				OUTLINECOLOR 0 0 0
+				OPACITY 30.0
+				COLOR "#f5fbff"
+				OUTLINECOLOR "#f5fbff"
+				OUTLINEWIDTH 0.0
+			END
+		END
+
+		CLASS
+			NAME "1:20 year extent"
+			EXPRESSION ([depth_class] = 6)
+			STYLE
+				OPACITY 30.0
+				COLOR "#bfddf1"
+				OUTLINECOLOR "#bfddf1"
+				OUTLINEWIDTH 0.0
+			END
+		END
+
+		CLASS
+			NAME "1:10 year extent"
+			EXPRESSION ([depth_class] = 7)
+			STYLE
+				OPACITY 30.0
+				COLOR "#52b4d9"
+				OUTLINECOLOR "#52b4d9"
+				OUTLINEWIDTH 0.0
+			END
+		END
+
+		CLASS
+			NAME "1:5 year extent"
+			EXPRESSION ([depth_class] =8)
+			STYLE
+				OPACITY 30.0
+				COLOR "#007aba"
+				OUTLINECOLOR "#007aba"
+				OUTLINEWIDTH 0.0
+			END
+		END
+
+		CLASS
+			NAME "all other values"
+                        EXPRESSION ([depth_class] NOT IN (5,6,7,8))
+			STYLE
+				OPACITY 30.0
+				COLOR "#00336c"
+				OUTLINECOLOR "#00336c"
+				OUTLINEWIDTH 0.0
 			END
 		END
 	END
